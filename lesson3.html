@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lesson 3 — Safe Sharing & Permission Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    #particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35;}
+    .reveal .slides{position:relative;z-index:1;}
+    .perm-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;margin-bottom:6px;background:var(--white);border:1px solid var(--border);}
+    .perm-row .plabel{font-size:0.48em;font-weight:700;color:var(--text);min-width:140px;}
+    .perm-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+    .dot-yes{background:#C6F6D5;color:#276749;}
+    .dot-no{background:#FED7D7;color:#9B2C2C;}
+    .dot-maybe{background:#FEFCBF;color:#744210;}
+  </style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+<a class="back-home" href="index.html">← All Lessons</a>
+
+<div class="reveal">
+ <div class="slides">
+
+  <!-- ① TITLE -->
+  <section class="section-slide">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <!-- SVG lock illustration -->
+    <svg style="position:absolute;right:60px;bottom:30px;opacity:.18;z-index:1;" width="240" height="260" viewBox="0 0 240 260" fill="none">
+      <rect x="40" y="110" width="160" height="130" rx="16" fill="white"/>
+      <path d="M80 110 L80 75 Q80 30 120 30 Q160 30 160 75 L160 110" stroke="white" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <circle cx="120" cy="165" r="22" fill="#4F8EF7" opacity=".6"/>
+      <rect x="113" y="165" width="14" height="22" rx="4" fill="white" opacity=".8"/>
+    </svg>
+    <div class="lesson-num">Lesson 3 of 6</div>
+    <h1>Safe Sharing &<br/>Permission Settings</h1>
+    <p style="margin-top:10px;font-size:0.5em;opacity:.85;max-width:520px;">The golden rule: give only what is needed, nothing more</p>
+  </section>
+
+  <!-- ② POLP -->
+  <section>
+    <div class="badge">🔐 The Golden Rule</div>
+    <h2>Principle of Least Privilege (PoLP)</h2>
+    <div class="two-col-3-2" style="align-items:center;">
+      <div>
+        <div style="background:linear-gradient(135deg,#EBF4FF,#E6FFFA);border-radius:14px;padding:22px 24px;border:1px solid var(--border);margin-bottom:14px;">
+          <p style="font-size:0.6em;font-weight:800;color:var(--blue);line-height:1.5;">"Give users only the minimum level of access they need to perform their job — nothing more."</p>
+        </div>
+        <ul>
+          <li class="fragment fade-up">Every extra permission is a potential security risk</li>
+          <li class="fragment fade-up">Default to the <span class="hi">lowest</span> access level that still works</li>
+          <li class="fragment fade-up">Escalate only with a documented business reason</li>
+        </ul>
+      </div>
+      <!-- SVG: permission pyramid -->
+      <div class="svg-wrap">
+        <svg width="200" height="210" viewBox="0 0 200 210" fill="none">
+          <!-- pyramid layers -->
+          <polygon points="100,10 180,60 20,60" fill="#FC8181" opacity=".85"/>
+          <text x="100" y="44" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Owner / Admin</text>
+          <polygon points="20,60 180,60 165,100 35,100" fill="#FF9F1C" opacity=".85"/>
+          <text x="100" y="86" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Editor</text>
+          <polygon points="35,100 165,100 150,140 50,140" fill="#4F8EF7" opacity=".85"/>
+          <text x="100" y="126" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Commenter</text>
+          <polygon points="50,140 150,140 140,180 60,180" fill="#2EC4B6" opacity=".85"/>
+          <text x="100" y="166" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Viewer (Default)</text>
+          <!-- arrow -->
+          <text x="190" y="100" font-size="9" fill="#718096" font-family="Inter,sans-serif">↑ More</text>
+          <text x="190" y="150" font-size="9" fill="#718096" font-family="Inter,sans-serif">↓ Less</text>
+          <text x="100" y="200" font-size="8" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">← Start here by default</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ POLP ROLES TABLE -->
+  <section>
+    <div class="badge">👥 Role-Based Access</div>
+    <h2>Right Access for the Right Role</h2>
+    <table>
+      <tr><th>Role</th><th>What They Need ✅</th><th>What They Should NOT Have ❌</th></tr>
+      <tr><td>External Auditor</td><td>View-only access to specific reports</td><td>Edit access, download rights to all files</td></tr>
+      <tr><td>Junior Accountant</td><td>Access to current month's files</td><td>Prior years' confidential records</td></tr>
+      <tr><td>Client</td><td>Their own invoices and statements</td><td>Other clients' data, internal cost sheets</td></tr>
+      <tr><td>IT Support</td><td>System configuration access</td><td>Financial data access</td></tr>
+    </table>
+    <div class="tip" style="margin-top:12px;">
+      <p>✅ When in doubt, assign <strong>Viewer</strong> access first. If they need more, they will ask — and you can document the reason for escalation.</p>
+    </div>
+  </section>
+
+  <!-- ④ PERMISSION LEVELS — visual rows -->
+  <section>
+    <div class="badge">🔑 Permission Levels</div>
+    <h2>Understanding the Four Access Tiers</h2>
+    <div style="margin-top:16px;">
+      <div class="perm-row fragment fade-up" data-fragment-index="1">
+        <div class="plabel">👁️ Viewer / Reader</div>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">View</span>
+        <div class="perm-dot dot-no">✗</div><span style="font-size:0.4em;color:#718096;">Edit</span>
+        <div class="perm-dot dot-no">✗</div><span style="font-size:0.4em;color:#718096;">Share</span>
+        <div class="perm-dot dot-no">✗</div><span style="font-size:0.4em;color:#718096;">Delete</span>
+        <span style="margin-left:auto;font-size:0.4em;background:#C6F6D5;color:#276749;padding:3px 10px;border-radius:10px;font-weight:700;">Default for External</span>
+      </div>
+      <div class="perm-row fragment fade-up" data-fragment-index="2">
+        <div class="plabel">💬 Commenter</div>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">View</span>
+        <div class="perm-dot dot-maybe">~</div><span style="font-size:0.4em;color:#718096;">Comments</span>
+        <div class="perm-dot dot-no">✗</div><span style="font-size:0.4em;color:#718096;">Share</span>
+        <div class="perm-dot dot-no">✗</div><span style="font-size:0.4em;color:#718096;">Delete</span>
+        <span style="margin-left:auto;font-size:0.4em;background:#FEFCBF;color:#744210;padding:3px 10px;border-radius:10px;font-weight:700;">For Reviewers</span>
+      </div>
+      <div class="perm-row fragment fade-up" data-fragment-index="3">
+        <div class="plabel">✏️ Editor / Contributor</div>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">View</span>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">Edit</span>
+        <div class="perm-dot dot-maybe">~</div><span style="font-size:0.4em;color:#718096;">Share</span>
+        <div class="perm-dot dot-maybe">~</div><span style="font-size:0.4em;color:#718096;">Delete</span>
+        <span style="margin-left:auto;font-size:0.4em;background:#BEE3F8;color:#2C5282;padding:3px 10px;border-radius:10px;font-weight:700;">Internal Team Only</span>
+      </div>
+      <div class="perm-row fragment fade-up" data-fragment-index="4">
+        <div class="plabel">👑 Owner / Admin</div>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">View</span>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">Edit</span>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">Share</span>
+        <div class="perm-dot dot-yes">✓</div><span style="font-size:0.4em;color:#718096;">Delete</span>
+        <span style="margin-left:auto;font-size:0.4em;background:#FED7D7;color:#9B2C2C;padding:3px 10px;border-radius:10px;font-weight:700;">Limit to Managers</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ PLATFORM ICONS + TEAMS -->
+  <section>
+    <div class="badge">💬 Microsoft Teams & SharePoint</div>
+    <h2>Platform-Specific Safe Sharing Settings</h2>
+    <div class="two-col-3-2" style="align-items:start;">
+      <ul>
+        <li class="fragment fade-up">Set channels to <strong>Private</strong> unless broad access is genuinely needed</li>
+        <li class="fragment fade-up">Apply <strong>Sensitivity Labels</strong> (Confidential, Internal) to files</li>
+        <li class="fragment fade-up">Set <strong>link expiration dates</strong> when sharing externally</li>
+        <li class="fragment fade-up">Enable <strong>guest access controls</strong> — require guests to authenticate</li>
+        <li class="fragment fade-up">Use <strong>SharePoint permission groups</strong> instead of individual user permissions</li>
+      </ul>
+      <!-- SVG: Teams channel visual -->
+      <div class="svg-wrap">
+        <svg width="190" height="200" viewBox="0 0 190 200" fill="none">
+          <!-- Teams window -->
+          <rect x="10" y="10" width="170" height="180" rx="10" fill="#F7F9FC" stroke="#E2E8F0" stroke-width="1.5"/>
+          <rect x="10" y="10" width="170" height="32" rx="10" fill="#4F8EF7"/>
+          <rect x="10" y="30" width="170" height="12" rx="0" fill="#4F8EF7"/>
+          <text x="95" y="30" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Microsoft Teams</text>
+          <!-- sidebar -->
+          <rect x="10" y="42" width="50" height="148" rx="0" fill="#EDF2F7"/>
+          <!-- channels -->
+          <text x="35" y="62" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">General</text>
+          <rect x="15" y="68" width="40" height="18" rx="4" fill="#2EC4B6" opacity=".15"/>
+          <text x="35" y="81" font-size="7" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🔒 Finance</text>
+          <rect x="15" y="90" width="40" height="18" rx="4" fill="#2EC4B6" opacity=".15"/>
+          <text x="35" y="103" font-size="7" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🔒 Payroll</text>
+          <text x="35" y="122" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Marketing</text>
+          <!-- main area -->
+          <rect x="68" y="50" width="104" height="130" rx="6" fill="white" stroke="#E2E8F0" stroke-width="1"/>
+          <rect x="76" y="60" width="60" height="8" rx="3" fill="#EDF2F7"/>
+          <rect x="76" y="74" width="88" height="6" rx="3" fill="#EDF2F7"/>
+          <rect x="76" y="84" width="70" height="6" rx="3" fill="#EDF2F7"/>
+          <rect x="76" y="100" width="40" height="18" rx="4" fill="#4F8EF7" opacity=".15"/>
+          <text x="96" y="113" font-size="7" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif">📎 Report.xlsx</text>
+          <text x="95" y="155" font-size="7" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Private Channel ✓</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ GOOGLE DRIVE -->
+  <section>
+    <div class="badge">📁 Google Drive & Workspace</div>
+    <h2>Safe Sharing in Google Drive</h2>
+    <div class="two-col-3-2" style="align-items:center;">
+      <ul>
+        <li class="fragment fade-up">Share with <strong>specific people</strong> (email addresses) — never "Anyone with the link" for sensitive files</li>
+        <li class="fragment fade-up">Set link default to <strong>Restricted</strong> in Google Admin settings</li>
+        <li class="fragment fade-up">Use <strong>expiring access</strong> for external collaborators</li>
+        <li class="fragment fade-up">Enable <strong>Download, Print, Copy restrictions</strong> for highly sensitive documents</li>
+        <li class="fragment fade-up">Regularly audit <strong>"Shared with me"</strong> and <strong>"Shared drives"</strong></li>
+      </ul>
+      <!-- SVG: sharing dialog visual -->
+      <div class="svg-wrap">
+        <svg width="190" height="200" viewBox="0 0 190 200" fill="none">
+          <!-- dialog box -->
+          <rect x="10" y="20" width="170" height="160" rx="10" fill="white" stroke="#E2E8F0" stroke-width="1.5" filter="url(#sh)"/>
+          <rect x="10" y="20" width="170" height="36" rx="10" fill="#F7F9FC" stroke="#E2E8F0" stroke-width="1"/>
+          <rect x="10" y="44" width="170" height="12" rx="0" fill="#F7F9FC"/>
+          <text x="95" y="42" font-size="9" fill="#2D3748" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Share "Q3 Report.xlsx"</text>
+          <!-- input -->
+          <rect x="20" y="66" width="150" height="22" rx="6" fill="#F7F9FC" stroke="#E2E8F0" stroke-width="1"/>
+          <text x="30" y="81" font-size="8" fill="#A0AEC0" font-family="Inter,sans-serif">Add people by email...</text>
+          <!-- option: restricted -->
+          <rect x="20" y="98" width="150" height="22" rx="6" fill="#E6FFFA" stroke="#2EC4B6" stroke-width="1.5"/>
+          <text x="30" y="113" font-size="8" fill="#2EC4B6" font-family="Inter,sans-serif" font-weight="700">🔒 Restricted (Specific people)</text>
+          <!-- option: anyone -->
+          <rect x="20" y="126" width="150" height="22" rx="6" fill="#FFF8EE" stroke="#FF9F1C" stroke-width="1"/>
+          <text x="30" y="141" font-size="8" fill="#FF9F1C" font-family="Inter,sans-serif">⚠️ Anyone with the link</text>
+          <!-- expiry -->
+          <rect x="20" y="154" width="150" height="18" rx="6" fill="#EBF4FF" stroke="#4F8EF7" stroke-width="1"/>
+          <text x="30" y="167" font-size="8" fill="#4F8EF7" font-family="Inter,sans-serif" font-weight="700">📅 Expires: 30 days</text>
+          <defs>
+            <filter id="sh" x="-10%" y="-10%" width="120%" height="120%">
+              <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#4F8EF7" flood-opacity=".08"/>
+            </filter>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑦ SLACK + ONEDRIVE -->
+  <section>
+    <div class="badge">⚡ Slack & OneDrive</div>
+    <h2>Safe Sharing Settings</h2>
+    <div class="two-col" style="gap:20px;">
+      <div>
+        <h3 style="margin-bottom:10px;">⚡ Slack</h3>
+        <ul>
+          <li>Use <strong>private channels</strong> for all financial discussions</li>
+          <li>Avoid sharing raw files in Slack — use cloud storage links with proper permissions</li>
+          <li>Enable <strong>DLP policies</strong> to detect sensitive data in messages</li>
+          <li>Regularly review workspace members and remove inactive users</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:10px;">🗂️ OneDrive</h3>
+        <ul>
+          <li>Always use <strong>"Specific people"</strong> sharing option for sensitive files</li>
+          <li>Set <strong>expiration dates</strong> on all shared links</li>
+          <li>Enable <strong>password-protected links</strong> for external sharing</li>
+          <li>Use <strong>Personal Vault</strong> for the most sensitive documents</li>
+        </ul>
+      </div>
+    </div>
+    <div class="warn" style="margin-top:14px;">
+      <p>⚠️ Slack messages in public channels are searchable by all workspace members. Treat public Slack channels like a company-wide bulletin board — never post sensitive data there.</p>
+    </div>
+  </section>
+
+  <!-- ⑧ SAFE SHARING CHECKLIST -->
+  <section>
+    <div class="badge">✅ Quick Reference</div>
+    <h2>Safe Sharing Checklist</h2>
+    <p style="margin-bottom:14px;">Run through this every time you share a file containing financial, payroll, or client data:</p>
+    <ul class="checklist" id="shareChecklist">
+      <li onclick="toggle(this)"><div class="chk"></div>Am I sharing the minimum needed — a file, not a folder?</li>
+      <li onclick="toggle(this)"><div class="chk"></div>Is the permission level set to the lowest that still works?</li>
+      <li onclick="toggle(this)"><div class="chk"></div>Have I set an expiration date on the sharing link?</li>
+      <li onclick="toggle(this)"><div class="chk"></div>Am I sharing with specific people, not "anyone with the link"?</li>
+      <li onclick="toggle(this)"><div class="chk"></div>Does the recipient still need access after this task is done?</li>
+      <li onclick="toggle(this)"><div class="chk"></div>Is this an approved company tool — not a personal account?</li>
+    </ul>
+    <div style="margin-top:18px;display:flex;gap:16px;align-items:center;">
+      <a href="lesson2.html" style="font-size:0.42em;color:#718096;text-decoration:none;font-weight:600;">← Lesson 2</a>
+      <a href="lesson4.html" style="font-size:0.42em;color:var(--blue);font-weight:800;text-decoration:none;background:var(--card);padding:8px 18px;border-radius:8px;">Next: Lesson 4 — Oversharing →</a>
+    </div>
+  </section>
+
+ </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+Reveal.initialize({hash:true,transition:'slide',backgroundTransition:'fade',controls:true,controlsLayout:'bottom-right',progress:true,center:true,width:'100%',height:'100%',margin:0,minScale:1,maxScale:1});
+function toggle(el){el.classList.toggle('done');if(el.classList.contains('done'))el.querySelector('.chk').textContent='✓';else el.querySelector('.chk').textContent='';}
+const cv=document.getElementById('particle-canvas'),cx=cv.getContext('2d');let W,H,pts=[];
+const COLS=['#4F8EF7','#2EC4B6','#FF9F1C'];
+function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<45;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*3+1.5,c:COLS[Math.floor(Math.random()*3)]});
+(function draw(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<120){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.1*(1-d/120)})`;cx.lineWidth=.8;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'44';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(draw);})();
+</script>
+</body>
+</html>

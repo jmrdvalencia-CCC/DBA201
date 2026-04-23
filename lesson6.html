@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lesson 6 — Compliance & Legal Context</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    #particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35;}
+    .reveal .slides{position:relative;z-index:1;}
+    .law-card{
+      background:var(--white);border-radius:12px;border:1px solid var(--border);
+      padding:16px 18px;display:flex;gap:14px;align-items:flex-start;
+      box-shadow:0 2px 10px rgba(0,0,0,.04);margin-bottom:10px;
+    }
+    .law-icon{font-size:1.6em;flex-shrink:0;margin-top:2px;}
+    .law-title{font-size:0.5em;font-weight:800;color:var(--blue);margin-bottom:3px;}
+    .law-desc{font-size:0.43em;color:#718096;line-height:1.6;}
+  </style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+<a class="back-home" href="index.html">← All Lessons</a>
+
+<div class="reveal">
+ <div class="slides">
+
+  <!-- ① TITLE -->
+  <section class="section-slide">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <!-- SVG scales of justice -->
+    <svg style="position:absolute;right:60px;bottom:30px;opacity:.18;z-index:1;" width="260" height="260" viewBox="0 0 260 260" fill="none">
+      <line x1="130" y1="20" x2="130" y2="220" stroke="white" stroke-width="8" stroke-linecap="round"/>
+      <line x1="60" y1="80" x2="200" y2="80" stroke="white" stroke-width="8" stroke-linecap="round"/>
+      <line x1="60" y1="80" x2="40" y2="140" stroke="white" stroke-width="4"/>
+      <line x1="200" y1="80" x2="220" y2="140" stroke="white" stroke-width="4"/>
+      <ellipse cx="40" cy="148" rx="30" ry="12" fill="white" opacity=".7"/>
+      <ellipse cx="220" cy="148" rx="30" ry="12" fill="white" opacity=".7"/>
+      <rect x="110" y="215" width="40" height="12" rx="4" fill="white" opacity=".7"/>
+    </svg>
+    <div class="lesson-num">Lesson 6 of 6</div>
+    <h1>Compliance &<br/>Legal Context</h1>
+    <p style="margin-top:10px;font-size:0.5em;opacity:.85;max-width:520px;">Philippine laws that govern how accountants must protect cloud data</p>
+  </section>
+
+  <!-- ② WHY COMPLIANCE MATTERS -->
+  <section>
+    <div class="badge">⚖️ Why It Matters</div>
+    <h2>Compliance is Not Optional</h2>
+    <div class="two-col-3-2" style="align-items:center;">
+      <div>
+        <p style="margin-bottom:16px;">As an accounting professional in the Philippines, you are <span class="hi">legally obligated</span> to protect the data you handle. Ignorance of the law is not a valid defense.</p>
+        <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="card fragment fade-up" data-fragment-index="1" style="text-align:center;">
+            <span class="icon">🏛️</span>
+            <h4>Legal Liability</h4>
+            <p>You — not just your employer — can be held personally liable for data breaches caused by negligence.</p>
+          </div>
+          <div class="card fragment fade-up" data-fragment-index="2" style="text-align:center;border-top:3px solid var(--orange);">
+            <span class="icon">💰</span>
+            <h4>Financial Penalties</h4>
+            <p>Fines can reach ₱2,000,000 per violation under the Data Privacy Act.</p>
+          </div>
+          <div class="card fragment fade-up" data-fragment-index="3" style="text-align:center;border-top:3px solid #FC8181;">
+            <span class="icon">⛓️</span>
+            <h4>Criminal Charges</h4>
+            <p>Serious violations can result in imprisonment of 1 to 6 years for responsible officers.</p>
+          </div>
+        </div>
+      </div>
+      <!-- SVG: PH map outline with shield -->
+      <div class="svg-wrap">
+        <svg width="180" height="210" viewBox="0 0 180 210" fill="none">
+          <!-- shield -->
+          <path d="M90 15 L160 50 L160 120 Q160 175 90 200 Q20 175 20 120 L20 50 Z" fill="#EBF4FF" stroke="#4F8EF7" stroke-width="2"/>
+          <!-- PH flag colors -->
+          <path d="M20 50 L160 50 L160 120 Q160 175 90 200 Q20 175 20 120 Z" fill="#4F8EF7" opacity=".08"/>
+          <!-- checkmark -->
+          <path d="M55 105 L80 130 L125 80" stroke="#2EC4B6" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- RA text -->
+          <text x="90" y="58" font-size="9" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">RA 10173</text>
+          <text x="90" y="70" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Data Privacy Act</text>
+          <text x="90" y="155" font-size="8" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Philippines</text>
+          <text x="90" y="167" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Protected by Law</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ DATA PRIVACY ACT -->
+  <section>
+    <div class="badge">🏛️ Republic Act 10173</div>
+    <h2>Data Privacy Act of 2012</h2>
+    <div class="two-col-3-2" style="align-items:start;">
+      <ul>
+        <li class="fragment fade-up">Requires organizations to implement <strong>reasonable and appropriate security measures</strong> for personal data</li>
+        <li class="fragment fade-up">Cloud misconfigurations that expose PII (names, TINs, salaries) are <strong>direct violations</strong></li>
+        <li class="fragment fade-up">Organizations must report data breaches to the <strong>NPC within 72 hours</strong></li>
+        <li class="fragment fade-up">Individuals have the right to know what data is collected and how it is used</li>
+        <li class="fragment fade-up">Applies to all organizations processing personal data — including accounting firms</li>
+      </ul>
+      <!-- SVG: 72 hour clock -->
+      <div class="svg-wrap">
+        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
+          <!-- clock face -->
+          <circle cx="90" cy="90" r="70" fill="#FFF8EE" stroke="#FF9F1C" stroke-width="2"/>
+          <circle cx="90" cy="90" r="55" fill="white" stroke="#E2E8F0" stroke-width="1"/>
+          <!-- clock hands -->
+          <line x1="90" y1="90" x2="90" y2="45" stroke="#4F8EF7" stroke-width="3" stroke-linecap="round"/>
+          <line x1="90" y1="90" x2="120" y2="100" stroke="#FF9F1C" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="90" cy="90" r="5" fill="#2D3748"/>
+          <!-- 72h label -->
+          <text x="90" y="115" font-size="14" fill="#FF9F1C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900">72h</text>
+          <text x="90" y="128" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Report to NPC</text>
+          <!-- tick marks -->
+          <line x1="90" y1="22" x2="90" y2="30" stroke="#E2E8F0" stroke-width="2"/>
+          <line x1="90" y1="150" x2="90" y2="158" stroke="#E2E8F0" stroke-width="2"/>
+          <line x1="22" y1="90" x2="30" y2="90" stroke="#E2E8F0" stroke-width="2"/>
+          <line x1="150" y1="90" x2="158" y2="90" stroke="#E2E8F0" stroke-width="2"/>
+          <text x="90" y="185" font-size="8" fill="#FF9F1C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Breach Notification Deadline</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ DPA PENALTIES — animated stat boxes -->
+  <section>
+    <div class="badge">⚠️ RA 10173 Penalties</div>
+    <h2>What You Risk Under the Data Privacy Act</h2>
+    <table>
+      <tr><th>Violation</th><th>Imprisonment</th><th>Fine</th></tr>
+      <tr><td>Unauthorized processing of personal data</td><td>1–3 years</td><td>₱500K – ₱2M</td></tr>
+      <tr><td>Negligent handling leading to breach</td><td>1–3 years</td><td>₱500K – ₱2M</td></tr>
+      <tr><td>Malicious disclosure of personal data</td><td>3–5 years</td><td>₱500K – ₱1M</td></tr>
+      <tr><td>Combination of violations</td><td>Up to 6 years</td><td>Up to ₱5M</td></tr>
+    </table>
+    <div class="warn" style="margin-top:14px;">
+      <p>⚠️ A misconfigured SharePoint site exposing employee payroll data is a <strong>negligent handling violation</strong> — even if no one intentionally shared the data. You can be held personally liable.</p>
+    </div>
+  </section>
+
+  <!-- ⑤ BIR + SEC -->
+  <section>
+    <div class="badge">📋 BIR & SEC</div>
+    <h2>Record Keeping & Financial Reporting</h2>
+    <div class="two-col" style="gap:20px;">
+      <div>
+        <div class="law-card fragment fade-up" data-fragment-index="1">
+          <div class="law-icon">🏦</div>
+          <div>
+            <div class="law-title">BIR Regulations</div>
+            <div class="law-desc">Accounting records must be retained for a <strong>minimum of 10 years</strong>. Cloud storage must ensure long-term data integrity. Accidental deletion of tax records can result in BIR penalties and surcharges.</div>
+          </div>
+        </div>
+        <div class="tip" style="margin-top:10px;">
+          <p>✅ Enable version history and set retention policies in your cloud storage to automatically comply with BIR's 10-year retention requirement.</p>
+        </div>
+      </div>
+      <div>
+        <div class="law-card fragment fade-up" data-fragment-index="2">
+          <div class="law-icon">📊</div>
+          <div>
+            <div class="law-title">SEC Memorandum Circulars</div>
+            <div class="law-desc">Financial reports submitted to the SEC must be <strong>accurate, tamper-proof, and verifiable</strong>. Cloud version control provides an audit trail of document changes. Unauthorized modifications — even accidental — can constitute falsification.</div>
+          </div>
+        </div>
+        <div class="warn" style="margin-top:10px;">
+          <p>⚠️ If an unauthorized user edits a financial statement in a shared cloud folder, the integrity of that document is compromised — even if the change was minor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑥ BSP + NPC -->
+  <section>
+    <div class="badge">🏛️ BSP & NPC</div>
+    <h2>Banking Regulations & Privacy Commission</h2>
+    <div class="two-col" style="gap:20px;">
+      <div>
+        <div class="law-card fragment fade-up" data-fragment-index="1">
+          <div class="law-icon">🏧</div>
+          <div>
+            <div class="law-title">BSP Circulars (Banking & Finance)</div>
+            <div class="law-desc">Strict data security for financial institutions using cloud. Cloud vendor due diligence required. Data residency requirements — some financial data must be stored within the Philippines. Regular penetration testing required.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="law-card fragment fade-up" data-fragment-index="2">
+          <div class="law-icon">🛡️</div>
+          <div>
+            <div class="law-title">National Privacy Commission (NPC)</div>
+            <div class="law-desc">Register data processing systems with the NPC. Appoint a Data Protection Officer (DPO). Report breaches within 72 hours. Conduct Privacy Impact Assessments before implementing new cloud tools.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑦ COMPLIANCE SUMMARY TABLE -->
+  <section>
+    <div class="badge">📋 Quick Reference</div>
+    <h2>Laws & Their Cloud Security Relevance</h2>
+    <table>
+      <tr><th>Law / Regulation</th><th>Key Cloud Security Requirement</th></tr>
+      <tr><td>🏛️ RA 10173 — Data Privacy Act</td><td>Protect PII; report breaches within 72 hours; implement security measures</td></tr>
+      <tr><td>🏦 BIR Regulations</td><td>Retain accounting records for 10 years; ensure data integrity</td></tr>
+      <tr><td>📊 SEC Memorandum Circulars</td><td>Tamper-proof financial reports; audit trail for document changes</td></tr>
+      <tr><td>🏧 BSP Circulars</td><td>Cloud vendor due diligence; data residency; incident response plans</td></tr>
+      <tr><td>🛡️ NPC Requirements</td><td>Register systems; appoint DPO; conduct PIAs; 72-hour breach notification</td></tr>
+    </table>
+  </section>
+
+  <!-- ⑧ FINAL SUMMARY -->
+  <section>
+    <div class="badge">📋 Lesson 6 Summary</div>
+    <h2>Key Takeaways</h2>
+    <ul>
+      <li class="fragment fade-up">Philippine law — not just best practice — requires you to protect cloud data</li>
+      <li class="fragment fade-up">The Data Privacy Act imposes fines up to <span class="hi">₱5M</span> and imprisonment up to <span class="hi">6 years</span></li>
+      <li class="fragment fade-up">BIR requires 10-year retention — cloud storage must support this with version history</li>
+      <li class="fragment fade-up">SEC requires tamper-proof financial records — cloud access controls are part of internal controls</li>
+      <li class="fragment fade-up">BSP requires cloud vendor due diligence for financial institutions</li>
+      <li class="fragment fade-up">Appoint a DPO, register with NPC, and report breaches within 72 hours</li>
+    </ul>
+    <div style="margin-top:20px;display:flex;gap:16px;align-items:center;">
+      <a href="lesson5.html" style="font-size:0.42em;color:#718096;text-decoration:none;font-weight:600;">← Lesson 5</a>
+      <a href="activities.html" style="font-size:0.42em;color:var(--orange);font-weight:800;text-decoration:none;background:#FFF8EE;padding:8px 18px;border-radius:8px;border:1px solid #FFD9A0;">🎮 Start Interactive Activities →</a>
+    </div>
+  </section>
+
+ </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+Reveal.initialize({hash:true,transition:'slide',backgroundTransition:'fade',controls:true,controlsLayout:'bottom-right',progress:true,center:true,width:'100%',height:'100%',margin:0,minScale:1,maxScale:1});
+const cv=document.getElementById('particle-canvas'),cx=cv.getContext('2d');let W,H,pts=[];
+const COLS=['#4F8EF7','#2EC4B6','#FF9F1C'];
+function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<45;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*3+1.5,c:COLS[Math.floor(Math.random()*3)]});
+(function draw(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<120){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.1*(1-d/120)})`;cx.lineWidth=.8;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'44';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(draw);})();
+</script>
+</body>
+</html>

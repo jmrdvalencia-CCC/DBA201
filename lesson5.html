@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lesson 5 — Secure Cloud Storage Practices</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
+  <link rel="stylesheet" href="shared.css"/>
+  <style>
+    #particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35;}
+    .reveal .slides{position:relative;z-index:1;}
+  </style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+<a class="back-home" href="index.html">← All Lessons</a>
+
+<div class="reveal">
+ <div class="slides">
+
+  <!-- ① TITLE -->
+  <section class="section-slide">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <!-- SVG server/storage illustration -->
+    <svg style="position:absolute;right:60px;bottom:30px;opacity:.18;z-index:1;" width="260" height="240" viewBox="0 0 260 240" fill="none">
+      <rect x="30" y="20" width="200" height="40" rx="8" fill="white"/>
+      <rect x="30" y="70" width="200" height="40" rx="8" fill="white"/>
+      <rect x="30" y="120" width="200" height="40" rx="8" fill="white"/>
+      <circle cx="210" cy="40" r="6" fill="#2EC4B6" opacity=".8"/>
+      <circle cx="210" cy="90" r="6" fill="#2EC4B6" opacity=".8"/>
+      <circle cx="210" cy="140" r="6" fill="#FF9F1C" opacity=".8"/>
+      <rect x="40" y="30" width="60" height="6" rx="3" fill="#4F8EF7" opacity=".4"/>
+      <rect x="40" y="80" width="80" height="6" rx="3" fill="#4F8EF7" opacity=".4"/>
+      <rect x="40" y="130" width="50" height="6" rx="3" fill="#4F8EF7" opacity=".4"/>
+      <!-- lock -->
+      <rect x="90" y="180" width="80" height="50" rx="8" fill="white" opacity=".9"/>
+      <path d="M110 180 L110 165 Q110 150 130 150 Q150 150 150 165 L150 180" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <circle cx="130" cy="200" r="10" fill="#4F8EF7" opacity=".6"/>
+    </svg>
+    <div class="lesson-num">Lesson 5 of 6</div>
+    <h1>Secure Cloud<br/>Storage Practices</h1>
+    <p style="margin-top:10px;font-size:0.5em;opacity:.85;max-width:520px;">Classify, encrypt, back up, and review — the four pillars of secure storage</p>
+  </section>
+
+  <!-- ② FOUR PILLARS OVERVIEW -->
+  <section>
+    <div class="badge">🏛️ Four Pillars</div>
+    <h2>Secure Cloud Storage Framework</h2>
+    <div class="card-grid" style="grid-template-columns:repeat(4,1fr);margin-top:20px;">
+      <div class="card fragment fade-up" data-fragment-index="1" style="text-align:center;border-top:4px solid #2EC4B6;">
+        <span class="icon">🗂️</span>
+        <h4>1. Classify</h4>
+        <p>Know what data you have and how sensitive it is before storing it anywhere.</p>
+      </div>
+      <div class="card fragment fade-up" data-fragment-index="2" style="text-align:center;border-top:4px solid #4F8EF7;">
+        <span class="icon">🔒</span>
+        <h4>2. Encrypt</h4>
+        <p>Ensure data is encrypted at rest and in transit. Use client-side encryption for highly confidential files.</p>
+      </div>
+      <div class="card fragment fade-up" data-fragment-index="3" style="text-align:center;border-top:4px solid #FF9F1C;">
+        <span class="icon">💾</span>
+        <h4>3. Back Up</h4>
+        <p>Follow the 3-2-1 rule. Enable version history. Test recovery annually.</p>
+      </div>
+      <div class="card fragment fade-up" data-fragment-index="4" style="text-align:center;border-top:4px solid #FC8181;">
+        <span class="icon">👥</span>
+        <h4>4. Review</h4>
+        <p>Conduct quarterly access reviews. Revoke access immediately upon offboarding.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ DATA CLASSIFICATION — SVG pyramid -->
+  <section>
+    <div class="badge">🗂️ Step 1: Classify</div>
+    <h2>Data Classification for Accountants</h2>
+    <div class="two-col-3-2" style="align-items:center;">
+      <table>
+        <tr><th>Level</th><th>Examples</th><th>Storage Rule</th></tr>
+        <tr><td>🟢 Public</td><td>Published annual reports, public tax forms</td><td>Any approved cloud storage</td></tr>
+        <tr><td>🔵 Internal</td><td>Budget templates, general policies</td><td>Company cloud, authenticated access only</td></tr>
+        <tr><td>🟠 Confidential</td><td>Payroll data, client financials, tax records</td><td>Restricted access, encrypted, audit-logged</td></tr>
+        <tr><td>🔴 Highly Confidential</td><td>M&A documents, board financials</td><td>Need-to-know only, extra encryption</td></tr>
+      </table>
+      <!-- SVG classification pyramid -->
+      <div class="svg-wrap">
+        <svg width="180" height="210" viewBox="0 0 180 210" fill="none">
+          <polygon points="90,10 170,55 10,55" fill="#FC8181" opacity=".9"/>
+          <text x="90" y="40" font-size="8" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🔴 Highly Confidential</text>
+          <polygon points="10,55 170,55 155,100 25,100" fill="#FF9F1C" opacity=".9"/>
+          <text x="90" y="84" font-size="8" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🟠 Confidential</text>
+          <polygon points="25,100 155,100 140,145 40,145" fill="#4F8EF7" opacity=".9"/>
+          <text x="90" y="129" font-size="8" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🔵 Internal</text>
+          <polygon points="40,145 140,145 130,185 50,185" fill="#2EC4B6" opacity=".9"/>
+          <text x="90" y="170" font-size="8" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🟢 Public</text>
+          <text x="90" y="202" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Strictest controls at top</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ④ ENCRYPTION — SVG diagram -->
+  <section>
+    <div class="badge">🔒 Step 2: Encrypt</div>
+    <h2>Encryption in Cloud Storage</h2>
+    <div class="two-col-3-2" style="align-items:center;">
+      <div>
+        <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="card fragment fade-up" data-fragment-index="1">
+            <span class="icon">💾</span>
+            <h4>At Rest</h4>
+            <p>Data encrypted while stored on servers. Even if the drive is stolen, data is unreadable.</p>
+          </div>
+          <div class="card fragment fade-up" data-fragment-index="2">
+            <span class="icon">📡</span>
+            <h4>In Transit</h4>
+            <p>Data encrypted while being transferred. Look for HTTPS and TLS in your browser.</p>
+          </div>
+          <div class="card fragment fade-up" data-fragment-index="3">
+            <span class="icon">🔐</span>
+            <h4>Client-Side</h4>
+            <p>You encrypt the file before uploading. Even the cloud provider cannot read it.</p>
+          </div>
+        </div>
+        <div class="tip" style="margin-top:12px;">
+          <p>✅ Google Drive, OneDrive, and SharePoint provide encryption at rest and in transit by default. Verify this in your organization's cloud service agreements.</p>
+        </div>
+      </div>
+      <!-- SVG: encryption flow -->
+      <div class="svg-wrap">
+        <svg width="180" height="210" viewBox="0 0 180 210" fill="none">
+          <!-- your device -->
+          <rect x="20" y="10" width="60" height="40" rx="6" fill="#EBF4FF" stroke="#4F8EF7" stroke-width="1.5"/>
+          <text x="50" y="28" font-size="8" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">📄 File</text>
+          <text x="50" y="42" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Your Device</text>
+          <!-- encrypt arrow -->
+          <path d="M80 30 L100 30" stroke="#2EC4B6" stroke-width="2" marker-end="url(#a5)"/>
+          <!-- encrypted -->
+          <rect x="100" y="10" width="60" height="40" rx="6" fill="#E6FFFA" stroke="#2EC4B6" stroke-width="1.5"/>
+          <text x="130" y="28" font-size="8" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🔒 Encrypted</text>
+          <text x="130" y="42" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">In Transit</text>
+          <!-- down arrow -->
+          <path d="M130 50 L130 80" stroke="#E2E8F0" stroke-width="2" marker-end="url(#a5)"/>
+          <!-- cloud storage -->
+          <rect x="80" y="80" width="100" height="50" rx="8" fill="#EBF4FF" stroke="#4F8EF7" stroke-width="1.5"/>
+          <text x="130" y="102" font-size="8" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">☁️ Cloud Storage</text>
+          <text x="130" y="116" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">🔒 Encrypted at Rest</text>
+          <!-- HTTPS label -->
+          <rect x="20" y="80" width="55" height="22" rx="6" fill="#C6F6D5" stroke="#2EC4B6" stroke-width="1"/>
+          <text x="47" y="95" font-size="8" fill="#276749" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">HTTPS ✓</text>
+          <text x="47" y="115" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">TLS Secured</text>
+          <defs>
+            <marker id="a5" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6Z" fill="#2EC4B6"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 3-2-1 BACKUP — animated stat boxes -->
+  <section>
+    <div class="badge">💾 Step 3: Back Up</div>
+    <h2>The 3-2-1 Backup Rule</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:20px;">
+      <div class="stat-box fragment fade-up" data-fragment-index="1" style="background:linear-gradient(135deg,#4F8EF7,#6BA3F9);">
+        <span class="num">3</span>
+        <span class="label">Copies of Data</span>
+        <p style="font-size:0.38em;color:rgba(255,255,255,.8);margin-top:8px;">The original + 2 backups</p>
+      </div>
+      <div class="stat-box fragment fade-up" data-fragment-index="2" style="background:linear-gradient(135deg,#2EC4B6,#4DD9CC);">
+        <span class="num">2</span>
+        <span class="label">Different Storage Types</span>
+        <p style="font-size:0.38em;color:rgba(255,255,255,.8);margin-top:8px;">e.g., Cloud + External Drive</p>
+      </div>
+      <div class="stat-box fragment fade-up" data-fragment-index="3" style="background:linear-gradient(135deg,#FF9F1C,#FFB84D);">
+        <span class="num">1</span>
+        <span class="label">Offsite Copy</span>
+        <p style="font-size:0.38em;color:rgba(255,255,255,.8);margin-top:8px;">Separate cloud region or physical location</p>
+      </div>
+    </div>
+    <div class="warn" style="margin-top:16px;">
+      <p>⚠️ <strong>BIR Requirement:</strong> Philippine tax regulations require accounting records to be retained for a minimum of <strong>10 years</strong>. Cloud storage must ensure long-term data integrity and accessibility.</p>
+    </div>
+  </section>
+
+  <!-- ⑥ ACCESS REVIEWS + OFFBOARDING -->
+  <section>
+    <div class="badge">👥 Step 4: Review Access</div>
+    <h2>Access Reviews & Offboarding</h2>
+    <div class="two-col" style="gap:20px;">
+      <div>
+        <h3 style="margin-bottom:10px;">📅 Quarterly Access Review</h3>
+        <ul>
+          <li class="fragment fade-up">Export a list of all users with access to cloud accounting tools</li>
+          <li class="fragment fade-up">Verify each user still requires that level of access</li>
+          <li class="fragment fade-up">Remove or downgrade unnecessary permissions immediately</li>
+          <li class="fragment fade-up">Document the review for audit trail and compliance</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:10px;">🚪 Employee Offboarding</h3>
+        <ul class="checklist" style="font-size:1em;">
+          <li onclick="toggle(this)"><div class="chk"></div>Revoke all cloud platform access on last day</li>
+          <li onclick="toggle(this)"><div class="chk"></div>Transfer file ownership to manager</li>
+          <li onclick="toggle(this)"><div class="chk"></div>Invalidate all active sharing links they created</li>
+          <li onclick="toggle(this)"><div class="chk"></div>Remove from Teams channels and Slack workspaces</li>
+          <li onclick="toggle(this)"><div class="chk"></div>Archive their data per retention policy</li>
+        </ul>
+      </div>
+    </div>
+    <div class="warn" style="margin-top:12px;">
+      <p>⚠️ Access revocation must happen on the <strong>last day of employment</strong> — not days or weeks later. Every day of delay is a window of unauthorized access.</p>
+    </div>
+  </section>
+
+  <!-- ⑦ LESSON SUMMARY -->
+  <section>
+    <div class="badge">📋 Lesson 5 Summary</div>
+    <h2>The Four Pillars of Secure Cloud Storage</h2>
+    <div class="card-grid" style="grid-template-columns:repeat(4,1fr);margin-top:16px;">
+      <div class="card" style="border-top:4px solid var(--mint);text-align:center;">
+        <span class="icon">🗂️</span>
+        <h4>Classify</h4>
+        <p>Public → Internal → Confidential → Highly Confidential</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--blue);text-align:center;">
+        <span class="icon">🔒</span>
+        <h4>Encrypt</h4>
+        <p>At rest + in transit. Client-side for highly confidential.</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--orange);text-align:center;">
+        <span class="icon">💾</span>
+        <h4>Back Up</h4>
+        <p>3-2-1 rule. Version history. 10-year BIR retention.</p>
+      </div>
+      <div class="card" style="border-top:4px solid #FC8181;text-align:center;">
+        <span class="icon">👥</span>
+        <h4>Review</h4>
+        <p>Quarterly access reviews. Immediate offboarding.</p>
+      </div>
+    </div>
+    <div style="margin-top:18px;display:flex;gap:16px;align-items:center;">
+      <a href="lesson4.html" style="font-size:0.42em;color:#718096;text-decoration:none;font-weight:600;">← Lesson 4</a>
+      <a href="lesson6.html" style="font-size:0.42em;color:var(--blue);font-weight:800;text-decoration:none;background:var(--card);padding:8px 18px;border-radius:8px;">Next: Lesson 6 — Compliance →</a>
+    </div>
+  </section>
+
+ </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+Reveal.initialize({hash:true,transition:'slide',backgroundTransition:'fade',controls:true,controlsLayout:'bottom-right',progress:true,center:true,width:'100%',height:'100%',margin:0,minScale:1,maxScale:1});
+function toggle(el){el.classList.toggle('done');el.querySelector('.chk').textContent=el.classList.contains('done')?'✓':'';}
+const cv=document.getElementById('particle-canvas'),cx=cv.getContext('2d');let W,H,pts=[];
+const COLS=['#4F8EF7','#2EC4B6','#FF9F1C'];
+function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<45;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*3+1.5,c:COLS[Math.floor(Math.random()*3)]});
+(function draw(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<120){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.1*(1-d/120)})`;cx.lineWidth=.8;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'44';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(draw);})();
+</script>
+</body>
+</html>
