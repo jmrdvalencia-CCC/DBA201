@@ -1,0 +1,27 @@
+<div class="slide success">
+  <h2>🔀 Best Practice 4: Network Segmentation at Home</h2>
+  <p>Create <span class="accent-text">two separate Wi-Fi networks</span> on your router:</p>
+  <div class="columns">
+    <div class="card success-card">
+      <h3 style="color:#34d399;">Network A: WORK</h3>
+      <ul>
+        <li>Your work laptop</li>
+        <li>Work phone (if applicable)</li>
+        <li>Printer used for work documents</li>
+      </ul>
+      <p class="small" style="margin-top:8px;">✅ Isolated — no IoT devices can reach it</p>
+    </div>
+    <div class="card warning-card">
+      <h3 style="color:#fbbf24;">Network B: EVERYTHING ELSE</h3>
+      <ul>
+        <li>Smart TV, gaming console</li>
+        <li>Kids' tablets, smart speakers</li>
+        <li>Security cameras, smart thermostat</li>
+      </ul>
+      <p class="small" style="margin-top:8px;">⚠️ IoT devices are notoriously insecure — hardcoded passwords, no updates</p>
+    </div>
+  </div>
+  <div class="scenario">
+    <strong>🏢 Accounting Case:</strong> An employee's smart camera (same network as work laptop) was hacked via firmware vulnerability. Attacker pivoted to the laptop, stole VPN credentials, accessed the firm's file server — <span class="danger-text">15,000 client records exposed</span>.
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="slide">
+  <h2>🚫 Best Practice 5: Disable WPS & UPnP</h2>
+  <div class="columns">
+    <div class="card danger-card">
+      <h3>WPS (Wi-Fi Protected Setup)</h3>
+      <ul>
+        <li>Designed for convenience — press button or enter 8-digit PIN</li>
+        <li>The 8-digit PIN is validated in <span class="danger-text">two halves</span> (4+4)</li>
+        <li>Can be brute-forced in <span class="danger-text">4–11 hours</span></li>
+        <li>Once cracked → attacker gets your Wi-Fi password regardless of strength</li>
+      </ul>
+    </div>
+    <div class="card danger-card">
+      <h3>UPnP (Universal Plug and Play)</h3>
+      <ul>
+        <li>Allows devices to <span class="danger-text">auto-open ports</span> on your router</li>
+        <li><span class="danger-text">Zero authentication</span> — any device (or malware) can request it</li>
+        <li>Malware uses UPnP to punch holes in your firewall</li>
+        <li>Mirai botnet recruited <span class="danger-text">hundreds of thousands</span> of devices via UPnP</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card accent-card" style="margin-top:12px;">
+    <strong>✅ Fix:</strong> Router admin panel → Advanced Settings → WPS: <span class="danger-text">OFF</span> → UPnP: <span class="danger-text">OFF</span>. If a device needs a port, configure it manually.
+  </div>
+</div>

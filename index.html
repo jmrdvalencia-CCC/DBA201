@@ -3,225 +3,101 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cloud & SaaS Security — Data Security Module</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <title>DBA201 — Data Security Topics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet"/>
   <style>
-    :root {
-      --blue:#4F8EF7; --mint:#2EC4B6; --bg:#F7F9FC;
-      --text:#2D3748; --orange:#FF9F1C; --card:#EDF2F7;
-      --border:#E2E8F0; --white:#FFFFFF;
-    }
+    :root{--blue:#4F8EF7;--mint:#2EC4B6;--orange:#FF9F1C;--bg:#F7F9FC;--text:#2D3748;--white:#FFF;--border:#E2E8F0;}
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      font-family:'Inter','Segoe UI',system-ui,sans-serif;
-      background:var(--bg);color:var(--text);
-      min-height:100vh;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;padding:40px 20px;
-      position:relative;overflow-x:hidden;
-    }
-    canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.5;}
-    .content{position:relative;z-index:1;width:100%;max-width:1040px;display:flex;flex-direction:column;align-items:center;}
+    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow-x:hidden;}
+    canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.45;}
+    .content{position:relative;z-index:1;width:100%;max-width:860px;display:flex;flex-direction:column;align-items:center;}
 
-    /* Hero */
-    .hero{text-align:center;margin-bottom:48px;animation:heroIn .8s ease both;}
-    @keyframes heroIn{from{opacity:0;transform:translateY(-24px);}to{opacity:1;transform:translateY(0);}}
-    .badge{
-      display:inline-flex;align-items:center;gap:6px;
-      background:linear-gradient(135deg,var(--blue),var(--mint));
-      color:white;font-size:12px;font-weight:700;letter-spacing:1.5px;
-      text-transform:uppercase;padding:7px 18px;border-radius:20px;
-      margin-bottom:20px;box-shadow:0 4px 16px rgba(79,142,247,.3);
-    }
-    h1{font-size:clamp(30px,5vw,52px);font-weight:900;color:var(--blue);line-height:1.15;margin-bottom:12px;letter-spacing:-1px;}
+    .hero{text-align:center;margin-bottom:48px;animation:fadeUp .7s ease both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+    .badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--blue),var(--mint));color:#fff;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px 18px;border-radius:20px;margin-bottom:20px;box-shadow:0 4px 16px rgba(79,142,247,.3);}
+    h1{font-size:clamp(28px,5vw,48px);font-weight:900;color:var(--blue);line-height:1.15;margin-bottom:10px;letter-spacing:-1px;}
     h1 span{color:var(--mint);}
-    .subtitle{font-size:16px;color:#718096;margin-bottom:8px;}
-    .meta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
-    .meta-tag{
-      background:var(--white);border:1px solid var(--border);
-      border-radius:8px;padding:6px 14px;font-size:13px;color:#4A5568;
-      box-shadow:0 2px 6px rgba(0,0,0,.04);
-    }
+    .subtitle{font-size:15px;color:#718096;}
 
-    /* Grid */
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
-      gap:20px;width:100%;
-      animation:gridIn .9s ease .2s both;
-    }
-    @keyframes gridIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;width:100%;animation:fadeUp .8s ease .15s both;}
 
-    /* Cards */
-    .card{
-      background:var(--white);border-radius:18px;
-      border:1px solid var(--border);padding:28px 24px;
-      text-decoration:none;color:var(--text);
-      transition:transform .25s,box-shadow .25s;
-      display:flex;flex-direction:column;gap:10px;
-      position:relative;overflow:hidden;
-      box-shadow:0 2px 12px rgba(0,0,0,.04);
-    }
-    .card::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:3px;
-      background:linear-gradient(90deg,var(--blue),var(--mint));
-      transform:scaleX(0);transform-origin:left;
-      transition:transform .3s ease;border-radius:18px 18px 0 0;
-    }
-    .card:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(79,142,247,.14);}
+    .card{background:var(--white);border-radius:20px;border:1px solid var(--border);padding:36px 30px;text-decoration:none;color:var(--text);transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.04);}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:20px 20px 0 0;transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+    .card:hover{transform:translateY(-6px);box-shadow:0 20px 48px rgba(79,142,247,.14);}
     .card:hover::before{transform:scaleX(1);}
-    .card-icon{font-size:34px;line-height:1;}
-    .card-num{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mint);}
-    .card h2{font-size:17px;font-weight:800;color:var(--blue);line-height:1.3;}
-    .card p{font-size:13px;color:#718096;line-height:1.65;flex:1;}
-    .card-footer{
-      margin-top:auto;padding-top:12px;border-top:1px solid var(--border);
-      font-size:12px;color:var(--blue);font-weight:700;
-      display:flex;align-items:center;gap:4px;
-    }
-    .card.activity{border-left:4px solid var(--orange);}
-    .card.activity .card-num{color:var(--orange);}
-    .card.activity h2{color:var(--orange);}
-    .card.activity .card-footer{color:var(--orange);}
-    .card.activity::before{background:linear-gradient(90deg,var(--orange),#FFB84D);}
 
-    /* SVG cloud deco */
-    .deco-svg{position:fixed;bottom:-60px;right:-60px;opacity:.06;pointer-events:none;z-index:0;}
+    .card.cloud::before{background:linear-gradient(90deg,var(--blue),var(--mint));}
+    .card.remote::before{background:linear-gradient(90deg,var(--orange),#f97316);}
+    .card.remote .card-tag{color:var(--orange);}
+    .card.remote h2{color:var(--orange);}
+    .card.remote .card-footer{color:var(--orange);}
+
+    .card-icon{font-size:42px;line-height:1;}
+    .card-tag{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mint);}
+    .card h2{font-size:20px;font-weight:800;color:var(--blue);line-height:1.3;}
+    .card p{font-size:14px;color:#718096;line-height:1.7;flex:1;}
+    .card-meta{display:flex;gap:8px;flex-wrap:wrap;}
+    .card-meta span{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:#4A5568;}
+    .card-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);font-size:13px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:4px;}
 
     footer{margin-top:48px;text-align:center;font-size:12px;color:#A0AEC0;position:relative;z-index:1;}
   </style>
 </head>
 <body>
 
-<!-- HTML5 Canvas Particle Background -->
 <canvas id="c"></canvas>
-
-<!-- Decorative SVG -->
-<svg class="deco-svg" width="500" height="500" viewBox="0 0 500 500" fill="none">
-  <circle cx="250" cy="250" r="240" stroke="#4F8EF7" stroke-width="2"/>
-  <circle cx="250" cy="250" r="180" stroke="#2EC4B6" stroke-width="1.5"/>
-  <circle cx="250" cy="250" r="120" stroke="#4F8EF7" stroke-width="1"/>
-  <path d="M150 250 Q250 150 350 250 Q250 350 150 250Z" stroke="#2EC4B6" stroke-width="1.5" fill="none"/>
-</svg>
 
 <div class="content">
   <div class="hero">
-    <div class="badge">📘 Data Security · SY 2025–2026 · 2nd Semester</div>
-    <h1>Cloud & <span>SaaS Security</span></h1>
-    <p class="subtitle">Sharing Data Safely in Teams, Slack, and Cloud Storage</p>
-    <div class="meta">
-      <span class="meta-tag">🎓 Accounting Students</span>
-      <span class="meta-tag">🌐 Online Modality</span>
-      <span class="meta-tag">⏱ 90–120 minutes</span>
-      <span class="meta-tag">📂 6 Lessons + 4 Activities</span>
-    </div>
+    <div class="badge">📘 DBA201 · Data Security · SY 2025–2026 · 2nd Semester</div>
+    <h1>Select a <span>Topic</span></h1>
+    <p class="subtitle">Choose a module below to begin your lesson</p>
   </div>
 
   <div class="grid">
-    <a class="card" href="lesson1.html">
+    <a class="card remote" href="Module-1-Remote-Work-Mobile-Security-Presentation/index.html">
+      <div class="card-icon">🏠📱</div>
+      <div class="card-tag">Module-1-Remote-Work-Mobile-Security-Presentation</div>
+      <h2>Remote Work & Mobile Security</h2>
+      <p>Securing home networks, public Wi-Fi risks, Mobile Device Management (MDM), and protecting mobile devices against unauthorized access and data theft.</p>
+      <div class="card-meta">
+        <span>📊 Slide Presentation</span>
+        <span>🔒 5 Parts</span>
+        <span>⏱ 90–120 min</span>
+      </div>
+      <div class="card-footer">Open Module →</div>
+    </a>
+
+    <a class="card cloud" href="Module-2-Cloud-SaaS-Security/index.html">
       <div class="card-icon">☁️</div>
-      <div class="card-num">Lesson 1</div>
-      <h2>Cloud & SaaS Tools in Accounting</h2>
-      <p>Understand what cloud computing means for accountants and why accounting data is a high-value target.</p>
-      <div class="card-footer">Open Lesson →</div>
-    </a>
-    <a class="card" href="lesson2.html">
-      <div class="card-icon">⚠️</div>
-      <div class="card-num">Lesson 2</div>
-      <h2>Risks in Cloud Collaboration Tools</h2>
-      <p>Explore 7 major risk categories with real-world accounting scenarios involving Teams, Slack, and Drive.</p>
-      <div class="card-footer">Open Lesson →</div>
-    </a>
-    <a class="card" href="lesson3.html">
-      <div class="card-icon">🔐</div>
-      <div class="card-num">Lesson 3</div>
-      <h2>Safe Sharing & Permission Settings</h2>
-      <p>Apply the Principle of Least Privilege and configure secure sharing settings across all major platforms.</p>
-      <div class="card-footer">Open Lesson →</div>
-    </a>
-    <a class="card" href="lesson4.html">
-      <div class="card-icon">🔍</div>
-      <div class="card-num">Lesson 4</div>
-      <h2>Oversharing & Misconfiguration Risks</h2>
-      <p>Recognize red flags of oversharing and learn to audit cloud configurations using a practical checklist.</p>
-      <div class="card-footer">Open Lesson →</div>
-    </a>
-    <a class="card" href="lesson5.html">
-      <div class="card-icon">🗄️</div>
-      <div class="card-num">Lesson 5</div>
-      <h2>Secure Cloud Storage Practices</h2>
-      <p>Implement data classification, encryption, the 3-2-1 backup rule, and proper access review procedures.</p>
-      <div class="card-footer">Open Lesson →</div>
-    </a>
-    <a class="card" href="lesson6.html">
-      <div class="card-icon">⚖️</div>
-      <div class="card-num">Lesson 6</div>
-      <h2>Compliance & Legal Context</h2>
-      <p>Philippine laws — Data Privacy Act, BIR, SEC, and BSP — and their cloud security implications.</p>
-      <div class="card-footer">Open Lesson →</div>
-    </a>
-    <a class="card activity" href="activities.html">
-      <div class="card-icon">🎮</div>
-      <div class="card-num">Activities 1–4</div>
-      <h2>Interactive Activities & Quizzes</h2>
-      <p>Risk identification quiz, permission scenarios, misconfiguration audit exercise, and reflection questions.</p>
-      <div class="card-footer">Start Activities →</div>
+      <div class="card-tag">Module-2-Cloud-SaaS-Security</div>
+      <h2>Cloud & SaaS Security</h2>
+      <p>Sharing data safely in Teams, Slack, and cloud storage. Learn about cloud risks, permission settings, oversharing, secure storage, and Philippine compliance.</p>
+      <div class="card-meta">
+        <span>📂 6 Lessons</span>
+        <span>🎮 4 Activities</span>
+        <span>⏱ 90–120 min</span>
+      </div>
+      <div class="card-footer">Open Module →</div>
     </a>
   </div>
 
-  <footer><p>Cloud & SaaS Security Module · Data Security · SY 2025–2026 2nd Semester · For Accounting Students</p></footer>
+  <footer><p>DBA201 · Data Security · Cloud & SaaS Security · SY 2025–2026 2nd Semester · For Accounting Students</p></footer>
 </div>
 
 <script>
-// HTML5 Canvas — floating network particles
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-let W, H, pts = [];
-const COLORS = ['#4F8EF7','#2EC4B6','#FF9F1C'];
-
-function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-resize(); window.addEventListener('resize', resize);
-
-function rand(a,b){ return a + Math.random()*(b-a); }
-for(let i=0;i<55;i++){
-  pts.push({
-    x:rand(0,window.innerWidth), y:rand(0,window.innerHeight),
-    vx:rand(-0.4,0.4), vy:rand(-0.4,0.4),
-    r:rand(2,4.5),
-    color:COLORS[Math.floor(Math.random()*COLORS.length)]
-  });
-}
-
-function draw(){
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W,H,pts=[];
+const C=['#4F8EF7','#2EC4B6','#FF9F1C'];
+function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight}
+resize();addEventListener('resize',resize);
+for(let i=0;i<50;i++)pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.6,vy:(Math.random()-.5)*.6,r:2+Math.random()*2.5,c:C[Math.random()*3|0]});
+(function draw(){
   ctx.clearRect(0,0,W,H);
-  // lines
-  for(let i=0;i<pts.length;i++){
-    for(let j=i+1;j<pts.length;j++){
-      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      if(d<130){
-        ctx.beginPath();
-        ctx.strokeStyle=`rgba(79,142,247,${0.12*(1-d/130)})`;
-        ctx.lineWidth=1;
-        ctx.moveTo(pts[i].x,pts[i].y);
-        ctx.lineTo(pts[j].x,pts[j].y);
-        ctx.stroke();
-      }
-    }
-  }
-  // dots
-  pts.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=p.color+'55';
-    ctx.fill();
-    p.x+=p.vx; p.y+=p.vy;
-    if(p.x<0||p.x>W) p.vx*=-1;
-    if(p.y<0||p.y>H) p.vy*=-1;
-  });
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.hypot(dx,dy);if(d<120){ctx.beginPath();ctx.strokeStyle=`rgba(79,142,247,${.1*(1-d/120)})`;ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke()}}
+  pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c+'44';ctx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1});
   requestAnimationFrame(draw);
-}
-draw();
+})();
 </script>
 </body>
 </html>

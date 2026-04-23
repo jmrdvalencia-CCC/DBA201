@@ -1,0 +1,16 @@
+<div class="slide accent">
+  <h2>📶 Best Practice 2: Enable WPA3 / WPA2-AES</h2>
+  <table>
+    <tr><th>Protocol</th><th>Encryption</th><th>Time to Crack</th><th>Status</th></tr>
+    <tr><td>WEP</td><td>RC4 (weak)</td><td><span class="danger-text">Minutes</span></td><td><span class="danger-text">☠️ Dead — never use</span></td></tr>
+    <tr><td>WPA</td><td>TKIP (flawed)</td><td><span class="danger-text">Hours</span></td><td><span class="warn">⚠️ Deprecated</span></td></tr>
+    <tr><td>WPA2-AES</td><td>AES-128</td><td><span class="success-text">Years</span> (strong password)</td><td><span class="accent-text">✅ Minimum acceptable</span></td></tr>
+    <tr><td>WPA3</td><td>SAE + AES-256</td><td><span class="success-text">Practically impossible</span></td><td><span class="success-text">✅ Recommended</span></td></tr>
+  </table>
+  <h3>Why WPA3 is superior:</h3>
+  <ul>
+    <li><span class="accent-text">SAE handshake</span> — even if someone captures your Wi-Fi handshake, they can't crack it offline</li>
+    <li><span class="accent-text">Forward secrecy</span> — if your password is compromised later, previously captured traffic stays encrypted</li>
+    <li><span class="accent-text">Dictionary attack protection</span> — WPA2 is vulnerable to offline brute-force; WPA3 is not</li>
+  </ul>
+</div>

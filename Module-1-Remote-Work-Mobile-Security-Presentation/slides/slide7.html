@@ -1,0 +1,27 @@
+<div class="slide">
+  <h2>🔑 Best Practice 1: Change Default Router Credentials</h2>
+  <div class="columns">
+    <div>
+      <h3>The Problem</h3>
+      <ul>
+        <li>Every router ships with factory credentials</li>
+        <li>Defaults are publicly listed on sites like <span class="highlight">routerpasswords.com</span></li>
+        <li>Common defaults: <kbd>admin/admin</kbd>, <kbd>admin/password</kbd>, <kbd>admin/1234</kbd></li>
+        <li>Attackers use automated tools to scan and try these instantly</li>
+      </ul>
+    </div>
+    <div>
+      <h3>How to Fix It</h3>
+      <ul>
+        <li>Open browser → go to <kbd>192.168.0.1</kbd> or <kbd>192.168.1.1</kbd></li>
+        <li>Log in with current credentials (check sticker on router)</li>
+        <li>Navigate to <span class="accent-text">Administration → Password</span></li>
+        <li>Set a <span class="success-text">strong, unique password</span> (12+ characters)</li>
+        <li>Change the admin <span class="accent-text">username</span> too, if possible</li>
+      </ul>
+    </div>
+  </div>
+  <div class="scenario">
+    <strong>🏢 Accounting Scenario:</strong> An attacker accesses your router, changes DNS settings so that <em>bir.gov.ph</em> resolves to a fake BIR site. You enter your firm's eFPS credentials — attacker now files fraudulent tax returns.
+  </div>
+</div>
