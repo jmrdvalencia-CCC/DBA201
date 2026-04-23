@@ -4,304 +4,378 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lesson 2 — Risks in Cloud Collaboration Tools</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
-    #particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35;}
-    .reveal .slides{position:relative;z-index:1;}
-    /* risk number badge */
-    .rnum{
-      display:inline-flex;align-items:center;justify-content:center;
-      width:36px;height:36px;border-radius:50%;
-      background:linear-gradient(135deg,var(--orange),#FFB84D);
-      color:white;font-weight:900;font-size:0.55em;
-      box-shadow:0 4px 12px rgba(255,159,28,.35);
-      flex-shrink:0;
-    }
-    .risk-row{display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;}
-    .risk-row-text h4{color:var(--text);font-size:0.52em;font-weight:700;margin-bottom:3px;}
-    .risk-row-text p{font-size:0.44em;color:#718096;line-height:1.6;}
+    #pc{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.3;}
+    .reveal .slides{z-index:1;position:relative;}
+    .ig-full{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px 40px;box-sizing:border-box;}
+    .pill{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#4F8EF7,#2EC4B6);color:#fff;font-size:.48em;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;}
+    .slide-title{font-size:1.05em;font-weight:900;color:#4F8EF7;margin-bottom:2px;text-align:center;}
+    .slide-sub{font-size:.54em;color:#718096;text-align:center;margin-bottom:12px;}
+    /* 7 risks hub */
+    .risk-hub{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;}
+    .risk-card{background:#fff;border-radius:14px;border:1px solid #E2E8F0;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(255,159,28,.08);position:relative;overflow:hidden;}
+    .risk-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FF9F1C,#FFB84D);}
+    .risk-card .ri{font-size:1.6em;}
+    .risk-card .rn{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#FF9F1C,#FFB84D);color:#fff;font-size:.5em;font-weight:900;display:flex;align-items:center;justify-content:center;position:absolute;top:8px;right:8px;}
+    .risk-card .rt{font-size:.52em;font-weight:800;color:#2D3748;text-align:center;}
+    .risk-card .rd{font-size:.42em;color:#718096;text-align:center;line-height:1.4;}
+    /* scenario cards */
+    .scenario-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;width:100%;}
+    .sc-card{background:#fff;border-radius:16px;border:1px solid #E2E8F0;padding:16px 14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+    .sc-header{display:flex;align-items:center;gap:8px;}
+    .sc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3em;flex-shrink:0;}
+    .sc-label{font-size:.5em;font-weight:800;color:#2D3748;}
+    .sc-sub{font-size:.42em;color:#718096;}
+    .sc-body{font-size:.46em;color:#4A5568;line-height:1.55;background:#F7F9FC;border-radius:8px;padding:8px 10px;}
+    .sc-tag{display:inline-flex;align-items:center;gap:4px;font-size:.4em;font-weight:700;padding:3px 10px;border-radius:10px;margin-top:2px;}
+    .tag-red{background:#FED7D7;color:#9B2C2C;}
+    .tag-orange{background:#FFF0D9;color:#7B4F00;}
+    .tag-blue{background:#EBF4FF;color:#2C5282;}
+    /* risk detail slide */
+    .risk-detail{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;}
+    .rd-box{background:#fff;border-radius:16px;border:1px solid #E2E8F0;padding:16px 14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+    .rd-box .rdb-head{display:flex;align-items:center;gap:10px;}
+    .rd-box .rdb-icon{font-size:1.8em;}
+    .rd-box .rdb-title{font-size:.6em;font-weight:800;color:#2D3748;}
+    .rd-box .rdb-body{font-size:.48em;color:#718096;line-height:1.55;}
+    .rd-box .rdb-example{background:#FFF8EE;border-left:3px solid #FF9F1C;border-radius:6px;padding:6px 10px;font-size:.44em;color:#7B4F00;line-height:1.5;}
+    /* summary table */
+    .sum-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.5em;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(79,142,247,.08);}
+    .sum-table th{background:linear-gradient(135deg,#4F8EF7,#6BA3F9);color:#fff;padding:8px 12px;text-align:left;font-weight:700;}
+    .sum-table td{padding:7px 12px;border-bottom:1px solid #E2E8F0;color:#2D3748;background:#fff;}
+    .sum-table tr:nth-child(even) td{background:#F7F9FC;}
+    .sum-table tr:last-child td{border-bottom:none;}
+    .nav-row{display:flex;gap:12px;margin-top:14px;justify-content:center;}
+    .nav-btn{font-size:.48em;font-weight:700;text-decoration:none;padding:8px 20px;border-radius:10px;}
+    .nav-prev{color:#718096;background:#EDF2F7;}
+    .nav-next{color:#fff;background:linear-gradient(135deg,#4F8EF7,#2EC4B6);}
   </style>
 </head>
 <body>
-<canvas id="particle-canvas"></canvas>
+<canvas id="pc"></canvas>
 <a class="back-home" href="index.html">← All Lessons</a>
-
 <div class="reveal">
- <div class="slides">
+<div class="slides">
 
-  <!-- ① TITLE -->
-  <section class="section-slide">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <!-- SVG warning shield -->
-    <svg style="position:absolute;right:60px;bottom:30px;opacity:.18;z-index:1;" width="260" height="260" viewBox="0 0 260 260" fill="none">
-      <path d="M130 20 L220 60 L220 140 Q220 200 130 240 Q40 200 40 140 L40 60 Z" fill="white"/>
-      <path d="M130 80 L130 150" stroke="#FF9F1C" stroke-width="14" stroke-linecap="round"/>
-      <circle cx="130" cy="175" r="8" fill="#FF9F1C"/>
-    </svg>
-    <div class="lesson-num">Lesson 2 of 6</div>
-    <h1>Risks in Cloud-Based<br/>Collaboration Tools</h1>
-    <p style="margin-top:10px;font-size:0.5em;opacity:.85;max-width:520px;">7 major risks every accounting professional must recognize and avoid</p>
-  </section>
+<!-- ① TITLE -->
+<section class="section-slide">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div>
+  <svg style="position:absolute;right:40px;bottom:30px;opacity:.15;z-index:1;" width="320" height="320" viewBox="0 0 320 320" fill="none">
+    <path d="M160 30 L240 80 L240 180 Q240 260 160 290 Q80 260 80 180 L80 80 Z" fill="white"/>
+    <line x1="160" y1="110" x2="160" y2="200" stroke="#FF9F1C" stroke-width="18" stroke-linecap="round"/>
+    <circle cx="160" cy="230" r="14" fill="#FF9F1C"/>
+  </svg>
+  <div class="lesson-num">Lesson 2 of 6</div>
+  <h1>Risks in Cloud-Based<br/>Collaboration Tools</h1>
+  <p style="font-size:.5em;opacity:.85;max-width:500px;margin-top:10px;">7 major risks every accounting professional must recognize and avoid</p>
+  <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">🔓 Unauthorized Access</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">📤 Oversharing</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">⚙️ Misconfiguration</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">👤 Shadow IT</span>
+  </div>
+</section>
 
-  <!-- ② RISK OVERVIEW — SVG hub diagram -->
-  <section>
-    <div class="badge">⚠️ Risk Overview</div>
-    <h2>The 7 Major Cloud Risk Categories</h2>
-    <div class="two-col-3-2" style="align-items:center;">
-      <div class="card-grid" style="grid-template-columns:repeat(4,1fr);gap:10px;">
-        <div class="card fragment fade-up" data-fragment-index="1" style="text-align:center;padding:12px 8px;">
-          <span class="icon" style="font-size:1.3em;">🔓</span>
-          <h4 style="font-size:0.42em;">Unauthorized<br/>Access</h4>
-        </div>
-        <div class="card fragment fade-up" data-fragment-index="2" style="text-align:center;padding:12px 8px;">
-          <span class="icon" style="font-size:1.3em;">📤</span>
-          <h4 style="font-size:0.42em;">Oversharing</h4>
-        </div>
-        <div class="card fragment fade-up" data-fragment-index="3" style="text-align:center;padding:12px 8px;">
-          <span class="icon" style="font-size:1.3em;">⚙️</span>
-          <h4 style="font-size:0.42em;">Misconfiguration</h4>
-        </div>
-        <div class="card fragment fade-up" data-fragment-index="4" style="text-align:center;padding:12px 8px;">
-          <span class="icon" style="font-size:1.3em;">👤</span>
-          <h4 style="font-size:0.42em;">Shadow IT</h4>
-        </div>
-        <div class="card fragment fade-up" data-fragment-index="5" style="text-align:center;padding:12px 8px;">
-          <span class="icon" style="font-size:1.3em;">🔑</span>
-          <h4 style="font-size:0.42em;">Weak<br/>Credentials</h4>
-        </div>
-        <div class="card fragment fade-up" data-fragment-index="6" style="text-align:center;padding:12px 8px;">
-          <span class="icon" style="font-size:1.3em;">🔗</span>
-          <h4 style="font-size:0.42em;">Insecure<br/>Links</h4>
-        </div>
-        <div class="card fragment fade-up" data-fragment-index="7" style="text-align:center;padding:12px 8px;">
-          <span class="icon" style="font-size:1.3em;">🗑️</span>
-          <h4 style="font-size:0.42em;">Data Loss</h4>
-        </div>
+<!-- ② 7 RISKS HUB -->
+<section>
+  <div class="ig-full">
+    <div class="pill">⚠️ Risk Overview</div>
+    <div class="slide-title">The 7 Major Cloud Risk Categories</div>
+    <div class="slide-sub">Every accounting professional must know and avoid these risks</div>
+    <div class="risk-hub">
+      <div class="risk-card"><div class="rn">1</div><div class="ri">🔓</div><div class="rt">Unauthorized Access</div><div class="rd">People who shouldn't have access can view, edit, or download your data</div></div>
+      <div class="risk-card"><div class="rn">2</div><div class="ri">📤</div><div class="rt">Oversharing</div><div class="rd">Giving more access than necessary — often done for convenience</div></div>
+      <div class="risk-card"><div class="rn">3</div><div class="ri">⚙️</div><div class="rt">Misconfiguration</div><div class="rd">Wrong settings that expose data unintentionally to the public</div></div>
+      <div class="risk-card"><div class="rn">4</div><div class="ri">👤</div><div class="rt">Shadow IT</div><div class="rd">Using personal/unapproved cloud tools for company data</div></div>
+      <div class="risk-card"><div class="rn">5</div><div class="ri">🔑</div><div class="rt">Weak Credentials</div><div class="rd">Shared logins destroy audit trails and create single points of failure</div></div>
+      <div class="risk-card"><div class="rn">6</div><div class="ri">🔗</div><div class="rt">Insecure Links</div><div class="rd">Sharing links without expiry dates remain active for years</div></div>
+      <div class="risk-card"><div class="rn">7</div><div class="ri">🗑️</div><div class="rt">Data Loss</div><div class="rd">Accidental deletion without version history = permanent loss</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ③ RISKS 1–4 DETAIL -->
+<section>
+  <div class="ig-full">
+    <div class="pill">⚠️ Risks 1–4 Deep Dive</div>
+    <div class="slide-title">Access, Sharing, Config & Shadow IT</div>
+    <div class="risk-detail">
+      <div class="rd-box">
+        <div class="rdb-head"><div class="rdb-icon">🔓</div><div class="rdb-title">1. Unauthorized Access</div></div>
+        <div class="rdb-body">Occurs when people who should NOT have access can view, edit, or download data — caused by expired links never removed or unrevoked accounts.</div>
+        <div class="rdb-example">📌 A shared OneDrive link set to "Anyone with the link" lets a former employee access confidential financial reports months after leaving.</div>
       </div>
-      <!-- SVG hub -->
-      <div class="svg-wrap">
-        <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
-          <circle cx="100" cy="100" r="90" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="6 4"/>
-          <circle cx="100" cy="100" r="60" stroke="#E2E8F0" stroke-width="1" stroke-dasharray="4 3"/>
-          <!-- center -->
-          <circle cx="100" cy="100" r="28" fill="#4F8EF7"/>
-          <text x="100" y="96" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">CLOUD</text>
-          <text x="100" y="108" font-size="9" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">DATA</text>
-          <!-- spokes -->
-          <line x1="100" y1="72" x2="100" y2="20" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="128" y1="72" x2="168" y2="32" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="128" y1="100" x2="180" y2="100" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="128" y1="128" x2="168" y2="168" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="100" y1="128" x2="100" y2="180" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="72" y1="128" x2="32" y2="168" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="72" y1="100" x2="20" y2="100" stroke="#FF9F1C" stroke-width="1.5"/>
-          <!-- threat dots -->
-          <circle cx="100" cy="16" r="7" fill="#FF9F1C"/><circle cx="172" cy="28" r="7" fill="#FF9F1C"/>
-          <circle cx="184" cy="100" r="7" fill="#FF9F1C"/><circle cx="172" cy="172" r="7" fill="#FF9F1C"/>
-          <circle cx="100" cy="184" r="7" fill="#FF9F1C"/><circle cx="28" cy="172" r="7" fill="#FF9F1C"/>
-          <circle cx="16" cy="100" r="7" fill="#FF9F1C"/>
-        </svg>
+      <div class="rd-box">
+        <div class="rdb-head"><div class="rdb-icon">📤</div><div class="rdb-title">2. Oversharing</div></div>
+        <div class="rdb-body">Giving more access than necessary — sharing an entire folder when only one file is needed exposes all other files to unintended viewers.</div>
+        <div class="rdb-example">📌 Sharing the entire "Finance 2024" folder with an external auditor who only needed the Q3 income statement.</div>
+      </div>
+      <div class="rd-box">
+        <div class="rdb-head"><div class="rdb-icon">⚙️</div><div class="rdb-title">3. Misconfiguration</div></div>
+        <div class="rdb-body">Incorrect settings expose data unintentionally. This is the #1 cause of cloud data breaches worldwide — not hackers, but insiders setting things up wrong.</div>
+        <div class="rdb-example">📌 A SharePoint site set to "Public" during migration makes internal salary data visible to the entire organization.</div>
+      </div>
+      <div class="rd-box">
+        <div class="rdb-head"><div class="rdb-icon">👤</div><div class="rdb-title">4. Shadow IT</div></div>
+        <div class="rdb-body">Using unauthorized cloud tools bypasses all organizational security controls, encryption standards, and compliance requirements.</div>
+        <div class="rdb-example">📌 An accountant uploads payroll files to personal iCloud to work from home — bypassing all company security controls.</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ③ RISKS 1–3 -->
-  <section>
-    <div class="badge">⚠️ Risks 1–3</div>
-    <h2>Access, Sharing & Configuration</h2>
-    <div style="margin-top:14px;">
-      <div class="risk-row fragment fade-up" data-fragment-index="1">
-        <div class="rnum">1</div>
-        <div class="risk-row-text">
-          <h4>🔓 Unauthorized Access</h4>
-          <p>People who should NOT have access can view, edit, or download data. Caused by links that never expire or unrevoked accounts.</p>
-        </div>
+<!-- ④ RISKS 5–7 DETAIL -->
+<section>
+  <div class="ig-full">
+    <div class="pill">⚠️ Risks 5–7 Deep Dive</div>
+    <div class="slide-title">Credentials, Links & Data Loss</div>
+    <div class="risk-detail">
+      <div class="rd-box">
+        <div class="rdb-head"><div class="rdb-icon">🔑</div><div class="rdb-title">5. Weak / Shared Credentials</div></div>
+        <div class="rdb-body">Sharing one login among multiple accountants destroys the audit trail, creates a single point of failure, and violates most SaaS platform terms of service.</div>
+        <div class="rdb-example">📌 3 accountants share one QuickBooks Online login — impossible to track who made which journal entry.</div>
       </div>
-      <div class="risk-row fragment fade-up" data-fragment-index="2">
-        <div class="rnum">2</div>
-        <div class="risk-row-text">
-          <h4>📤 Oversharing</h4>
-          <p>Giving more access than necessary — often done for convenience. Sharing an entire folder when only one file is needed.</p>
-        </div>
+      <div class="rd-box">
+        <div class="rdb-head"><div class="rdb-icon">🔗</div><div class="rdb-title">6. Insecure File Sharing Links</div></div>
+        <div class="rdb-body">Links without expiration dates or password protection remain permanently active. Anyone who receives or finds the link can access the document indefinitely.</div>
+        <div class="rdb-example">📌 A financial statement link shared in Slack 2 years ago is still active — anyone with the link can still open it today.</div>
       </div>
-      <div class="risk-row fragment fade-up" data-fragment-index="3">
-        <div class="rnum">3</div>
-        <div class="risk-row-text">
-          <h4>⚙️ Misconfiguration</h4>
-          <p>Incorrect settings that expose data unintentionally. A SharePoint site set to "Public" instead of "Private" is a classic example.</p>
-        </div>
+      <div class="rd-box" style="grid-column:1/-1;">
+        <div class="rdb-head"><div class="rdb-icon">🗑️</div><div class="rdb-title">7. Data Loss / Accidental Deletion</div></div>
+        <div class="rdb-body">Cloud tools allow multiple users to edit or delete files simultaneously. Without version history enabled, permanently deleted tax documents violate BIR's 10-year retention requirement and can result in penalties.</div>
+        <div class="rdb-example">📌 A team member deletes a folder of 5-year-old tax documents thinking it was a duplicate. No version history = gone forever. BIR penalty risk.</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ④ RISKS 4–7 -->
-  <section>
-    <div class="badge">⚠️ Risks 4–7</div>
-    <h2>Credentials, Links & Data Loss</h2>
-    <div style="margin-top:14px;">
-      <div class="risk-row fragment fade-up" data-fragment-index="1">
-        <div class="rnum">4</div>
-        <div class="risk-row-text">
-          <h4>👤 Shadow IT</h4>
-          <p>Using unauthorized cloud tools not approved by IT. Uploading payroll files to a personal Google Drive bypasses all security controls.</p>
+<!-- ⑤ SCENARIO A — COMIC STRIP -->
+<section>
+  <style>
+    .comic-wrap{display:flex;flex-direction:column;align-items:center;width:100%;height:100%;padding:14px 36px;box-sizing:border-box;justify-content:center;gap:10px;}
+    .comic-title-bar{display:flex;align-items:center;gap:10px;background:#2D3748;border-radius:10px;padding:8px 18px;width:100%;box-sizing:border-box;}
+    .comic-title-bar .ct-badge{background:#FF9F1C;color:#fff;font-size:.5em;font-weight:900;padding:3px 12px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;}
+    .comic-title-bar .ct-title{color:#fff;font-size:.62em;font-weight:800;}
+    .comic-title-bar .ct-risk{color:#FF9F1C;font-size:.5em;font-weight:700;margin-left:auto;}
+    .comic-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;width:100%;border:3px solid #2D3748;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18);}
+    .panel{background:#fff;border-right:3px solid #2D3748;position:relative;display:flex;flex-direction:column;align-items:center;padding:10px 8px 8px;gap:4px;min-height:220px;}
+    .panel:last-child{border-right:none;}
+    .panel-num{position:absolute;top:6px;left:8px;background:#2D3748;color:#fff;font-size:.38em;font-weight:900;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    .panel-bg{width:100%;flex:1;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+    /* speech bubble */
+    .bubble{position:absolute;background:#fff;border:2.5px solid #2D3748;border-radius:14px;padding:5px 9px;font-size:.38em;font-weight:700;color:#2D3748;line-height:1.35;max-width:90%;text-align:center;box-shadow:2px 2px 0 #2D3748;}
+    .bubble::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#2D3748;}
+    .bubble.right::after{left:auto;right:14px;transform:none;}
+    .bubble.left::after{left:14px;transform:none;}
+    .bubble.thought{border-radius:50px;border-style:dashed;}
+    .bubble.thought::after{display:none;}
+    /* exclamation burst */
+    .burst{position:absolute;top:6px;right:6px;background:#FC8181;color:#fff;font-size:.42em;font-weight:900;padding:3px 8px;border-radius:4px;transform:rotate(3deg);box-shadow:2px 2px 0 #9B2C2C;}
+    .panel-caption{font-size:.4em;font-weight:700;color:#2D3748;text-align:center;background:#F7F9FC;border-radius:6px;padding:4px 8px;width:100%;box-sizing:border-box;border-top:2px solid #E2E8F0;}
+    /* lesson box below strip */
+    .comic-lesson{display:flex;gap:12px;width:100%;box-sizing:border-box;}
+    .cl-box{flex:1;border-radius:10px;padding:8px 14px;font-size:.48em;font-weight:600;display:flex;align-items:center;gap:8px;}
+  </style>
+  <div class="comic-wrap">
+    <div class="comic-title-bar">
+      <span class="ct-badge">📖 Scenario A</span>
+      <span class="ct-title">The Overshared Payroll Sheet</span>
+      <span class="ct-risk">⚠️ Risk: Oversharing</span>
+    </div>
+
+    <div class="comic-strip">
+
+      <!-- PANEL 1: Maria at desk -->
+      <div class="panel">
+        <div class="panel-num">1</div>
+        <div class="panel-bg" style="background:linear-gradient(160deg,#EBF4FF 60%,#BEE3F8);">
+          <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
+            <!-- desk -->
+            <rect x="10" y="95" width="110" height="10" rx="3" fill="#CBD5E0"/>
+            <rect x="20" y="105" width="8" height="30" rx="2" fill="#CBD5E0"/>
+            <rect x="102" y="105" width="8" height="30" rx="2" fill="#CBD5E0"/>
+            <!-- laptop -->
+            <rect x="35" y="68" width="60" height="38" rx="4" fill="#4F8EF7"/>
+            <rect x="38" y="71" width="54" height="30" rx="2" fill="#EBF4FF"/>
+            <!-- spreadsheet on screen -->
+            <rect x="40" y="73" width="50" height="4" rx="1" fill="#2EC4B6" opacity=".7"/>
+            <rect x="40" y="79" width="50" height="3" rx="1" fill="#E2E8F0"/>
+            <rect x="40" y="84" width="50" height="3" rx="1" fill="#E2E8F0"/>
+            <rect x="40" y="89" width="30" height="3" rx="1" fill="#E2E8F0"/>
+            <rect x="30" y="106" width="70" height="4" rx="2" fill="#A0AEC0"/>
+            <!-- Maria character -->
+            <circle cx="65" cy="38" r="18" fill="#FBBF24"/>
+            <circle cx="65" cy="38" r="14" fill="#FDE68A"/>
+            <!-- hair -->
+            <path d="M47 32 Q50 18 65 20 Q80 18 83 32" fill="#92400E"/>
+            <!-- eyes -->
+            <circle cx="59" cy="36" r="2.5" fill="#2D3748"/>
+            <circle cx="71" cy="36" r="2.5" fill="#2D3748"/>
+            <!-- smile -->
+            <path d="M59 43 Q65 48 71 43" stroke="#92400E" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- body -->
+            <rect x="52" y="56" width="26" height="20" rx="6" fill="#4F8EF7"/>
+            <!-- name tag -->
+            <rect x="54" y="60" width="22" height="8" rx="2" fill="#fff" opacity=".8"/>
+            <text x="65" y="67" font-size="5" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">MARIA</text>
+          </svg>
+          <div class="bubble" style="top:6px;left:50%;transform:translateX(-50%);">I need to share<br/>the payroll sheet<br/>with the VP! 😊</div>
         </div>
+        <div class="panel-caption">Maria, HR-Accounting Staff</div>
       </div>
-      <div class="risk-row fragment fade-up" data-fragment-index="2">
-        <div class="rnum">5</div>
-        <div class="risk-row-text">
-          <h4>🔑 Weak / Shared Credentials</h4>
-          <p>Sharing one QuickBooks login among three accountants destroys the audit trail and creates a single point of failure.</p>
+
+      <!-- PANEL 2: Sharing dialog -->
+      <div class="panel">
+        <div class="panel-num">2</div>
+        <div class="panel-bg" style="background:linear-gradient(160deg,#F0FDF9 60%,#C6F6D5);">
+          <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
+            <!-- browser window -->
+            <rect x="8" y="15" width="114" height="110" rx="8" fill="#fff" stroke="#E2E8F0" stroke-width="1.5"/>
+            <rect x="8" y="15" width="114" height="22" rx="8" fill="#4F8EF7"/>
+            <rect x="8" y="28" width="114" height="9" fill="#4F8EF7"/>
+            <text x="65" y="30" font-size="7" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Share Payroll_2024.xlsx</text>
+            <!-- share dialog -->
+            <rect x="16" y="44" width="98" height="16" rx="4" fill="#F7F9FC" stroke="#E2E8F0" stroke-width="1"/>
+            <text x="22" y="55" font-size="6" fill="#A0AEC0" font-family="Inter,sans-serif">Add people or groups...</text>
+            <!-- dropdown option highlighted in orange -->
+            <rect x="16" y="66" width="98" height="16" rx="4" fill="#FFF8EE" stroke="#FF9F1C" stroke-width="2"/>
+            <text x="22" y="77" font-size="6.5" fill="#FF9F1C" font-family="Inter,sans-serif" font-weight="800">🌐 Everyone in organization</text>
+            <rect x="16" y="88" width="98" height="16" rx="4" fill="#F7F9FC" stroke="#E2E8F0" stroke-width="1"/>
+            <text x="22" y="99" font-size="6" fill="#718096" font-family="Inter,sans-serif">Specific people</text>
+            <!-- share button -->
+            <rect x="70" y="112" width="40" height="10" rx="4" fill="#4F8EF7"/>
+            <text x="90" y="119" font-size="6" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Share</text>
+          </svg>
+          <div class="burst">⚠️ WRONG!</div>
+          <div class="bubble right" style="bottom:32px;right:4px;">She picks<br/>&quot;Everyone&quot;! 😱</div>
         </div>
+        <div class="panel-caption">Clicks &quot;Everyone in org&quot;</div>
       </div>
-      <div class="risk-row fragment fade-up" data-fragment-index="3">
-        <div class="rnum">6</div>
-        <div class="risk-row-text">
-          <h4>🔗 Insecure File Sharing Links</h4>
-          <p>Links without expiration dates remain active for years. Anyone who finds the link can access the document indefinitely.</p>
+
+      <!-- PANEL 3: Employees discovering -->
+      <div class="panel">
+        <div class="panel-num">3</div>
+        <div class="panel-bg" style="background:linear-gradient(160deg,#FFF8EE 60%,#FEEBC8);">
+          <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
+            <!-- 3 shocked employees -->
+            <!-- Employee 1 -->
+            <circle cx="28" cy="55" r="14" fill="#FDE68A"/>
+            <circle cx="24" cy="52" r="2" fill="#2D3748"/>
+            <circle cx="32" cy="52" r="2" fill="#2D3748"/>
+            <path d="M23 60 Q28 56 33 60" stroke="#92400E" stroke-width="1.5" fill="none"/>
+            <path d="M20 44 Q22 36 28 37 Q34 36 36 44" fill="#92400E"/>
+            <rect x="18" y="69" width="20" height="16" rx="4" fill="#FC8181"/>
+            <!-- Employee 2 -->
+            <circle cx="65" cy="50" r="16" fill="#FDE68A"/>
+            <circle cx="60" cy="47" r="2.5" fill="#2D3748"/>
+            <circle cx="70" cy="47" r="2.5" fill="#2D3748"/>
+            <!-- shocked mouth -->
+            <ellipse cx="65" cy="56" rx="4" ry="5" fill="#2D3748"/>
+            <path d="M57 38 Q60 28 65 30 Q70 28 73 38" fill="#92400E"/>
+            <rect x="53" y="66" width="24" height="18" rx="4" fill="#FF9F1C"/>
+            <!-- Employee 3 -->
+            <circle cx="102" cy="55" r="14" fill="#FDE68A"/>
+            <circle cx="98" cy="52" r="2" fill="#2D3748"/>
+            <circle cx="106" cy="52" r="2" fill="#2D3748"/>
+            <path d="M97 60 Q102 56 107 60" stroke="#92400E" stroke-width="1.5" fill="none"/>
+            <path d="M94 44 Q96 36 102 37 Q108 36 110 44" fill="#555"/>
+            <rect x="92" y="69" width="20" height="16" rx="4" fill="#4F8EF7"/>
+            <!-- phones showing spreadsheet -->
+            <rect x="14" y="90" width="28" height="40" rx="4" fill="#2D3748"/>
+            <rect x="16" y="93" width="24" height="34" rx="2" fill="#EBF4FF"/>
+            <rect x="18" y="95" width="20" height="3" rx="1" fill="#2EC4B6"/>
+            <rect x="18" y="100" width="20" height="2" rx="1" fill="#E2E8F0"/>
+            <rect x="18" y="104" width="20" height="2" rx="1" fill="#E2E8F0"/>
+            <rect x="51" y="90" width="28" height="40" rx="4" fill="#2D3748"/>
+            <rect x="53" y="93" width="24" height="34" rx="2" fill="#EBF4FF"/>
+            <rect x="55" y="95" width="20" height="3" rx="1" fill="#2EC4B6"/>
+            <rect x="55" y="100" width="20" height="2" rx="1" fill="#E2E8F0"/>
+            <rect x="55" y="104" width="20" height="2" rx="1" fill="#E2E8F0"/>
+            <rect x="88" y="90" width="28" height="40" rx="4" fill="#2D3748"/>
+            <rect x="90" y="93" width="24" height="34" rx="2" fill="#EBF4FF"/>
+            <rect x="92" y="95" width="20" height="3" rx="1" fill="#2EC4B6"/>
+            <rect x="92" y="100" width="20" height="2" rx="1" fill="#E2E8F0"/>
+            <rect x="92" y="104" width="20" height="2" rx="1" fill="#E2E8F0"/>
+          </svg>
+          <div class="bubble thought" style="top:4px;left:50%;transform:translateX(-50%);">I can see<br/>everyone's salary?! 😨</div>
         </div>
+        <div class="panel-caption">200 employees see everything!</div>
       </div>
-      <div class="risk-row fragment fade-up" data-fragment-index="4">
-        <div class="rnum">7</div>
-        <div class="risk-row-text">
-          <h4>🗑️ Data Loss / Accidental Deletion</h4>
-          <p>Without version history, a deleted folder of tax documents is gone permanently — violating BIR's 10-year retention requirement.</p>
+
+      <!-- PANEL 4: Consequence + Fix -->
+      <div class="panel">
+        <div class="panel-num">4</div>
+        <div class="panel-bg" style="background:linear-gradient(160deg,#FED7D7 40%,#FEB2B2 100%);">
+          <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
+            <!-- warning sign -->
+            <polygon points="65,10 115,95 15,95" fill="#FC8181" stroke="#9B2C2C" stroke-width="3"/>
+            <text x="65" y="72" font-size="28" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" fill="white">!</text>
+            <!-- consequences list -->
+            <rect x="8" y="100" width="114" height="36" rx="6" fill="#fff" stroke="#FC8181" stroke-width="1.5"/>
+            <text x="14" y="113" font-size="6" fill="#9B2C2C" font-family="Inter,sans-serif" font-weight="700">❌ Data Privacy Act Violation</text>
+            <text x="14" y="123" font-size="6" fill="#9B2C2C" font-family="Inter,sans-serif" font-weight="700">❌ Employee Trust Destroyed</text>
+            <text x="14" y="133" font-size="6" fill="#9B2C2C" font-family="Inter,sans-serif" font-weight="700">❌ Legal Liability for Maria</text>
+          </svg>
+          <div class="burst" style="background:#9B2C2C;">🚨 BREACH!</div>
         </div>
+        <div class="panel-caption" style="background:#FED7D7;color:#9B2C2C;">Consequences are serious</div>
+      </div>
+
+    </div><!-- end comic-strip -->
+
+    <div class="comic-lesson">
+      <div class="cl-box" style="background:#FFF8EE;border:2px solid #FF9F1C;color:#7B4F00;">
+        <span style="font-size:1.3em;">⚠️</span>
+        <span><strong>What went wrong:</strong> Maria selected "Everyone in the organization" instead of sharing with the Finance VP's specific email address.</span>
+      </div>
+      <div class="cl-box" style="background:#F0FDF9;border:2px solid #2EC4B6;color:#1A5C54;">
+        <span style="font-size:1.3em;">✅</span>
+        <span><strong>The fix:</strong> Always share with <strong>specific email addresses only</strong>. Never use "Everyone" or "Anyone with the link" for payroll or financial data.</span>
       </div>
     </div>
-  </section>
 
-  <!-- ⑤ SCENARIO A -->
-  <section>
-    <div class="badge">📖 Real-World Scenario A</div>
-    <h2>The Overshared Payroll Sheet</h2>
-    <div class="two-col-3-2" style="align-items:center;">
-      <div>
-        <div class="scenario">
-          <div class="s-label">Scenario A</div>
-          <p>Maria, an HR-Accounting staff, creates a Google Sheet with all employee salaries. She shares it with <strong>"Everyone in the organization"</strong> so the Finance VP can view it quickly.</p>
-          <p style="margin-top:10px;">Two weeks later, employees discover their salaries are visible to all 200 staff members. This violates data privacy and causes serious damage to employee trust.</p>
+  </div>
+</section>
+
+<!-- ⑤ REAL-WORLD SCENARIOS B & C -->
+<section>
+  <div class="ig-full">
+    <div class="pill">📖 Real-World Scenarios B & C</div>
+    <div class="slide-title">More Incidents in Accounting Firms</div>
+    <div class="slide-sub">These are not hypothetical — these incidents occur regularly</div>
+    <div class="scenario-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="sc-card">
+        <div class="sc-header">
+          <div class="sc-icon" style="background:#FED7D7;">🔓</div>
+          <div><div class="sc-label">Scenario B</div><div class="sc-sub">The Expired Contractor</div></div>
         </div>
-        <div class="warn">
-          <p>🔴 <strong>Risk:</strong> Oversharing &nbsp;|&nbsp; <strong>Fix:</strong> Share with specific email addresses only — never "Everyone in the organization" for sensitive data.</p>
-        </div>
+        <div class="sc-body">A freelance bookkeeper's QuickBooks Online and SharePoint access was never revoked after their 3-month contract ended. Six months later, they — now at a competitor — still have full access to all financial records.</div>
+        <div class="sc-tag tag-red">🔓 Unauthorized Access</div>
+        <div style="font-size:.42em;color:#2EC4B6;font-weight:700;margin-top:4px;">✅ Fix: Revoke access on last day of contract</div>
       </div>
-      <!-- SVG: oversharing visual -->
-      <div class="svg-wrap">
-        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
-          <!-- file -->
-          <rect x="65" y="10" width="50" height="60" rx="6" fill="#4F8EF7" opacity=".9"/>
-          <rect x="75" y="22" width="30" height="4" rx="2" fill="white" opacity=".7"/>
-          <rect x="75" y="30" width="30" height="4" rx="2" fill="white" opacity=".7"/>
-          <rect x="75" y="38" width="20" height="4" rx="2" fill="white" opacity=".7"/>
-          <text x="90" y="62" font-size="8" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">PAYROLL</text>
-          <!-- arrows spreading out -->
-          <line x1="90" y1="70" x2="30" y2="110" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="90" y1="70" x2="90" y2="110" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="90" y1="70" x2="150" y2="110" stroke="#FF9F1C" stroke-width="1.5"/>
-          <line x1="90" y1="70" x2="10" y2="130" stroke="#FF9F1C" stroke-width="1.5" opacity=".5"/>
-          <line x1="90" y1="70" x2="170" y2="130" stroke="#FF9F1C" stroke-width="1.5" opacity=".5"/>
-          <!-- people icons -->
-          <circle cx="30" cy="120" r="10" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1.5"/>
-          <circle cx="90" cy="120" r="10" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1.5"/>
-          <circle cx="150" cy="120" r="10" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1.5"/>
-          <circle cx="10" cy="140" r="8" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1" opacity=".6"/>
-          <circle cx="170" cy="140" r="8" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1" opacity=".6"/>
-          <text x="90" y="175" font-size="8" fill="#FF9F1C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">200 employees can see!</text>
-        </svg>
+      <div class="sc-card">
+        <div class="sc-header">
+          <div class="sc-icon" style="background:#EBF4FF;">⚙️</div>
+          <div><div class="sc-label">Scenario C</div><div class="sc-sub">The Public Slack Channel</div></div>
+        </div>
+        <div class="sc-body">The accounting team's <strong>#invoices</strong> Slack channel was accidentally set to public during workspace setup. All interns, new hires, and IT staff can now view confidential client billing data.</div>
+        <div class="sc-tag tag-blue">⚙️ Misconfiguration</div>
+        <div style="font-size:.42em;color:#2EC4B6;font-weight:700;margin-top:4px;">✅ Fix: Set financial channels to Private always</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ⑥ SCENARIO B -->
-  <section>
-    <div class="badge">📖 Real-World Scenario B</div>
-    <h2>The Expired Contractor's Access</h2>
-    <div class="two-col-3-2" style="align-items:center;">
-      <div>
-        <div class="scenario">
-          <div class="s-label">Scenario B</div>
-          <p>A freelance bookkeeper was given access to a company's QuickBooks Online and SharePoint for a 3-month project. After the contract ended, <strong>no one revoked access</strong>.</p>
-          <p style="margin-top:10px;">Six months later, the bookkeeper — now working for a competitor — still has full access to all financial records, client data, and internal reports.</p>
-        </div>
-        <div class="warn">
-          <p>🔴 <strong>Risk:</strong> Unauthorized Access &nbsp;|&nbsp; <strong>Fix:</strong> Revoke all cloud access on the last day of any contract or employment.</p>
-        </div>
-      </div>
-      <!-- SVG: timeline visual -->
-      <div class="svg-wrap">
-        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
-          <!-- timeline line -->
-          <line x1="90" y1="20" x2="90" y2="180" stroke="#E2E8F0" stroke-width="2"/>
-          <!-- month 1-3: active -->
-          <circle cx="90" cy="40" r="8" fill="#2EC4B6"/>
-          <text x="105" y="44" font-size="8" fill="#2EC4B6" font-family="Inter,sans-serif" font-weight="700">Month 1–3</text>
-          <text x="105" y="54" font-size="7" fill="#718096" font-family="Inter,sans-serif">Contract Active ✓</text>
-          <!-- contract end -->
-          <circle cx="90" cy="90" r="8" fill="#FF9F1C"/>
-          <text x="105" y="94" font-size="8" fill="#FF9F1C" font-family="Inter,sans-serif" font-weight="700">Month 3</text>
-          <text x="105" y="104" font-size="7" fill="#718096" font-family="Inter,sans-serif">Contract Ends</text>
-          <!-- access not revoked -->
-          <circle cx="90" cy="140" r="8" fill="#FC8181"/>
-          <text x="105" y="144" font-size="8" fill="#FC8181" font-family="Inter,sans-serif" font-weight="700">Month 9</text>
-          <text x="105" y="154" font-size="7" fill="#718096" font-family="Inter,sans-serif">Still has access! ⚠️</text>
-          <!-- X mark -->
-          <line x1="75" y1="75" x2="105" y2="75" stroke="#FC8181" stroke-width="2" stroke-dasharray="4 2"/>
-          <text x="60" y="79" font-size="9" fill="#FC8181" font-family="Inter,sans-serif" font-weight="700">✗</text>
-        </svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- ⑦ SCENARIO C -->
-  <section>
-    <div class="badge">📖 Real-World Scenario C</div>
-    <h2>The Public Slack Channel</h2>
-    <div class="two-col-3-2" style="align-items:center;">
-      <div>
-        <div class="scenario">
-          <div class="s-label">Scenario C</div>
-          <p>An accounting team uses a Slack channel called <strong>#invoices</strong> to share client billing information. The channel was accidentally set to <strong>public</strong> during workspace setup.</p>
-          <p style="margin-top:10px;">Anyone in the Slack workspace — including interns, new hires, and IT staff — can view confidential client invoice data and billing amounts.</p>
-        </div>
-        <div class="warn">
-          <p>🔴 <strong>Risk:</strong> Misconfiguration &nbsp;|&nbsp; <strong>Fix:</strong> Always set financial channels to Private. Audit channel visibility settings monthly.</p>
-        </div>
-      </div>
-      <!-- SVG: public vs private channel -->
-      <div class="svg-wrap">
-        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
-          <!-- public channel box -->
-          <rect x="10" y="20" width="160" height="70" rx="8" fill="#FFF8EE" stroke="#FF9F1C" stroke-width="1.5"/>
-          <text x="90" y="42" font-size="9" fill="#FF9F1C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700"># invoices (PUBLIC)</text>
-          <!-- people in public -->
-          <circle cx="35" cy="65" r="8" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1"/>
-          <circle cx="60" cy="65" r="8" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1"/>
-          <circle cx="85" cy="65" r="8" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1"/>
-          <circle cx="110" cy="65" r="8" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1"/>
-          <circle cx="135" cy="65" r="8" fill="#EDF2F7" stroke="#FF9F1C" stroke-width="1"/>
-          <text x="90" y="105" font-size="8" fill="#FF9F1C" text-anchor="middle" font-family="Inter,sans-serif">Everyone can see ⚠️</text>
-          <!-- private channel box -->
-          <rect x="10" y="120" width="160" height="70" rx="8" fill="#F0FDF9" stroke="#2EC4B6" stroke-width="1.5"/>
-          <text x="90" y="142" font-size="9" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🔒 invoices (PRIVATE)</text>
-          <circle cx="60" cy="165" r="8" fill="#EDF2F7" stroke="#2EC4B6" stroke-width="1"/>
-          <circle cx="90" cy="165" r="8" fill="#EDF2F7" stroke="#2EC4B6" stroke-width="1"/>
-          <circle cx="120" cy="165" r="8" fill="#EDF2F7" stroke="#2EC4B6" stroke-width="1"/>
-          <text x="90" y="200" font-size="8" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif">Only 3 members ✓</text>
-        </svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- ⑧ SUMMARY TABLE -->
-  <section>
-    <div class="badge">📋 Lesson 2 Summary</div>
-    <h2>Know Your 7 Risks</h2>
-    <table>
+<!-- ⑥ SUMMARY TABLE -->
+<section>
+  <div class="ig-full">
+    <div class="pill">📋 Lesson 2 Summary</div>
+    <div class="slide-title">Know Your 7 Risks at a Glance</div>
+    <table class="sum-table">
       <tr><th>Risk</th><th>Key Trigger</th><th>Quick Fix</th></tr>
       <tr><td>🔓 Unauthorized Access</td><td>Expired links, unrevoked accounts</td><td>Revoke access immediately on offboarding</td></tr>
       <tr><td>📤 Oversharing</td><td>Sharing folders instead of files</td><td>Share minimum needed, specific people only</td></tr>
@@ -311,24 +385,22 @@
       <tr><td>🔗 Insecure Links</td><td>No expiration, no password</td><td>Set 7–30 day expiry on all links</td></tr>
       <tr><td>🗑️ Data Loss</td><td>No version history, no backup</td><td>Enable version history + 3-2-1 backup</td></tr>
     </table>
-    <div style="margin-top:18px;display:flex;gap:16px;align-items:center;">
-      <a href="lesson1.html" style="font-size:0.42em;color:#718096;text-decoration:none;font-weight:600;">← Lesson 1</a>
-      <a href="lesson3.html" style="font-size:0.42em;color:var(--blue);font-weight:800;text-decoration:none;background:var(--card);padding:8px 18px;border-radius:8px;">Next: Lesson 3 — Safe Sharing →</a>
+    <div class="nav-row">
+      <a href="lesson1.html" class="nav-btn nav-prev">← Lesson 1</a>
+      <a href="lesson3.html" class="nav-btn nav-next">Lesson 3: Safe Sharing →</a>
     </div>
-  </section>
+  </div>
+</section>
 
- </div>
-</div>
-
+</div></div>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script>
 Reveal.initialize({hash:true,transition:'slide',backgroundTransition:'fade',controls:true,controlsLayout:'bottom-right',progress:true,center:true,width:'100%',height:'100%',margin:0,minScale:1,maxScale:1});
-const cv=document.getElementById('particle-canvas'),cx=cv.getContext('2d');let W,H,pts=[];
-const COLS=['#4F8EF7','#2EC4B6','#FF9F1C'];
-function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
-resize();window.addEventListener('resize',resize);
-for(let i=0;i<45;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*3+1.5,c:COLS[Math.floor(Math.random()*3)]});
-(function draw(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<120){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.1*(1-d/120)})`;cx.lineWidth=.8;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'44';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(draw);})();
+const cv=document.getElementById('pc'),cx=cv.getContext('2d');let W,H,pts=[];
+const C=['#4F8EF7','#2EC4B6','#FF9F1C'];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;}rs();addEventListener('resize',rs);
+for(let i=0;i<50;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*3+1,c:C[i%3]});
+(function d(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const dist=Math.hypot(p.x-q.x,p.y-q.y);if(dist<130){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.08*(1-dist/130)})`;cx.lineWidth=.7;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'33';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(d);})();
 </script>
 </body>
 </html>

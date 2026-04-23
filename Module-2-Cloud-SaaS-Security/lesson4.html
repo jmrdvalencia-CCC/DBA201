@@ -4,264 +4,236 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lesson 4 — Oversharing & Misconfiguration Risks</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
-    #particle-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35;}
-    .reveal .slides{position:relative;z-index:1;}
+    #pc{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.3;}
+    .reveal .slides{z-index:1;position:relative;}
+    .ig-full{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px 40px;box-sizing:border-box;}
+    .pill{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#4F8EF7,#2EC4B6);color:#fff;font-size:.48em;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;}
+    .slide-title{font-size:1.05em;font-weight:900;color:#4F8EF7;margin-bottom:2px;text-align:center;}
+    .slide-sub{font-size:.54em;color:#718096;text-align:center;margin-bottom:12px;}
+    .nav-row{display:flex;gap:12px;margin-top:14px;justify-content:center;}
+    .nav-btn{font-size:.48em;font-weight:700;text-decoration:none;padding:8px 20px;border-radius:10px;}
+    .nav-prev{color:#718096;background:#EDF2F7;}
+    .nav-next{color:#fff;background:linear-gradient(135deg,#4F8EF7,#2EC4B6);}
+    /* oversharing vs correct */
+    .os-compare{display:grid;grid-template-columns:1fr 80px 1fr;gap:0;align-items:center;width:100%;}
+    .os-box{border-radius:16px;padding:16px 14px;display:flex;flex-direction:column;gap:8px;}
+    .os-box .ob-title{font-size:.62em;font-weight:900;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+    .os-box .ob-item{display:flex;align-items:center;gap:8px;font-size:.5em;padding:6px 10px;border-radius:8px;}
+    .os-vs{text-align:center;font-size:.8em;font-weight:900;color:#CBD5E0;}
+    /* red flags grid */
+    .rf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;}
+    .rf-item{background:#fff;border-radius:12px;border:1px solid #FFD9A0;border-left:4px solid #FF9F1C;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;font-size:.52em;color:#2D3748;font-weight:600;}
+    .rf-item .rfi{font-size:1.3em;flex-shrink:0;}
+    /* misconfig table */
+    .mc-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.48em;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(79,142,247,.08);}
+    .mc-table th{background:linear-gradient(135deg,#FF9F1C,#FFB84D);color:#fff;padding:8px 12px;text-align:left;font-weight:700;}
+    .mc-table td{padding:7px 12px;border-bottom:1px solid #E2E8F0;color:#2D3748;background:#fff;}
+    .mc-table tr:nth-child(even) td{background:#FFF8EE;}
+    .mc-table tr:last-child td{border-bottom:none;}
+    /* MFA visual */
+    .mfa-flow{display:flex;align-items:center;gap:0;width:100%;justify-content:center;}
+    .mfa-step{background:#fff;border-radius:14px;border:1px solid #E2E8F0;padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;box-shadow:0 2px 10px rgba(79,142,247,.06);}
+    .mfa-step .ms-icon{font-size:2em;}
+    .mfa-step .ms-title{font-size:.54em;font-weight:800;color:#2D3748;text-align:center;}
+    .mfa-step .ms-desc{font-size:.44em;color:#718096;text-align:center;}
+    .mfa-arrow{font-size:1.2em;color:#CBD5E0;padding:0 8px;flex-shrink:0;}
+    .mfa-result{background:linear-gradient(135deg,#C6F6D5,#9AE6B4);border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;align-items:center;gap:6px;flex:1.2;}
+    .mfa-result .mr-icon{font-size:2em;}
+    .mfa-result .mr-title{font-size:.58em;font-weight:900;color:#276749;text-align:center;}
+    /* audit checklist */
+    .audit-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+    .audit-item{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:10px 14px;cursor:pointer;transition:background .2s;font-size:.52em;color:#2D3748;font-weight:600;}
+    .audit-item .ab{width:20px;height:20px;border:2px solid #E2E8F0;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8em;transition:all .2s;}
+    .audit-item.done{background:#F0FDF9;}
+    .audit-item.done .ab{background:#2EC4B6;border-color:#2EC4B6;color:#fff;}
   </style>
 </head>
 <body>
-<canvas id="particle-canvas"></canvas>
+<canvas id="pc"></canvas>
 <a class="back-home" href="index.html">← All Lessons</a>
-
 <div class="reveal">
- <div class="slides">
+<div class="slides">
 
-  <!-- ① TITLE -->
-  <section class="section-slide">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <!-- SVG magnifier illustration -->
-    <svg style="position:absolute;right:60px;bottom:30px;opacity:.18;z-index:1;" width="260" height="260" viewBox="0 0 260 260" fill="none">
-      <circle cx="110" cy="110" r="80" stroke="white" stroke-width="14"/>
-      <circle cx="110" cy="110" r="55" fill="white" opacity=".15"/>
-      <line x1="170" y1="170" x2="240" y2="240" stroke="white" stroke-width="14" stroke-linecap="round"/>
-      <line x1="85" y1="110" x2="135" y2="110" stroke="white" stroke-width="8" stroke-linecap="round" opacity=".7"/>
-      <line x1="110" y1="85" x2="110" y2="135" stroke="white" stroke-width="8" stroke-linecap="round" opacity=".7"/>
-    </svg>
-    <div class="lesson-num">Lesson 4 of 6</div>
-    <h1>Oversharing &<br/>Misconfiguration Risks</h1>
-    <p style="margin-top:10px;font-size:0.5em;opacity:.85;max-width:520px;">Recognizing red flags and auditing your cloud configurations</p>
-  </section>
+<!-- ① TITLE -->
+<section class="section-slide">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div>
+  <svg style="position:absolute;right:40px;bottom:20px;opacity:.15;z-index:1;" width="300" height="300" viewBox="0 0 300 300" fill="none">
+    <circle cx="130" cy="130" r="100" stroke="white" stroke-width="16"/>
+    <circle cx="130" cy="130" r="65" fill="white" opacity=".12"/>
+    <line x1="200" y1="200" x2="280" y2="280" stroke="white" stroke-width="16" stroke-linecap="round"/>
+    <line x1="100" y1="130" x2="160" y2="130" stroke="white" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+    <line x1="130" y1="100" x2="130" y2="160" stroke="white" stroke-width="10" stroke-linecap="round" opacity=".7"/>
+  </svg>
+  <div class="lesson-num">Lesson 4 of 6</div>
+  <h1>Oversharing &<br/>Misconfiguration Risks</h1>
+  <p style="font-size:.5em;opacity:.85;max-width:500px;margin-top:10px;">Recognizing red flags and auditing your cloud configurations</p>
+  <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">📤 Oversharing Signs</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">⚙️ Misconfigurations</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">🔑 MFA</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">📋 Audit Checklist</span>
+  </div>
+</section>
 
-  <!-- ② OVERSHARING INTRO -->
-  <section>
-    <div class="badge">📤 Oversharing</div>
-    <h2>What is Oversharing?</h2>
-    <div class="two-col-3-2" style="align-items:center;">
-      <div>
-        <p style="margin-bottom:14px;">Oversharing means granting <span class="hi">more access than necessary</span> — often done with good intentions but with serious security consequences.</p>
-        <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
-          <div class="card fragment fade-up" data-fragment-index="1" style="text-align:center;">
-            <span class="icon">😇</span>
-            <h4>The Intent</h4>
-            <p>"I'll share the whole folder so they can find what they need easily."</p>
-          </div>
-          <div class="card fragment fade-up" data-fragment-index="2" style="text-align:center;border-top:3px solid var(--orange);">
-            <span class="icon">😱</span>
-            <h4>The Reality</h4>
-            <p>They now see every file — including ones they were never meant to access.</p>
-          </div>
-          <div class="card fragment fade-up" data-fragment-index="3" style="text-align:center;border-top:3px solid #FC8181;">
-            <span class="icon">⚖️</span>
-            <h4>The Consequence</h4>
-            <p>Data Privacy Act violation, breach, loss of client trust, legal liability.</p>
-          </div>
-        </div>
+<!-- ② OVERSHARING VISUAL COMPARISON -->
+<section>
+  <div class="ig-full">
+    <div class="pill">📤 Oversharing</div>
+    <div class="slide-title">Wrong vs. Right Way to Share</div>
+    <div class="slide-sub">Convenience is not a valid reason to overshare sensitive accounting data</div>
+    <div class="os-compare">
+      <div class="os-box" style="background:#FFF8EE;border:2px solid #FF9F1C;">
+        <div class="ob-title" style="color:#FF9F1C;">❌ Oversharing (Wrong)</div>
+        <div class="ob-item" style="background:#FED7D7;"><span>📁</span> Sharing entire Finance folder</div>
+        <div class="ob-item" style="background:#FED7D7;"><span>🌐</span> "Anyone with the link"</div>
+        <div class="ob-item" style="background:#FED7D7;"><span>♾️</span> No expiration date set</div>
+        <div class="ob-item" style="background:#FED7D7;"><span>✏️</span> Editor access when view-only needed</div>
+        <div class="ob-item" style="background:#FED7D7;"><span>👥</span> Entire department added</div>
+        <div style="background:#FF9F1C;color:#fff;border-radius:8px;padding:8px 12px;font-size:.5em;font-weight:700;margin-top:4px;text-align:center;">⚠️ Data Privacy Act Violation Risk</div>
       </div>
-      <!-- SVG: folder vs file -->
-      <div class="svg-wrap">
-        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
-          <!-- Wrong: folder -->
-          <rect x="10" y="20" width="70" height="80" rx="6" fill="#FFF8EE" stroke="#FF9F1C" stroke-width="1.5"/>
-          <rect x="10" y="20" width="30" height="12" rx="4" fill="#FF9F1C" opacity=".6"/>
-          <text x="45" y="55" font-size="8" fill="#FF9F1C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">📁 Finance</text>
-          <text x="45" y="68" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">All 200 files</text>
-          <text x="45" y="110" font-size="8" fill="#FF9F1C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">❌ Wrong</text>
-          <!-- Right: file -->
-          <rect x="100" y="20" width="70" height="80" rx="6" fill="#F0FDF9" stroke="#2EC4B6" stroke-width="1.5"/>
-          <text x="135" y="55" font-size="8" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">📄 Q3 Report</text>
-          <text x="135" y="68" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">1 specific file</text>
-          <text x="135" y="110" font-size="8" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">✓ Correct</text>
-          <!-- divider -->
-          <line x1="90" y1="20" x2="90" y2="100" stroke="#E2E8F0" stroke-width="1.5" stroke-dasharray="4 3"/>
-          <text x="90" y="140" font-size="9" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Share the file,</text>
-          <text x="90" y="155" font-size="9" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">not the folder.</text>
-        </svg>
+      <div class="os-vs">VS</div>
+      <div class="os-box" style="background:#F0FDF9;border:2px solid #2EC4B6;">
+        <div class="ob-title" style="color:#2EC4B6;">✅ Correct Sharing (Right)</div>
+        <div class="ob-item" style="background:#C6F6D5;"><span>📄</span> Share only the specific file needed</div>
+        <div class="ob-item" style="background:#C6F6D5;"><span>👤</span> Specific email addresses only</div>
+        <div class="ob-item" style="background:#C6F6D5;"><span>📅</span> 7–30 day expiration date set</div>
+        <div class="ob-item" style="background:#C6F6D5;"><span>👁️</span> Viewer access by default</div>
+        <div class="ob-item" style="background:#C6F6D5;"><span>🎯</span> Only named individuals added</div>
+        <div style="background:#2EC4B6;color:#fff;border-radius:8px;padding:8px 12px;font-size:.5em;font-weight:700;margin-top:4px;text-align:center;">✅ Principle of Least Privilege Applied</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ③ OVERSHARING RED FLAGS -->
-  <section>
-    <div class="badge">🚩 Red Flags</div>
-    <h2>Signs of Oversharing in Your Team</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
-      <div class="card fragment fade-up" data-fragment-index="1" style="border-left:3px solid var(--orange);">
-        <p>❌ Sharing an entire folder when only <strong>one file</strong> is needed</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="2" style="border-left:3px solid var(--orange);">
-        <p>❌ Using <strong>"Anyone with the link"</strong> for internal documents</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="3" style="border-left:3px solid var(--orange);">
-        <p>❌ Sending sharing links via email <strong>without expiration dates</strong></p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="4" style="border-left:3px solid var(--orange);">
-        <p>❌ Adding people to a project channel <strong>after the project has ended</strong></p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="5" style="border-left:3px solid var(--orange);">
-        <p>❌ Keeping former employees or contractors in <strong>shared workspaces</strong></p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="6" style="border-left:3px solid var(--orange);">
-        <p>❌ Using <strong>Editor access</strong> when Viewer would be sufficient</p>
-      </div>
+<!-- ③ RED FLAGS GRID -->
+<section>
+  <div class="ig-full">
+    <div class="pill">🚩 Red Flags</div>
+    <div class="slide-title">Signs of Oversharing in Your Team</div>
+    <div class="slide-sub">Watch for these warning signs in your daily accounting work</div>
+    <div class="rf-grid">
+      <div class="rf-item"><div class="rfi">📁</div>Sharing an entire folder when only <strong>one file</strong> is needed</div>
+      <div class="rf-item"><div class="rfi">🌐</div>Using <strong>"Anyone with the link"</strong> for internal documents</div>
+      <div class="rf-item"><div class="rfi">♾️</div>Sending sharing links via email <strong>without expiration dates</strong></div>
+      <div class="rf-item"><div class="rfi">👥</div>Adding people to a project channel <strong>after the project ended</strong></div>
+      <div class="rf-item"><div class="rfi">🚪</div>Keeping former employees or contractors in <strong>shared workspaces</strong></div>
+      <div class="rf-item"><div class="rfi">✏️</div>Using <strong>Editor access</strong> when Viewer would be sufficient</div>
     </div>
-  </section>
-
-  <!-- ④ MISCONFIGURATION INTRO -->
-  <section>
-    <div class="badge">⚙️ Misconfiguration</div>
-    <h2>The #1 Cause of Cloud Data Breaches</h2>
-    <div class="two-col-3-2" style="align-items:center;">
-      <div>
-        <p style="margin-bottom:14px;">A misconfiguration is an <span class="hi">incorrect security setting</span> in a cloud tool that exposes data unintentionally — often without anyone realizing it for months.</p>
-        <div class="warn">
-          <p>⚠️ Misconfiguration is the <strong>#1 cause of cloud data breaches</strong> worldwide. It is not caused by hackers breaking in — it is caused by insiders setting things up incorrectly.</p>
-        </div>
-        <div class="tip" style="margin-top:10px;">
-          <p>💡 The most dangerous misconfigurations are the ones that have been in place for months or years — because no one thought to check.</p>
-        </div>
-      </div>
-      <!-- SVG: misconfiguration visual -->
-      <div class="svg-wrap">
-        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
-          <!-- server/cloud -->
-          <rect x="50" y="20" width="80" height="60" rx="8" fill="#EBF4FF" stroke="#4F8EF7" stroke-width="1.5"/>
-          <text x="90" y="48" font-size="9" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">SharePoint</text>
-          <text x="90" y="62" font-size="8" fill="#FC8181" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">⚙️ PUBLIC</text>
-          <!-- crack/leak -->
-          <path d="M90 80 L90 110 L70 130 L110 130 L90 110" fill="#FF9F1C" opacity=".3"/>
-          <path d="M90 80 L90 110 L70 130 L110 130 L90 110" stroke="#FF9F1C" stroke-width="1.5" fill="none"/>
-          <!-- data leaking out -->
-          <circle cx="50" cy="150" r="8" fill="#FC8181" opacity=".7"/>
-          <circle cx="90" cy="155" r="8" fill="#FC8181" opacity=".7"/>
-          <circle cx="130" cy="150" r="8" fill="#FC8181" opacity=".7"/>
-          <text x="90" y="180" font-size="8" fill="#FC8181" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Data exposed to internet</text>
-          <!-- X badge -->
-          <circle cx="140" cy="30" r="14" fill="#FC8181"/>
-          <text x="140" y="35" font-size="12" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900">✗</text>
-        </svg>
-      </div>
+    <div style="background:#FFF8EE;border-left:4px solid #FF9F1C;border-radius:10px;padding:10px 16px;margin-top:12px;width:100%;box-sizing:border-box;">
+      <p style="font-size:.5em;color:#7B4F00;margin:0;">⚠️ Oversharing is often accidental — done with good intentions. But the <strong>legal consequences are the same</strong> whether intentional or not under the Data Privacy Act.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ⑤ MISCONFIGURATION TABLE -->
-  <section>
-    <div class="badge">⚙️ Common Mistakes</div>
-    <h2>Misconfiguration Examples & Fixes</h2>
-    <table>
-      <tr><th>Misconfiguration</th><th>Risk</th><th>Fix</th></tr>
-      <tr><td>Public SharePoint site</td><td>Internet can access files</td><td>Set to Private; require authentication</td></tr>
-      <tr><td>"Anyone with link" on Drive</td><td>Uncontrolled access spread</td><td>Change to "Specific people"</td></tr>
-      <tr><td>No MFA on accounting software</td><td>Account takeover risk</td><td>Enable Multi-Factor Authentication</td></tr>
-      <tr><td>Shared team login credentials</td><td>No audit trail</td><td>Create individual user accounts</td></tr>
-      <tr><td>Inactive accounts not removed</td><td>Former employees retain access</td><td>Quarterly access reviews</td></tr>
-      <tr><td>No link expiration</td><td>Permanent unauthorized access</td><td>Set 7–30 day expiration</td></tr>
-      <tr><td>Overpermissive API integrations</td><td>Third-party apps access too much</td><td>Review and restrict app permissions</td></tr>
+<!-- ④ MISCONFIGURATION TABLE -->
+<section>
+  <div class="ig-full">
+    <div class="pill">⚙️ Misconfiguration</div>
+    <div class="slide-title">Common Mistakes & How to Fix Them</div>
+    <div class="slide-sub">Misconfiguration is the #1 cause of cloud data breaches worldwide</div>
+    <table class="mc-table">
+      <tr><th>⚙️ Misconfiguration</th><th>🔴 Risk</th><th>✅ Fix</th></tr>
+      <tr><td>Public SharePoint site</td><td>Internet can access all files</td><td>Set to Private; require authentication</td></tr>
+      <tr><td>"Anyone with link" on Drive</td><td>Uncontrolled access spread</td><td>Change to "Specific people" only</td></tr>
+      <tr><td>No MFA on accounting software</td><td>Account takeover via stolen password</td><td>Enable Multi-Factor Authentication</td></tr>
+      <tr><td>Shared team login credentials</td><td>No audit trail, accountability gap</td><td>Create individual user accounts</td></tr>
+      <tr><td>Inactive accounts not removed</td><td>Former employees retain access</td><td>Conduct quarterly access reviews</td></tr>
+      <tr><td>No link expiration dates</td><td>Permanent unauthorized access</td><td>Set 7–30 day expiration on all links</td></tr>
+      <tr><td>Overpermissive API integrations</td><td>Third-party apps access too much data</td><td>Review and restrict app permissions</td></tr>
     </table>
-  </section>
+  </div>
+</section>
 
-  <!-- ⑥ MFA VISUAL -->
-  <section>
-    <div class="badge">🔑 Critical Control</div>
-    <h2>Multi-Factor Authentication (MFA)</h2>
-    <div class="two-col-3-2" style="align-items:center;">
-      <div>
-        <p style="margin-bottom:14px;">MFA requires users to verify their identity using <span class="hi">two or more methods</span> before accessing a system.</p>
-        <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
-          <div class="card fragment fade-up" data-fragment-index="1" style="text-align:center;">
-            <span class="icon">🔑</span>
-            <h4>Something You Know</h4>
-            <p>Password or PIN</p>
-          </div>
-          <div class="card fragment fade-up" data-fragment-index="2" style="text-align:center;">
-            <span class="icon">📱</span>
-            <h4>Something You Have</h4>
-            <p>Authenticator app, SMS code, hardware token</p>
-          </div>
-          <div class="card fragment fade-up" data-fragment-index="3" style="text-align:center;">
-            <span class="icon">👁️</span>
-            <h4>Something You Are</h4>
-            <p>Fingerprint, face recognition, biometrics</p>
-          </div>
-        </div>
-        <div class="warn" style="margin-top:12px;">
-          <p>⚠️ Without MFA, a stolen password gives an attacker <strong>complete access</strong>. MFA stops 99.9% of automated account attacks.</p>
-        </div>
+<!-- ⑤ MFA VISUAL FLOW -->
+<section>
+  <div class="ig-full">
+    <div class="pill">🔑 Critical Control</div>
+    <div class="slide-title">Multi-Factor Authentication (MFA)</div>
+    <div class="slide-sub">MFA stops 99.9% of automated account attacks — enable it on everything</div>
+    <div class="mfa-flow">
+      <div class="mfa-step" style="border-top:4px solid #4F8EF7;">
+        <div class="ms-icon">🔑</div>
+        <div class="ms-title">Factor 1<br/>Something You Know</div>
+        <div class="ms-desc">Password or PIN</div>
       </div>
-      <!-- SVG: MFA flow -->
-      <div class="svg-wrap">
-        <svg width="180" height="210" viewBox="0 0 180 210" fill="none">
-          <!-- step 1 -->
-          <rect x="30" y="10" width="120" height="36" rx="8" fill="#EBF4FF" stroke="#4F8EF7" stroke-width="1.5"/>
-          <text x="90" y="26" font-size="8" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">🔑 Enter Password</text>
-          <text x="90" y="38" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Factor 1</text>
-          <line x1="90" y1="46" x2="90" y2="66" stroke="#E2E8F0" stroke-width="2" marker-end="url(#a4)"/>
-          <!-- step 2 -->
-          <rect x="30" y="66" width="120" height="36" rx="8" fill="#E6FFFA" stroke="#2EC4B6" stroke-width="1.5"/>
-          <text x="90" y="82" font-size="8" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">📱 Verify on Phone</text>
-          <text x="90" y="94" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Factor 2</text>
-          <line x1="90" y1="102" x2="90" y2="122" stroke="#E2E8F0" stroke-width="2" marker-end="url(#a4)"/>
-          <!-- access granted -->
-          <rect x="30" y="122" width="120" height="36" rx="8" fill="#C6F6D5" stroke="#2EC4B6" stroke-width="1.5"/>
-          <text x="90" y="138" font-size="8" fill="#276749" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">✅ Access Granted</text>
-          <text x="90" y="150" font-size="7" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Secure Login</text>
-          <!-- vs no MFA -->
-          <text x="90" y="180" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Without MFA:</text>
-          <rect x="30" y="184" width="120" height="22" rx="6" fill="#FED7D7" stroke="#FC8181" stroke-width="1"/>
-          <text x="90" y="199" font-size="8" fill="#9B2C2C" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">❌ Password alone = Full Access</text>
-          <defs>
-            <marker id="a4" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6Z" fill="#CBD5E0"/>
-            </marker>
-          </defs>
-        </svg>
+      <div class="mfa-arrow">+</div>
+      <div class="mfa-step" style="border-top:4px solid #2EC4B6;">
+        <div class="ms-icon">📱</div>
+        <div class="ms-title">Factor 2<br/>Something You Have</div>
+        <div class="ms-desc">Authenticator app, SMS code, hardware token</div>
+      </div>
+      <div class="mfa-arrow">+</div>
+      <div class="mfa-step" style="border-top:4px solid #FF9F1C;">
+        <div class="ms-icon">👁️</div>
+        <div class="ms-title">Factor 3<br/>Something You Are</div>
+        <div class="ms-desc">Fingerprint, face recognition, biometrics</div>
+      </div>
+      <div class="mfa-arrow">=</div>
+      <div class="mfa-result">
+        <div class="mr-icon">✅</div>
+        <div class="mr-title">Secure Access Granted</div>
+        <div style="font-size:.44em;color:#276749;text-align:center;">Even if password is stolen, attacker cannot log in without the second factor</div>
       </div>
     </div>
-  </section>
-
-  <!-- ⑦ INTERACTIVE AUDIT CHECKLIST -->
-  <section>
-    <div class="badge">📋 Monthly Practice</div>
-    <h2>Misconfiguration Audit Checklist</h2>
-    <p style="margin-bottom:12px;font-size:0.48em;">Click each item to mark it complete — use this monthly for your accounting team's cloud tools:</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <ul class="checklist">
-        <li onclick="toggle(this)"><div class="chk"></div>Are all sharing links set to expire?</li>
-        <li onclick="toggle(this)"><div class="chk"></div>Are former employees/contractors removed?</li>
-        <li onclick="toggle(this)"><div class="chk"></div>Are sensitive channels/folders set to private?</li>
-        <li onclick="toggle(this)"><div class="chk"></div>Is MFA enabled for all users?</li>
-      </ul>
-      <ul class="checklist">
-        <li onclick="toggle(this)"><div class="chk"></div>Are permission levels reviewed and appropriate?</li>
-        <li onclick="toggle(this)"><div class="chk"></div>Are third-party app integrations reviewed?</li>
-        <li onclick="toggle(this)"><div class="chk"></div>Is there a log/audit trail of who accessed what?</li>
-        <li onclick="toggle(this)"><div class="chk"></div>Are files labeled with sensitivity levels?</li>
-      </ul>
+    <div style="background:#FED7D7;border-left:4px solid #FC8181;border-radius:10px;padding:10px 16px;margin-top:12px;width:100%;box-sizing:border-box;">
+      <p style="font-size:.5em;color:#9B2C2C;margin:0;">❌ <strong>Without MFA:</strong> A stolen password gives an attacker <strong>complete access</strong> to QuickBooks Online, SharePoint, and all financial records — instantly.</p>
     </div>
-    <div style="margin-top:18px;display:flex;gap:16px;align-items:center;">
-      <a href="lesson3.html" style="font-size:0.42em;color:#718096;text-decoration:none;font-weight:600;">← Lesson 3</a>
-      <a href="lesson5.html" style="font-size:0.42em;color:var(--blue);font-weight:800;text-decoration:none;background:var(--card);padding:8px 18px;border-radius:8px;">Next: Lesson 5 — Secure Storage →</a>
+  </div>
+</section>
+
+<!-- ⑥ INTERACTIVE AUDIT CHECKLIST -->
+<section>
+  <div class="ig-full">
+    <div class="pill">📋 Monthly Audit</div>
+    <div class="slide-title">Misconfiguration Audit Checklist</div>
+    <div class="slide-sub">Click each item to mark complete — run this monthly for your accounting team</div>
+    <div class="audit-grid">
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Are all sharing links set to expire?
+      </div>
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Are former employees/contractors removed from all platforms?
+      </div>
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Are sensitive channels/folders set to private?
+      </div>
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Is MFA enabled for all users on all platforms?
+      </div>
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Are permission levels reviewed and appropriate?
+      </div>
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Are third-party app integrations reviewed?
+      </div>
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Is there a log/audit trail of who accessed what?
+      </div>
+      <div class="audit-item" onclick="this.classList.toggle('done');this.querySelector('.ab').textContent=this.classList.contains('done')?'✓':'';">
+        <div class="ab"></div>Are files labeled with appropriate sensitivity levels?
+      </div>
     </div>
-  </section>
+    <div class="nav-row">
+      <a href="lesson3.html" class="nav-btn nav-prev">← Lesson 3</a>
+      <a href="lesson5.html" class="nav-btn nav-next">Lesson 5: Secure Storage →</a>
+    </div>
+  </div>
+</section>
 
- </div>
-</div>
-
+</div></div>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script>
 Reveal.initialize({hash:true,transition:'slide',backgroundTransition:'fade',controls:true,controlsLayout:'bottom-right',progress:true,center:true,width:'100%',height:'100%',margin:0,minScale:1,maxScale:1});
-function toggle(el){el.classList.toggle('done');el.querySelector('.chk').textContent=el.classList.contains('done')?'✓':'';}
-const cv=document.getElementById('particle-canvas'),cx=cv.getContext('2d');let W,H,pts=[];
-const COLS=['#4F8EF7','#2EC4B6','#FF9F1C'];
-function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
-resize();window.addEventListener('resize',resize);
-for(let i=0;i<45;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*3+1.5,c:COLS[Math.floor(Math.random()*3)]});
-(function draw(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<120){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.1*(1-d/120)})`;cx.lineWidth=.8;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'44';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(draw);})();
+const cv=document.getElementById('pc'),cx=cv.getContext('2d');let W,H,pts=[];
+const C=['#4F8EF7','#2EC4B6','#FF9F1C'];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;}rs();addEventListener('resize',rs);
+for(let i=0;i<50;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*3+1,c:C[i%3]});
+(function d(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const dist=Math.hypot(p.x-q.x,p.y-q.y);if(dist<130){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.08*(1-dist/130)})`;cx.lineWidth=.7;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'33';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(d);})();
 </script>
 </body>
 </html>

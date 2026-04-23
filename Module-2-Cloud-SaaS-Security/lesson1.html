@@ -4,285 +4,288 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lesson 1 — Cloud & SaaS Tools in Accounting</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css"/>
   <link rel="stylesheet" href="shared.css"/>
   <style>
-    /* Particle canvas sits behind reveal */
-    #particle-canvas{ position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35; }
-    .reveal .slides { position: relative; z-index: 1; }
+    #pc{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.3;}
+    .reveal .slides{z-index:1;position:relative;}
+    .ig-full{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px 40px;box-sizing:border-box;}
+    .ig-row{display:flex;gap:16px;align-items:stretch;width:100%;justify-content:center;}
+    .ig-col{display:flex;flex-direction:column;gap:12px;flex:1;}
+    .vcard{background:#fff;border-radius:16px;border:1px solid #E2E8F0;padding:16px 18px;box-shadow:0 2px 16px rgba(79,142,247,.08);display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
+    .vcard.accent-blue{border-top:4px solid #4F8EF7;}
+    .vcard.accent-mint{border-top:4px solid #2EC4B6;}
+    .vcard.accent-orange{border-top:4px solid #FF9F1C;}
+    .vcard.accent-red{border-top:4px solid #FC8181;}
+    .vcard .vi{font-size:2em;line-height:1;}
+    .vcard .vt{font-size:.72em;font-weight:800;color:#2D3748;margin:0;}
+    .vcard .vd{font-size:.58em;color:#718096;line-height:1.5;margin:0;}
+    .slide-title{font-size:1.1em;font-weight:900;color:#4F8EF7;margin-bottom:4px;text-align:center;}
+    .slide-sub{font-size:.58em;color:#718096;text-align:center;margin-bottom:14px;}
+    .pill{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#4F8EF7,#2EC4B6);color:#fff;font-size:.5em;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;}
+    /* tool icon grid */
+    .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;}
+    .tool-item{background:#fff;border-radius:14px;border:1px solid #E2E8F0;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(79,142,247,.07);}
+    .tool-item .ti{font-size:1.8em;}
+    .tool-item .tn{font-size:.52em;font-weight:800;color:#2D3748;text-align:center;}
+    .tool-item .tt{font-size:.44em;color:#718096;text-align:center;line-height:1.4;}
+    .tool-item .tb{font-size:.4em;font-weight:700;padding:2px 10px;border-radius:10px;margin-top:2px;}
+    .tb-saas{background:#EBF4FF;color:#4F8EF7;}
+    .tb-storage{background:#E6FFFA;color:#2EC4B6;}
+    .tb-acc{background:#FFF8EE;color:#FF9F1C;}
+    /* comparison */
+    .cmp{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:center;width:100%;}
+    .cmp-box{border-radius:14px;padding:18px 14px;display:flex;flex-direction:column;gap:8px;}
+    .cmp-box .cb-title{font-size:.65em;font-weight:800;margin-bottom:4px;}
+    .cmp-box .cb-item{display:flex;align-items:center;gap:8px;font-size:.52em;color:#4A5568;}
+    .cmp-box .cb-item span{font-size:1.1em;}
+    .cmp-vs{text-align:center;font-size:.9em;font-weight:900;color:#CBD5E0;}
+    /* responsibility split */
+    .resp{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;}
+    .resp-box{border-radius:14px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;}
+    .resp-item{display:flex;align-items:center;gap:8px;font-size:.52em;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.7);}
+    /* data target */
+    .target-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;}
+    .target-item{background:#fff;border-radius:14px;border:1px solid #E2E8F0;padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(79,142,247,.07);position:relative;overflow:hidden;}
+    .target-item::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+    .target-item.t1::before{background:#4F8EF7;}
+    .target-item.t2::before{background:#2EC4B6;}
+    .target-item.t3::before{background:#FF9F1C;}
+    .target-item.t4::before{background:#FC8181;}
+    .target-item .tii{font-size:2em;}
+    .target-item .tin{font-size:.58em;font-weight:800;color:#2D3748;text-align:center;}
+    .target-item .tid{font-size:.46em;color:#718096;text-align:center;line-height:1.4;}
+    /* summary */
+    .sum-list{display:flex;flex-direction:column;gap:8px;width:100%;}
+    .sum-item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:10px;padding:10px 14px;border:1px solid #E2E8F0;font-size:.58em;color:#2D3748;font-weight:600;}
+    .sum-item .si{font-size:1.3em;flex-shrink:0;}
+    .nav-row{display:flex;gap:12px;margin-top:16px;justify-content:center;}
+    .nav-btn{font-size:.5em;font-weight:700;text-decoration:none;padding:8px 20px;border-radius:10px;}
+    .nav-prev{color:#718096;background:#EDF2F7;}
+    .nav-next{color:#fff;background:linear-gradient(135deg,#4F8EF7,#2EC4B6);}
   </style>
 </head>
 <body>
-<canvas id="particle-canvas"></canvas>
+<canvas id="pc"></canvas>
 <a class="back-home" href="index.html">← All Lessons</a>
-
 <div class="reveal">
- <div class="slides">
+<div class="slides">
 
-  <!-- ① TITLE SLIDE -->
-  <section class="section-slide">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <!-- SVG cloud illustration -->
-    <svg style="position:absolute;right:60px;bottom:40px;opacity:.18;z-index:1;" width="320" height="220" viewBox="0 0 320 220" fill="none">
-      <ellipse cx="160" cy="150" rx="140" ry="50" fill="white"/>
-      <ellipse cx="110" cy="130" rx="70" ry="55" fill="white"/>
-      <ellipse cx="200" cy="120" rx="80" ry="60" fill="white"/>
-      <ellipse cx="160" cy="105" rx="60" ry="55" fill="white"/>
-      <!-- data lines -->
-      <line x1="80" y1="170" x2="80" y2="200" stroke="white" stroke-width="3" stroke-dasharray="4 3"/>
-      <line x1="160" y1="175" x2="160" y2="205" stroke="white" stroke-width="3" stroke-dasharray="4 3"/>
-      <line x1="240" y1="170" x2="240" y2="200" stroke="white" stroke-width="3" stroke-dasharray="4 3"/>
-      <rect x="65" y="200" width="30" height="18" rx="4" fill="white" opacity=".7"/>
-      <rect x="145" y="205" width="30" height="18" rx="4" fill="white" opacity=".7"/>
-      <rect x="225" y="200" width="30" height="18" rx="4" fill="white" opacity=".7"/>
-    </svg>
-    <div class="lesson-num">Lesson 1 of 6</div>
-    <h1>Cloud & SaaS Tools<br/>in Accounting</h1>
-    <p style="margin-top:10px;font-size:0.5em;opacity:.85;max-width:520px;">Understanding the tools you use every day — and why your data is a high-value target</p>
-  </section>
+<!-- ① TITLE -->
+<section class="section-slide">
+  <div class="blob blob-1"></div><div class="blob blob-2"></div>
+  <svg style="position:absolute;right:0;top:0;opacity:.12;z-index:1;" width="500" height="500" viewBox="0 0 500 500" fill="none">
+    <ellipse cx="300" cy="220" rx="180" ry="70" fill="white"/>
+    <ellipse cx="220" cy="190" rx="100" ry="80" fill="white"/>
+    <ellipse cx="360" cy="170" rx="120" ry="90" fill="white"/>
+    <ellipse cx="290" cy="150" rx="90" ry="80" fill="white"/>
+    <line x1="180" y1="290" x2="180" y2="360" stroke="white" stroke-width="4" stroke-dasharray="6 4"/>
+    <line x1="290" y1="300" x2="290" y2="370" stroke="white" stroke-width="4" stroke-dasharray="6 4"/>
+    <line x1="400" y1="290" x2="400" y2="360" stroke="white" stroke-width="4" stroke-dasharray="6 4"/>
+    <rect x="160" y="360" width="40" height="28" rx="6" fill="white" opacity=".6"/>
+    <rect x="270" y="370" width="40" height="28" rx="6" fill="white" opacity=".6"/>
+    <rect x="380" y="360" width="40" height="28" rx="6" fill="white" opacity=".6"/>
+    <circle cx="180" cy="374" r="6" fill="#4F8EF7" opacity=".5"/>
+    <circle cx="290" cy="384" r="6" fill="#2EC4B6" opacity=".5"/>
+    <circle cx="400" cy="374" r="6" fill="#FF9F1C" opacity=".5"/>
+  </svg>
+  <div class="lesson-num">Lesson 1 of 6</div>
+  <h1>Cloud & SaaS Tools<br/>in Accounting</h1>
+  <p style="font-size:.5em;opacity:.85;max-width:500px;margin-top:10px;">Understanding the platforms you use every day — and why your data is a prime target</p>
+  <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">☁️ Cloud Computing</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">🛠️ SaaS Tools</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">🎯 Data Targets</span>
+    <span style="background:rgba(255,255,255,.2);color:white;font-size:.38em;padding:5px 14px;border-radius:20px;font-weight:700;">🤝 Shared Responsibility</span>
+  </div>
+</section>
 
-  <!-- ② LEARNING OUTCOMES -->
-  <section>
-    <div class="badge">🎯 What You'll Learn</div>
-    <h2>Lesson Outcomes</h2>
-    <div class="two-col" style="grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
-      <div class="card fragment fade-up" data-fragment-index="1">
-        <span class="icon">☁️</span>
-        <h4>Define Cloud Computing</h4>
-        <p>Understand what cloud computing means in the context of daily accounting work.</p>
+<!-- ② WHAT IS CLOUD — visual comparison -->
+<section>
+  <div class="ig-full">
+    <div class="pill">☁️ Core Concept</div>
+    <div class="slide-title">What is Cloud Computing?</div>
+    <div class="slide-sub">From your desk drawer to a secure online vault</div>
+    <div class="cmp">
+      <div class="cmp-box" style="background:#EDF2F7;">
+        <div class="cb-title" style="color:#718096;">🖥️ Traditional (Local)</div>
+        <div class="cb-item"><span>💿</span> Files saved on your hard drive</div>
+        <div class="cb-item"><span>🔌</span> Only accessible at your desk</div>
+        <div class="cb-item"><span>🔄</span> Manual backups required</div>
+        <div class="cb-item"><span>👤</span> One person at a time</div>
+        <div class="cb-item"><span>❌</span> Lost if computer breaks</div>
       </div>
-      <div class="card fragment fade-up" data-fragment-index="2">
-        <span class="icon">🛠️</span>
-        <h4>Identify SaaS Tools</h4>
-        <p>Name the major SaaS platforms used by accounting professionals and their purposes.</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="3">
-        <span class="icon">🎯</span>
-        <h4>Explain Why Data is Targeted</h4>
-        <p>Describe why accounting data is among the most valuable targets for cybercriminals.</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="4">
-        <span class="icon">🔐</span>
-        <h4>Shared Responsibility</h4>
-        <p>Understand what the cloud provider secures vs. what YOU are responsible for.</p>
+      <div class="cmp-vs">VS</div>
+      <div class="cmp-box" style="background:#EBF4FF;">
+        <div class="cb-title" style="color:#4F8EF7;">☁️ Cloud (SaaS)</div>
+        <div class="cb-item"><span>🌐</span> Files stored on secure servers</div>
+        <div class="cb-item"><span>📱</span> Access from any device, anywhere</div>
+        <div class="cb-item"><span>🔄</span> Auto-backup & version history</div>
+        <div class="cb-item"><span>👥</span> Real-time team collaboration</div>
+        <div class="cb-item"><span>✅</span> Always available, always updated</div>
       </div>
     </div>
-  </section>
+    <div style="background:#FFF8EE;border-left:4px solid #FF9F1C;border-radius:10px;padding:10px 16px;margin-top:12px;width:100%;box-sizing:border-box;">
+      <p style="font-size:.52em;color:#7B4F00;margin:0;">⚠️ <strong>Security Trade-off:</strong> Cloud = convenience + collaboration, but your data now lives on someone else's servers. <strong>Access control becomes your #1 responsibility.</strong></p>
+    </div>
+  </div>
+</section>
 
-  <!-- ③ WHAT IS CLOUD COMPUTING -->
-  <section>
-    <div class="badge">☁️ Core Concept</div>
-    <h2>What is Cloud Computing?</h2>
-    <div class="two-col-3-2">
-      <div>
-        <p style="margin-bottom:14px;">Instead of saving files on your computer's hard drive, cloud computing lets you <span class="blue">store, access, and share data</span> through the internet — from any device, anywhere.</p>
-        <div class="tip">
-          <p>💡 Think of it like this: instead of keeping your accounting files in a cabinet at your desk, you keep them in a <strong>secure online vault</strong> that your whole team can access from anywhere.</p>
+<!-- ③ TOOLS INFOGRAPHIC -->
+<section>
+  <div class="ig-full">
+    <div class="pill">🛠️ Tools Overview</div>
+    <div class="slide-title">Cloud Platforms Used in Accounting</div>
+    <div class="slide-sub">6 tools every accounting professional must know</div>
+    <div class="tool-grid">
+      <div class="tool-item">
+        <div class="ti">💬</div>
+        <div class="tn">Microsoft Teams</div>
+        <div class="tt">Meetings, file sharing, client communication</div>
+        <div class="tb tb-saas">Collaboration SaaS</div>
+      </div>
+      <div class="tool-item">
+        <div class="ti">⚡</div>
+        <div class="tn">Slack</div>
+        <div class="tt">Internal messaging, workflow alerts, channels</div>
+        <div class="tb tb-saas">Messaging SaaS</div>
+      </div>
+      <div class="tool-item">
+        <div class="ti">📁</div>
+        <div class="tn">Google Drive</div>
+        <div class="tt">Document collaboration, shared spreadsheets</div>
+        <div class="tb tb-storage">Cloud Storage</div>
+      </div>
+      <div class="tool-item">
+        <div class="ti">🗂️</div>
+        <div class="tn">OneDrive / SharePoint</div>
+        <div class="tt">File storage, version control, access management</div>
+        <div class="tb tb-storage">Cloud Storage</div>
+      </div>
+      <div class="tool-item">
+        <div class="ti">📊</div>
+        <div class="tn">QuickBooks Online</div>
+        <div class="tt">Bookkeeping, invoicing, financial reporting</div>
+        <div class="tb tb-acc">Accounting SaaS</div>
+      </div>
+      <div class="tool-item">
+        <div class="ti">💼</div>
+        <div class="tn">Xero</div>
+        <div class="tt">Cloud accounting, payroll, bank reconciliation</div>
+        <div class="tb tb-acc">Accounting SaaS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ HIGH VALUE TARGET — visual infographic -->
+<section>
+  <div class="ig-full">
+    <div class="pill">🎯 Why Accountants Are Targeted</div>
+    <div class="slide-title">Accounting Data = High-Value Target</div>
+    <div class="slide-sub">Cybercriminals specifically hunt for these 4 data types</div>
+    <div class="target-grid">
+      <div class="target-item t1">
+        <div class="tii">🪪</div>
+        <div class="tin">Personal Info (PII)</div>
+        <div class="tid">Names · Addresses · TIN Numbers · Employee IDs</div>
+        <svg width="60" height="8" style="margin-top:4px;"><rect width="60" height="8" rx="4" fill="#EBF4FF"/><rect width="48" height="8" rx="4" fill="#4F8EF7"/></svg>
+        <div style="font-size:.4em;color:#4F8EF7;font-weight:700;">HIGH RISK</div>
+      </div>
+      <div class="target-item t2">
+        <div class="tii">🏦</div>
+        <div class="tin">Financial Records</div>
+        <div class="tid">Bank accounts · Credit cards · Transaction history</div>
+        <svg width="60" height="8" style="margin-top:4px;"><rect width="60" height="8" rx="4" fill="#E6FFFA"/><rect width="56" height="8" rx="4" fill="#2EC4B6"/></svg>
+        <div style="font-size:.4em;color:#2EC4B6;font-weight:700;">CRITICAL</div>
+      </div>
+      <div class="target-item t3">
+        <div class="tii">📊</div>
+        <div class="tin">Business Intelligence</div>
+        <div class="tid">Revenue · Cost structures · Contracts · Pricing</div>
+        <svg width="60" height="8" style="margin-top:4px;"><rect width="60" height="8" rx="4" fill="#FFF8EE"/><rect width="44" height="8" rx="4" fill="#FF9F1C"/></svg>
+        <div style="font-size:.4em;color:#FF9F1C;font-weight:700;">HIGH RISK</div>
+      </div>
+      <div class="target-item t4">
+        <div class="tii">💼</div>
+        <div class="tin">Payroll Data</div>
+        <div class="tid">Salaries · SSS · PhilHealth · Pag-IBIG records</div>
+        <svg width="60" height="8" style="margin-top:4px;"><rect width="60" height="8" rx="4" fill="#FED7D7"/><rect width="52" height="8" rx="4" fill="#FC8181"/></svg>
+        <div style="font-size:.4em;color:#FC8181;font-weight:700;">CRITICAL</div>
+      </div>
+    </div>
+    <div style="background:#FFF8EE;border-left:4px solid #FF9F1C;border-radius:10px;padding:10px 16px;margin-top:12px;width:100%;box-sizing:border-box;">
+      <p style="font-size:.5em;color:#7B4F00;margin:0;">⚠️ One misconfigured Google Drive folder with payroll data = <strong>hundreds of employees exposed</strong> to identity theft, fraud, and legal liability.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ SHARED RESPONSIBILITY — visual split -->
+<section>
+  <div class="ig-full">
+    <div class="pill">🤝 Shared Responsibility</div>
+    <div class="slide-title">Who Secures What?</div>
+    <div class="slide-sub">Cloud security is a two-way partnership</div>
+    <div class="resp">
+      <div class="resp-box" style="background:#EBF4FF;border:2px solid #4F8EF7;">
+        <div style="font-size:.65em;font-weight:900;color:#4F8EF7;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#4F8EF7"/><text x="14" y="20" font-size="14" text-anchor="middle" fill="white" font-family="Inter">☁️</text></svg>
+          Cloud Provider
         </div>
+        <div class="resp-item">🏢 Physical servers & data centers</div>
+        <div class="resp-item">🌐 Network infrastructure</div>
+        <div class="resp-item">⚡ Platform uptime & availability</div>
+        <div class="resp-item">🔒 Encryption of stored data</div>
+        <div class="resp-item">🛡️ DDoS protection</div>
       </div>
-      <!-- SVG: local vs cloud -->
-      <div class="svg-wrap">
-        <svg width="220" height="200" viewBox="0 0 220 200" fill="none">
-          <!-- Local computer -->
-          <rect x="10" y="100" width="80" height="55" rx="6" fill="#EDF2F7" stroke="#E2E8F0" stroke-width="1.5"/>
-          <rect x="20" y="108" width="60" height="35" rx="3" fill="#CBD5E0"/>
-          <rect x="35" y="155" width="30" height="6" rx="2" fill="#CBD5E0"/>
-          <text x="50" y="185" font-size="9" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Local Drive</text>
-          <!-- Arrow -->
-          <path d="M95 128 L125 128" stroke="#E2E8F0" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#arr)"/>
-          <text x="110" y="122" font-size="8" fill="#A0AEC0" text-anchor="middle" font-family="Inter,sans-serif">vs</text>
-          <!-- Cloud -->
-          <ellipse cx="170" cy="95" rx="42" ry="16" fill="#4F8EF7" opacity=".15"/>
-          <ellipse cx="148" cy="88" rx="22" ry="18" fill="#4F8EF7" opacity=".2"/>
-          <ellipse cx="185" cy="84" rx="26" ry="20" fill="#4F8EF7" opacity=".2"/>
-          <ellipse cx="168" cy="78" rx="20" ry="18" fill="#4F8EF7" opacity=".25"/>
-          <ellipse cx="168" cy="88" rx="42" ry="18" fill="#4F8EF7"/>
-          <ellipse cx="148" cy="82" rx="22" ry="18" fill="#4F8EF7"/>
-          <ellipse cx="185" cy="78" rx="26" ry="20" fill="#4F8EF7"/>
-          <ellipse cx="168" cy="72" rx="20" ry="18" fill="#4F8EF7"/>
-          <!-- cloud shine -->
-          <ellipse cx="155" cy="74" rx="10" ry="5" fill="white" opacity=".25"/>
-          <text x="168" y="185" font-size="9" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">Cloud Storage</text>
-          <!-- lines down from cloud -->
-          <line x1="148" y1="106" x2="148" y2="130" stroke="#4F8EF7" stroke-width="1.5" stroke-dasharray="3 2"/>
-          <line x1="168" y1="106" x2="168" y2="130" stroke="#2EC4B6" stroke-width="1.5" stroke-dasharray="3 2"/>
-          <line x1="188" y1="106" x2="188" y2="130" stroke="#4F8EF7" stroke-width="1.5" stroke-dasharray="3 2"/>
-          <!-- devices -->
-          <rect x="136" y="130" width="24" height="16" rx="3" fill="#EDF2F7" stroke="#4F8EF7" stroke-width="1"/>
-          <rect x="156" y="132" width="24" height="14" rx="3" fill="#EDF2F7" stroke="#2EC4B6" stroke-width="1"/>
-          <rect x="176" y="130" width="24" height="16" rx="3" fill="#EDF2F7" stroke="#4F8EF7" stroke-width="1"/>
-          <defs>
-            <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6Z" fill="#CBD5E0"/>
-            </marker>
-          </defs>
-        </svg>
+      <div class="resp-box" style="background:#E6FFFA;border:2px solid #2EC4B6;">
+        <div style="font-size:.65em;font-weight:900;color:#2EC4B6;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="8" fill="#2EC4B6"/><text x="14" y="20" font-size="14" text-anchor="middle" fill="white" font-family="Inter">👤</text></svg>
+          YOU (Accountant)
+        </div>
+        <div class="resp-item">🔑 Who has access to your files</div>
+        <div class="resp-item">⚙️ Sharing settings & permissions</div>
+        <div class="resp-item">🔐 Passwords and MFA</div>
+        <div class="resp-item">📤 What data you upload & share</div>
+        <div class="resp-item">🗑️ Removing old/unused access</div>
       </div>
     </div>
-  </section>
-
-  <!-- ④ TOOLS TABLE -->
-  <section>
-    <div class="badge">🛠️ Tools Overview</div>
-    <h2>Cloud Platforms Used in Accounting</h2>
-    <table>
-      <tr><th>Tool</th><th>Type</th><th>Common Use in Accounting</th></tr>
-      <tr><td>💬 Microsoft Teams</td><td>Collaboration / SaaS</td><td>Meetings, file sharing, client communication</td></tr>
-      <tr><td>⚡ Slack</td><td>Messaging / SaaS</td><td>Internal communication, workflow alerts</td></tr>
-      <tr><td>📁 Google Drive</td><td>Cloud Storage</td><td>Document collaboration, spreadsheets</td></tr>
-      <tr><td>🗂️ OneDrive / SharePoint</td><td>Cloud Storage</td><td>File storage, version control, access management</td></tr>
-      <tr><td>📊 QuickBooks Online</td><td>Accounting SaaS</td><td>Bookkeeping, invoicing, financial reporting</td></tr>
-      <tr><td>💼 Xero</td><td>Accounting SaaS</td><td>Cloud-based accounting and payroll</td></tr>
-    </table>
-  </section>
-
-  <!-- ⑤ SAAS vs TRADITIONAL -->
-  <section>
-    <div class="badge">🔑 Key Concept</div>
-    <h2>Traditional Software vs. SaaS</h2>
-    <div class="card-grid" style="grid-template-columns:1fr 1fr 1fr;margin-top:18px;">
-      <div class="card fragment fade-up" data-fragment-index="1">
-        <span class="icon">💿</span>
-        <h4>Traditional Software</h4>
-        <p>Installed on your computer. Manual updates. Data stored locally. Examples: Excel desktop, old accounting software.</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="2" style="border-top:3px solid var(--blue);">
-        <span class="icon">☁️</span>
-        <h4>SaaS</h4>
-        <p>Accessed via browser. Always up to date. Data stored in the cloud. Examples: QuickBooks Online, Xero, Google Workspace.</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="3" style="border-top:3px solid var(--orange);">
-        <span class="icon">⚠️</span>
-        <h4>Why It Matters</h4>
-        <p>SaaS means your data lives on someone else's servers — making <strong>access control and sharing settings</strong> critically important.</p>
-      </div>
+    <div style="background:#F0FDF9;border-left:4px solid #2EC4B6;border-radius:10px;padding:10px 16px;margin-top:12px;width:100%;box-sizing:border-box;">
+      <p style="font-size:.5em;color:#1A5C54;margin:0;">✅ Google & Microsoft secure their servers. <strong>You</strong> are responsible for how you configure and share data within those platforms.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ⑥ HIGH VALUE TARGET -->
-  <section>
-    <div class="badge">🎯 Why Accountants Are Targeted</div>
-    <h2>Accounting Data is a High-Value Target</h2>
-    <div class="card-grid" style="grid-template-columns:repeat(4,1fr);margin-top:16px;">
-      <div class="card fragment fade-up" data-fragment-index="1">
-        <span class="icon">🪪</span>
-        <h4>PII</h4>
-        <p>Names, addresses, Tax Identification Numbers (TIN)</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="2">
-        <span class="icon">🏦</span>
-        <h4>Financial Records</h4>
-        <p>Bank account numbers, credit card data, transaction history</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="3">
-        <span class="icon">📊</span>
-        <h4>Business Intelligence</h4>
-        <p>Revenue figures, cost structures, contracts, pricing</p>
-      </div>
-      <div class="card fragment fade-up" data-fragment-index="4">
-        <span class="icon">💼</span>
-        <h4>Payroll Data</h4>
-        <p>Salaries, SSS, PhilHealth, Pag-IBIG records</p>
-      </div>
+<!-- ⑥ SUMMARY -->
+<section>
+  <div class="ig-full">
+    <div class="pill">📋 Lesson 1 Summary</div>
+    <div class="slide-title">Key Takeaways</div>
+    <div class="sum-list">
+      <div class="sum-item"><span class="si">☁️</span>Cloud stores data on internet servers — accessible from any device, anywhere</div>
+      <div class="sum-item"><span class="si">🛠️</span>Teams, Slack, QuickBooks Online, Xero are central to modern accounting work</div>
+      <div class="sum-item"><span class="si">🎯</span>Accounting data — PII, financials, payroll — is among the most targeted by attackers</div>
+      <div class="sum-item"><span class="si">🤝</span>Cloud providers secure infrastructure; <strong style="color:#FF9F1C;">YOU</strong> secure access, sharing, and permissions</div>
+      <div class="sum-item"><span class="si">⚠️</span>One misconfiguration can expose hundreds of people's sensitive data</div>
     </div>
-    <div class="warn">
-      <p>⚠️ A single misconfigured Google Drive folder containing payroll data can expose hundreds of employees' personal and financial information — leading to identity theft, fraud, and legal liability.</p>
+    <div class="nav-row">
+      <a href="index.html" class="nav-btn nav-prev">← All Lessons</a>
+      <a href="lesson2.html" class="nav-btn nav-next">Lesson 2: Risks →</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ⑦ SHARED RESPONSIBILITY MODEL — SVG diagram -->
-  <section>
-    <div class="badge">🤝 Shared Responsibility</div>
-    <h2>Who Secures What?</h2>
-    <div class="two-col-3-2">
-      <table>
-        <tr><th>Cloud Provider Secures ✅</th><th>YOU Must Secure 🔐</th></tr>
-        <tr><td>Physical servers & data centers</td><td>Who has access to your files</td></tr>
-        <tr><td>Network infrastructure</td><td>Sharing settings & permissions</td></tr>
-        <tr><td>Platform availability (uptime)</td><td>Passwords and MFA</td></tr>
-        <tr><td>Encryption of stored data</td><td>What data you upload & share</td></tr>
-      </table>
-      <!-- SVG responsibility diagram -->
-      <div class="svg-wrap">
-        <svg width="180" height="200" viewBox="0 0 180 200" fill="none">
-          <!-- Provider half -->
-          <rect x="10" y="20" width="160" height="80" rx="10" fill="#EBF4FF" stroke="#4F8EF7" stroke-width="1.5"/>
-          <text x="90" y="42" font-size="9" fill="#4F8EF7" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">CLOUD PROVIDER</text>
-          <text x="90" y="58" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Servers · Network · Encryption</text>
-          <text x="90" y="72" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Physical Security · Uptime</text>
-          <!-- You half -->
-          <rect x="10" y="110" width="160" height="80" rx="10" fill="#E6FFFA" stroke="#2EC4B6" stroke-width="1.5"/>
-          <text x="90" y="132" font-size="9" fill="#2EC4B6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">YOU (Accountant)</text>
-          <text x="90" y="148" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Access Control · Sharing Settings</text>
-          <text x="90" y="162" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter,sans-serif">Passwords · MFA · What You Upload</text>
-          <!-- divider arrow -->
-          <path d="M90 100 L90 110" stroke="#CBD5E0" stroke-width="2" marker-end="url(#arr2)"/>
-          <defs>
-            <marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6Z" fill="#CBD5E0"/>
-            </marker>
-          </defs>
-        </svg>
-      </div>
-    </div>
-    <div class="tip" style="margin-top:10px;">
-      <p>✅ Google and Microsoft secure their servers. <strong>You</strong> are responsible for how you configure and share your data within those platforms.</p>
-    </div>
-  </section>
-
-  <!-- ⑧ LESSON SUMMARY -->
-  <section>
-    <div class="badge">📋 Lesson 1 Summary</div>
-    <h2>Key Takeaways</h2>
-    <ul>
-      <li class="fragment fade-up">Cloud computing stores data on internet-accessible servers, not your local device</li>
-      <li class="fragment fade-up">SaaS tools like Teams, Slack, QuickBooks Online are central to modern accounting</li>
-      <li class="fragment fade-up">Accounting data — PII, financials, payroll — is among the most targeted by attackers</li>
-      <li class="fragment fade-up">Cloud providers secure infrastructure; <span class="hi">you</span> secure access and sharing</li>
-      <li class="fragment fade-up">One misconfiguration can expose hundreds of people's sensitive data</li>
-    </ul>
-    <div style="margin-top:24px;display:flex;gap:16px;align-items:center;">
-      <a href="index.html" style="font-size:0.42em;color:#718096;text-decoration:none;font-weight:600;">← All Lessons</a>
-      <a href="lesson2.html" style="font-size:0.42em;color:var(--blue);font-weight:800;text-decoration:none;background:var(--card);padding:8px 18px;border-radius:8px;">Next: Lesson 2 — Risks →</a>
-    </div>
-  </section>
-
- </div>
-</div>
-
+</div></div>
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script>
-Reveal.initialize({
-  hash:true, transition:'slide',
-  backgroundTransition:'fade', controls:true, controlsLayout:'bottom-right', progress:true,
-  center:true, width:'100%', height:'100%', margin:0, minScale:1, maxScale:1
-});
-
-// Canvas particles
-const cv = document.getElementById('particle-canvas');
-const cx = cv.getContext('2d');
-let W,H,pts=[];
-const COLS=['#4F8EF7','#2EC4B6','#FF9F1C'];
-function resize(){ W=cv.width=window.innerWidth; H=cv.height=window.innerHeight; }
-resize(); window.addEventListener('resize',resize);
-for(let i=0;i<45;i++) pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*3+1.5,c:COLS[Math.floor(Math.random()*3)]});
-(function draw(){
-  cx.clearRect(0,0,W,H);
-  pts.forEach((p,i)=>{
-    pts.slice(i+1).forEach(q=>{
-      const d=Math.hypot(p.x-q.x,p.y-q.y);
-      if(d<120){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.1*(1-d/120)})`;cx.lineWidth=.8;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}
-    });
-    cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'44';cx.fill();
-    p.x+=p.vx;p.y+=p.vy;
-    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
-  });
-  requestAnimationFrame(draw);
-})();
+Reveal.initialize({hash:true,transition:'slide',backgroundTransition:'fade',controls:true,controlsLayout:'bottom-right',progress:true,center:true,width:'100%',height:'100%',margin:0,minScale:1,maxScale:1});
+const cv=document.getElementById('pc'),cx=cv.getContext('2d');let W,H,pts=[];
+const C=['#4F8EF7','#2EC4B6','#FF9F1C'];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;}rs();addEventListener('resize',rs);
+for(let i=0;i<50;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.4,vy:(Math.random()-.5)*.4,r:Math.random()*3+1,c:C[i%3]});
+(function d(){cx.clearRect(0,0,W,H);pts.forEach((p,i)=>{pts.slice(i+1).forEach(q=>{const dist=Math.hypot(p.x-q.x,p.y-q.y);if(dist<130){cx.beginPath();cx.strokeStyle=`rgba(79,142,247,${.08*(1-dist/130)})`;cx.lineWidth=.7;cx.moveTo(p.x,p.y);cx.lineTo(q.x,q.y);cx.stroke();}});cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fillStyle=p.c+'33';cx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});requestAnimationFrame(d);})();
 </script>
 </body>
 </html>
