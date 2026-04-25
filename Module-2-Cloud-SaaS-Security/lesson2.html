@@ -164,6 +164,10 @@
     .comic-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;width:100%;border:3px solid #2D3748;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.18);}
     .panel{background:#fff;border-right:3px solid #2D3748;position:relative;display:flex;flex-direction:column;align-items:center;padding:10px 8px 8px;gap:4px;min-height:220px;}
     .panel:last-child{border-right:none;}
+    .panel.fragment{opacity:0;visibility:hidden;transition:opacity .5s ease;}
+    .panel.fragment.visible{opacity:1;visibility:visible;}
+    .comic-lesson.fragment{opacity:0;visibility:hidden;transition:opacity .5s ease;}
+    .comic-lesson.fragment.visible{opacity:1;visibility:visible;}
     .panel-num{position:absolute;top:6px;left:8px;background:#2D3748;color:#fff;font-size:.38em;font-weight:900;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
     .panel-bg{width:100%;flex:1;border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
     /* speech bubble */
@@ -190,7 +194,7 @@
     <div class="comic-strip">
 
       <!-- PANEL 1: Maria at desk -->
-      <div class="panel">
+      <div class="panel fragment" data-fragment-index="0">
         <div class="panel-num">1</div>
         <div class="panel-bg" style="background:linear-gradient(160deg,#EBF4FF 60%,#BEE3F8);">
           <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
@@ -229,7 +233,7 @@
       </div>
 
       <!-- PANEL 2: Sharing dialog -->
-      <div class="panel">
+      <div class="panel fragment" data-fragment-index="1">
         <div class="panel-num">2</div>
         <div class="panel-bg" style="background:linear-gradient(160deg,#F0FDF9 60%,#C6F6D5);">
           <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
@@ -257,7 +261,7 @@
       </div>
 
       <!-- PANEL 3: Employees discovering -->
-      <div class="panel">
+      <div class="panel fragment" data-fragment-index="2">
         <div class="panel-num">3</div>
         <div class="panel-bg" style="background:linear-gradient(160deg,#FFF8EE 60%,#FEEBC8);">
           <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
@@ -307,7 +311,7 @@
       </div>
 
       <!-- PANEL 4: Consequence + Fix -->
-      <div class="panel">
+      <div class="panel fragment" data-fragment-index="3">
         <div class="panel-num">4</div>
         <div class="panel-bg" style="background:linear-gradient(160deg,#FED7D7 40%,#FEB2B2 100%);">
           <svg width="130" height="140" viewBox="0 0 130 140" fill="none">
@@ -327,7 +331,7 @@
 
     </div><!-- end comic-strip -->
 
-    <div class="comic-lesson">
+    <div class="comic-lesson fragment" data-fragment-index="4">
       <div class="cl-box" style="background:#FFF8EE;border:2px solid #FF9F1C;color:#7B4F00;">
         <span style="font-size:1.3em;">⚠️</span>
         <span><strong>What went wrong:</strong> Maria selected "Everyone in the organization" instead of sharing with the Finance VP's specific email address.</span>

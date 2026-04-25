@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Review — Remote Work & Mobile Security</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:#0f172a;color:#cbd5e1;min-height:100vh;}
+
+  /* NAV TABS */
+  .tab-bar{display:flex;gap:0;background:#1e293b;border-bottom:2px solid #334155;position:sticky;top:0;z-index:10;}
+  .tab{flex:1;padding:14px 10px;text-align:center;font-size:.85em;font-weight:700;cursor:pointer;color:#64748b;transition:.2s;border-bottom:3px solid transparent;}
+  .tab:hover{color:#94a3b8;background:rgba(255,255,255,.03);}
+  .tab.active{color:#38bdf8;border-bottom-color:#38bdf8;background:rgba(56,189,248,.06);}
+
+  /* SECTIONS */
+  .section{display:none;padding:30px 24px 60px;max-width:900px;margin:0 auto;}
+  .section.active{display:block;}
+
+  h1{font-size:2em;font-weight:900;color:#f1f5f9;margin-bottom:6px;}
+  h2{font-size:1.5em;font-weight:700;color:#38bdf8;margin-bottom:16px;}
+  .desc{color:#94a3b8;margin-bottom:24px;line-height:1.6;}
+
+  /* QUIZ */
+  .q-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;margin-bottom:16px;transition:.3s;}
+  .q-num{font-size:.75em;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .q-text{font-size:1.05em;font-weight:600;color:#f1f5f9;margin-bottom:14px;line-height:1.5;}
+  .q-topic{display:inline-block;font-size:.7em;padding:3px 10px;border-radius:10px;background:rgba(56,189,248,.12);color:#38bdf8;font-weight:600;margin-bottom:10px;}
+  .opts{display:flex;flex-direction:column;gap:8px;}
+  .opt{padding:12px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,.1);cursor:pointer;transition:.2s;font-size:.95em;color:#e2e8f0;}
+  .opt:hover{border-color:#38bdf8;background:rgba(56,189,248,.08);}
+  .opt.selected{border-color:#38bdf8;background:rgba(56,189,248,.15);color:#fff;}
+  .opt.correct{border-color:#34d399!important;background:rgba(52,211,153,.15)!important;color:#34d399!important;}
+  .opt.wrong{border-color:#ef4444!important;background:rgba(239,68,68,.1)!important;color:#fca5a5!important;}
+  .opt.disabled{pointer-events:none;opacity:.7;}
+  .q-explain{margin-top:10px;padding:10px 14px;border-radius:8px;font-size:.85em;line-height:1.5;display:none;}
+  .q-explain.show{display:block;}
+  .q-explain.right{background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#6ee7b7;}
+  .q-explain.wrong-exp{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+
+  /* SCENARIO GAME */
+  .sc-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;margin-bottom:14px;}
+  .sc-text{font-size:1em;color:#e2e8f0;line-height:1.6;margin-bottom:14px;}
+  .sc-btns{display:flex;gap:10px;}
+  .sc-btn{flex:1;padding:12px;border-radius:10px;border:2px solid rgba(255,255,255,.1);cursor:pointer;font-size:.95em;font-weight:700;text-align:center;transition:.2s;background:transparent;}
+  .sc-btn.safe{color:#34d399;}
+  .sc-btn.safe:hover{border-color:#34d399;background:rgba(52,211,153,.1);}
+  .sc-btn.risky{color:#ef4444;}
+  .sc-btn.risky:hover{border-color:#ef4444;background:rgba(239,68,68,.1);}
+  .sc-btn.picked-right{border-color:#34d399!important;background:rgba(52,211,153,.2)!important;}
+  .sc-btn.picked-wrong{border-color:#ef4444!important;background:rgba(239,68,68,.15)!important;}
+  .sc-btn.disabled{pointer-events:none;opacity:.6;}
+  .sc-feedback{margin-top:10px;font-size:.85em;line-height:1.5;display:none;padding:10px 14px;border-radius:8px;}
+  .sc-feedback.show{display:block;}
+
+  /* TERM MATCH */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .match-term,.match-def{padding:14px 16px;border-radius:10px;border:2px solid rgba(255,255,255,.1);cursor:pointer;transition:.2s;font-size:.9em;line-height:1.5;}
+  .match-term{background:rgba(56,189,248,.06);color:#7dd3fc;font-weight:700;}
+  .match-def{background:rgba(249,115,22,.04);color:#cbd5e1;}
+  .match-term:hover,.match-def:hover{border-color:#38bdf8;}
+  .match-term.sel{border-color:#38bdf8;background:rgba(56,189,248,.15);box-shadow:0 0 12px rgba(56,189,248,.2);}
+  .match-def.sel{border-color:#f97316;background:rgba(249,115,22,.12);box-shadow:0 0 12px rgba(249,115,22,.2);}
+  .match-term.matched,.match-def.matched{border-color:#34d399;background:rgba(52,211,153,.1);color:#6ee7b7;pointer-events:none;opacity:.8;}
+  .match-term.wrong-flash,.match-def.wrong-flash{border-color:#ef4444;background:rgba(239,68,68,.15);}
+
+  /* SCORE BAR */
+  .score-bar{position:fixed;bottom:0;left:0;right:0;background:#1e293b;border-top:2px solid #334155;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;z-index:10;}
+  .score-text{font-size:.95em;font-weight:700;color:#f1f5f9;}
+  .score-text span{color:#38bdf8;}
+  .reset-btn{padding:8px 20px;border-radius:8px;border:1px solid rgba(56,189,248,.3);background:rgba(56,189,248,.1);color:#38bdf8;font-weight:700;cursor:pointer;font-size:.85em;transition:.2s;}
+  .reset-btn:hover{background:rgba(56,189,248,.25);}
+
+  /* BACK LINK */
+  .back{display:inline-block;padding:8px 16px;margin-bottom:20px;color:#64748b;font-size:.85em;text-decoration:none;border-radius:8px;transition:.2s;}
+  .back:hover{color:#38bdf8;background:rgba(56,189,248,.06);}
+
+  /* PROGRESS RING */
+  .progress-ring{display:flex;align-items:center;gap:12px;}
+  .ring{width:44px;height:44px;position:relative;}
+  .ring svg{transform:rotate(-90deg);}
+  .ring-bg{fill:none;stroke:#334155;stroke-width:4;}
+  .ring-fg{fill:none;stroke:#38bdf8;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .5s;}
+  .ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.7em;font-weight:900;color:#f1f5f9;}
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab(0)">🧠 Quiz</div>
+  <div class="tab" onclick="showTab(1)">⚖️ Safe or Risky?</div>
+  <div class="tab" onclick="showTab(2)">🔗 Term Match</div>
+</div>
+
+<!-- ========== QUIZ ========== -->
+<div class="section active" id="sec-0">
+  <a class="back" href="index.html">← Back to Presentation</a>
+  <h1>🧠 Module Review Quiz</h1>
+  <p class="desc">3 random questions from the question bank. Pick the best answer — instant feedback after each question.</p>
+  <div id="quiz-container"></div>
+</div>
+
+<!-- ========== SAFE OR RISKY ========== -->
+<div class="section" id="sec-1">
+  <a class="back" href="index.html">← Back to Presentation</a>
+  <h1>⚖️ Safe or Risky?</h1>
+  <p class="desc">3 random scenarios. Decide: is this behavior SAFE ✅ or RISKY ⚠️ for an accountant?</p>
+  <div id="scenario-container"></div>
+</div>
+
+<!-- ========== TERM MATCH ========== -->
+<div class="section" id="sec-2">
+  <a class="back" href="index.html">← Back to Presentation</a>
+  <h1>🔗 Match the Term</h1>
+  <p class="desc">3 random pairs. Click a term on the left, then click its matching definition on the right.</p>
+  <div id="match-status" style="margin-bottom:16px;font-weight:700;color:#38bdf8;"></div>
+  <div class="match-grid" id="match-grid"></div>
+</div>
+
+<!-- SCORE BAR -->
+<div class="score-bar">
+  <div class="progress-ring">
+    <div class="ring">
+      <svg width="44" height="44"><circle class="ring-bg" cx="22" cy="22" r="18"/><circle class="ring-fg" id="ring" cx="22" cy="22" r="18" stroke-dasharray="113.1" stroke-dashoffset="113.1"/></svg>
+      <div class="ring-label" id="ring-pct">0%</div>
+    </div>
+    <div class="score-text">Score: <span id="score">0</span> / <span id="total">0</span></div>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">🔄 Reset All</button>
+</div>
+
+<script>
+// ===== DATA =====
+const quizData = [
+  // Part 1: Home Networks
+  {t:"Part 1: Home Networks",q:"What is the MOST critical home network vulnerability?",o:["No network segmentation","Default router credentials","WPS enabled","Hiding SSID"],a:1,e:"Default credentials (admin/admin) are publicly listed online and give attackers full router access."},
+  {t:"Part 1: Home Networks",q:"Which Wi-Fi encryption protocol is recommended as the most secure?",o:["WEP","WPA","WPA2-AES","WPA3"],a:3,e:"WPA3 uses SAE handshake + AES-256, making it practically impossible to crack."},
+  {t:"Part 1: Home Networks",q:"Why should you disable UPnP on your router?",o:["It slows internet speed","It allows devices to auto-open firewall ports without authentication","It uses too much bandwidth","It conflicts with WPA3"],a:1,e:"UPnP lets any device (or malware) open ports on your router with zero authentication."},
+  {t:"Part 1: Home Networks",q:"What is the purpose of network segmentation at home?",o:["Faster internet for gaming","Isolate work devices from insecure IoT devices","Hide your network from neighbors","Reduce electricity usage"],a:1,e:"Segmentation prevents compromised IoT devices from reaching your work laptop."},
+  // Part 2: Public Wi-Fi
+  {t:"Part 2: Public Wi-Fi",q:"What does SSL stripping do?",o:["Breaks the Wi-Fi password","Downgrades HTTPS to HTTP so attacker can read your data","Deletes SSL certificates from your device","Encrypts your traffic twice"],a:1,e:"SSL stripping intercepts the HTTP→HTTPS redirect and keeps you on unencrypted HTTP."},
+  {t:"Part 2: Public Wi-Fi",q:"What is an 'Evil Twin' attack?",o:["A virus that duplicates files","A fake Wi-Fi access point mimicking a legitimate one","Two routers on the same channel","A phishing email with two links"],a:1,e:"Evil Twin creates a fake hotspot with the same name as a real one to intercept your traffic."},
+  {t:"Part 2: Public Wi-Fi",q:"What should you do FIRST before working on public Wi-Fi?",o:["Open your browser","Check email","Connect to company VPN","Turn off Bluetooth"],a:2,e:"Always connect VPN FIRST — before opening any browser or app — to encrypt all traffic."},
+  {t:"Part 2: Public Wi-Fi",q:"In ARP spoofing, the attacker pretends to be the:",o:["DNS server","Website","Router","Firewall"],a:2,e:"ARP spoofing sends fake messages saying 'I am the router' so all traffic flows through the attacker."},
+  {t:"Part 2: Public Wi-Fi",q:"What does a rogue DHCP server attack do?",o:["Blocks your internet","Assigns your device the attacker's DNS server","Steals your MAC address","Disables your firewall"],a:1,e:"Rogue DHCP gives your device a malicious DNS server, redirecting you to fake websites."},
+  {t:"Part 2: Public Wi-Fi",q:"If no VPN is available, the safest alternative on the go is:",o:["Use the hotel Wi-Fi","Use your phone's mobile hotspot","Connect to any network with a password","Use a neighbor's Wi-Fi"],a:1,e:"Cellular data is encrypted and far safer than any public Wi-Fi network."},
+  // Part 3: Remote Work
+  {t:"Part 3: Remote Work",q:"What is 'Shadow IT'?",o:["IT department working night shifts","Using unauthorized apps/services for work data","A backup IT team","Dark web tools"],a:1,e:"Shadow IT bypasses all organizational security controls, encryption, and compliance requirements."},
+  {t:"Part 3: Remote Work",q:"The three pillars of the Remote Work Security Framework are:",o:["Speed, Cost, Quality","Network, Device, Behavior","Hardware, Software, Cloud","Firewall, Antivirus, VPN"],a:1,e:"Network Security + Device Security + Behavior Security must all work together."},
+  {t:"Part 3: Remote Work",q:"What keyboard shortcut locks your Windows screen?",o:["Ctrl + L","Alt + F4","Win + L","Ctrl + Alt + Del"],a:2,e:"Win + L instantly locks your screen — use it every time you step away."},
+  {t:"Part 3: Remote Work",q:"Which is an example of Shadow IT in accounting?",o:["Using the firm's approved cloud storage","Sharing payroll data via personal WhatsApp","Logging into the company VPN","Using MFA on work accounts"],a:1,e:"Sharing work data via personal messaging apps bypasses all firm security controls."},
+  // Part 4: MDM
+  {t:"Part 4: MDM",q:"What does MDM stand for?",o:["Mobile Data Management","Mobile Device Management","Managed Desktop Monitoring","Multi-Device Maintenance"],a:1,e:"MDM = Mobile Device Management — software to monitor, manage, and secure mobile devices."},
+  {t:"Part 4: MDM",q:"What MDM approach is used for BYOD to protect privacy?",o:["Full device wipe","Containerization","GPS tracking","App blacklisting"],a:1,e:"Containerization isolates work data in an encrypted container, keeping personal data separate."},
+  {t:"Part 4: MDM",q:"When an employee leaves, MDM on a BYOD device should:",o:["Wipe the entire phone","Wipe only the work container","Do nothing","Delete all photos"],a:1,e:"On BYOD, MDM performs selective wipe — removing only corporate data, personal data stays."},
+  // Part 5: Mobile Security
+  {t:"Part 5: Mobile Security",q:"What is 'juice jacking'?",o:["Overcharging your phone battery","Data theft via compromised USB charging ports","Hacking through Bluetooth","Stealing phone juice (battery)"],a:1,e:"USB cables carry both power AND data — malicious charging stations can steal data or install malware."},
+  {t:"Part 5: Mobile Security",q:"In a SIM swapping attack, the attacker:",o:["Physically steals your SIM card","Convinces your carrier to transfer your number to their SIM","Clones your phone","Hacks your Wi-Fi"],a:1,e:"SIM swapping lets attackers receive your calls/SMS, bypassing SMS-based MFA on all accounts."},
+  {t:"Part 5: Mobile Security",q:"What is the FIRST step if your work phone is stolen?",o:["Buy a new phone","Post about it on social media","Lock the device remotely and notify IT","Wait and hope someone returns it"],a:2,e:"Immediately lock remotely via Find My Device/MDM and notify IT to begin incident response."}
+];
+
+const scenarioData = [
+  {text:"You connect to \"Starbucks_Free_WiFi\" and immediately log into your firm's tax software without VPN.",safe:false,fb:"RISKY! Always connect VPN first. This exposes credentials to evil twin and sniffing attacks."},
+  {text:"Before working from home, you verify your router uses WPA3 and has a unique admin password.",safe:true,fb:"SAFE! WPA3 + changed default credentials are fundamental home network security steps."},
+  {text:"You share payroll files with a colleague via your personal Viber account because it's faster.",safe:false,fb:"RISKY! This is Shadow IT — bypasses firm security controls and violates the Data Privacy Act."},
+  {text:"Your phone asks 'Trust this computer?' at an airport USB charging station. You tap 'Don't Trust' and unplug.",safe:true,fb:"SAFE! This prevents juice jacking. Better yet, use your own charger or power bank."},
+  {text:"You use the same Wi-Fi network for your work laptop and your kids' tablets and smart TV.",safe:false,fb:"RISKY! No network segmentation means a compromised IoT device can reach your work laptop."},
+  {text:"You enable Find My Device, record your IMEI, and set a SIM PIN on your work phone.",safe:true,fb:"SAFE! These are essential anti-theft measures that enable remote lock/wipe and prevent SIM misuse."},
+  {text:"Hotel Wi-Fi requires installing a 'security certificate' to connect. You install it to get online quickly.",safe:false,fb:"RISKY! Never install certificates from captive portals — this lets attackers decrypt ALL your HTTPS traffic."},
+  {text:"You activate your company VPN before opening any browser or app on hotel Wi-Fi.",safe:true,fb:"SAFE! VPN first, everything else second. This encrypts all traffic regardless of the network."},
+  {text:"Three accountants in your team share one QuickBooks Online login to save on license costs.",safe:false,fb:"RISKY! Shared credentials destroy audit trails — impossible to track who made which entry."},
+  {text:"Your firm uses MDM with containerization on BYOD phones to isolate work data from personal apps.",safe:true,fb:"SAFE! Containerization keeps client financial data encrypted and separately wipeable."},
+  {text:"You use SMS-based two-factor authentication for all your critical banking and work accounts.",safe:false,fb:"RISKY! SMS-based MFA is vulnerable to SIM swapping. Use authenticator apps or hardware keys instead."},
+  {text:"You update your home router firmware monthly and have auto-update enabled.",safe:true,fb:"SAFE! 87% of home routers run outdated firmware. Regular updates patch known vulnerabilities."}
+];
+
+const matchData = [
+  {term:"VPN",def:"Encrypted tunnel between your device and a remote server"},
+  {term:"MDM",def:"Software to monitor, manage, and secure mobile devices"},
+  {term:"Evil Twin",def:"Fake Wi-Fi access point mimicking a legitimate one"},
+  {term:"SSL Stripping",def:"Downgrading HTTPS to HTTP to intercept data"},
+  {term:"ARP Spoofing",def:"Attacker pretends to be the router to intercept traffic"},
+  {term:"SIM Swapping",def:"Attacker transfers your phone number to their SIM"},
+  {term:"Juice Jacking",def:"Data theft via compromised USB charging ports"},
+  {term:"Containerization",def:"Isolating work data in an encrypted container on a personal device"},
+  {term:"BYOD",def:"Bring Your Own Device — using personal devices for work"},
+  {term:"Smishing",def:"Phishing conducted via SMS text messages"},
+  {term:"Shadow IT",def:"Using unauthorized apps and services for work data"},
+  {term:"WPA3",def:"Most secure Wi-Fi encryption protocol using SAE + AES-256"}
+];
+
+// ===== RANDOM PICK =====
+function pick3(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,3); }
+
+let activeQuiz=[], activeScenario=[], activeMatch=[];
+
+// ===== STATE =====
+let score=0, totalAnswered=0;
+
+function updateScore(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('total').textContent=totalAnswered;
+  const pct=totalAnswered?Math.round(score/totalAnswered*100):0;
+  document.getElementById('ring-pct').textContent=pct+'%';
+  const circ=113.1;
+  document.getElementById('ring').style.strokeDashoffset=circ-(circ*pct/100);
+  document.getElementById('ring').style.stroke=pct>=70?'#34d399':pct>=40?'#fbbf24':'#ef4444';
+}
+
+// ===== TABS =====
+function showTab(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',j===i));
+  document.querySelectorAll('.section').forEach((s,j)=>s.classList.toggle('active',j===i));
+}
+
+// update tab labels with count
+function updateTabLabels(){
+  const tabs=document.querySelectorAll('.tab');
+  tabs[0].textContent=`🧠 Quiz (${activeQuiz.length})`;
+  tabs[1].textContent=`⚖️ Safe or Risky? (${activeScenario.length})`;
+  tabs[2].textContent=`🔗 Term Match (${activeMatch.length})`;
+}
+
+// ===== QUIZ =====
+function buildQuiz(){
+  activeQuiz=pick3(quizData);
+  const c=document.getElementById('quiz-container');
+  c.innerHTML='';
+  activeQuiz.forEach((q,i)=>{
+    const div=document.createElement('div');
+    div.className='q-card';
+    div.id='q-'+i;
+    div.innerHTML=`<div class="q-num">Question ${i+1} of ${activeQuiz.length}</div><div class="q-topic">${q.t}</div><div class="q-text">${q.q}</div><div class="opts">${q.o.map((o,j)=>`<div class="opt" onclick="answerQuiz(${i},${j})">${o}</div>`).join('')}</div><div class="q-explain" id="qe-${i}"></div>`;
+    c.appendChild(div);
+  });
+}
+
+function answerQuiz(qi,oi){
+  const q=activeQuiz[qi],card=document.getElementById('q-'+qi);
+  if(card.dataset.done) return;
+  card.dataset.done='1';
+  const opts=card.querySelectorAll('.opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  const exp=document.getElementById('qe-'+qi);
+  totalAnswered++;
+  if(oi===q.a){
+    score++;
+    opts[oi].classList.add('correct');
+    exp.className='q-explain show right';
+    exp.innerHTML='✅ Correct! '+q.e;
+  } else {
+    opts[oi].classList.add('wrong');
+    opts[q.a].classList.add('correct');
+    exp.className='q-explain show wrong-exp';
+    exp.innerHTML='❌ Incorrect. '+q.e;
+  }
+  updateScore();
+}
+
+// ===== SCENARIOS =====
+function buildScenarios(){
+  activeScenario=pick3(scenarioData);
+  const c=document.getElementById('scenario-container');
+  c.innerHTML='';
+  activeScenario.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.className='sc-card';
+    div.id='sc-'+i;
+    div.innerHTML=`<div class="sc-text">${s.text}</div><div class="sc-btns"><div class="sc-btn safe" onclick="answerSc(${i},true)">✅ Safe</div><div class="sc-btn risky" onclick="answerSc(${i},false)">⚠️ Risky</div></div><div class="sc-feedback" id="sf-${i}"></div>`;
+    c.appendChild(div);
+  });
+}
+
+function answerSc(si,picked){
+  const s=activeScenario[si],card=document.getElementById('sc-'+si);
+  if(card.dataset.done) return;
+  card.dataset.done='1';
+  const btns=card.querySelectorAll('.sc-btn');
+  btns.forEach(b=>b.classList.add('disabled'));
+  const fb=document.getElementById('sf-'+si);
+  const correct=picked===s.safe;
+  totalAnswered++;
+  if(correct) score++;
+  const idx=picked?0:1;
+  btns[idx].classList.add(correct?'picked-right':'picked-wrong');
+  if(!correct) btns[picked?1:0].classList.add('picked-right');
+  fb.className='sc-feedback show';
+  fb.style.background=correct?'rgba(52,211,153,.08)':'rgba(239,68,68,.08)';
+  fb.style.border=correct?'1px solid rgba(52,211,153,.2)':'1px solid rgba(239,68,68,.2)';
+  fb.style.color=correct?'#6ee7b7':'#fca5a5';
+  fb.textContent=(correct?'✅ Correct! ':'❌ Wrong! ')+s.fb;
+  updateScore();
+}
+
+// ===== TERM MATCH =====
+let selTerm=null, matchedCount=0;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildMatch(){
+  activeMatch=pick3(matchData);
+  const grid=document.getElementById('match-grid');
+  grid.innerHTML='';
+  matchedCount=0;
+  selTerm=null;
+  const indexed=activeMatch.map((m,i)=>({i,term:m.term,def:m.def}));
+  const terms=shuffle(indexed.map(m=>({i:m.i,text:m.term})));
+  const defs=shuffle(indexed.map(m=>({i:m.i,text:m.def})));
+  const left=document.createElement('div');
+  left.style.cssText='display:flex;flex-direction:column;gap:10px;';
+  terms.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='match-term';
+    d.dataset.idx=t.i;
+    d.textContent=t.text;
+    d.onclick=()=>selectTerm(d);
+    left.appendChild(d);
+  });
+  const right=document.createElement('div');
+  right.style.cssText='display:flex;flex-direction:column;gap:10px;';
+  defs.forEach(t=>{
+    const d=document.createElement('div');
+    d.className='match-def';
+    d.dataset.idx=t.i;
+    d.textContent=t.text;
+    d.onclick=()=>selectDef(d);
+    right.appendChild(d);
+  });
+  grid.appendChild(left);
+  grid.appendChild(right);
+  document.getElementById('match-status').textContent=`Matched: 0 / ${activeMatch.length}`;
+}
+
+function selectTerm(el){
+  if(el.classList.contains('matched')) return;
+  document.querySelectorAll('.match-term').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  selTerm=el;
+}
+
+function selectDef(el){
+  if(!selTerm||el.classList.contains('matched')) return;
+  totalAnswered++;
+  if(selTerm.dataset.idx===el.dataset.idx){
+    score++;
+    selTerm.classList.remove('sel');
+    selTerm.classList.add('matched');
+    el.classList.add('matched');
+    matchedCount++;
+    document.getElementById('match-status').textContent=`Matched: ${matchedCount} / ${activeMatch.length}`;
+    if(matchedCount===activeMatch.length) document.getElementById('match-status').textContent='🎉 All matched! Great job!';
+  } else {
+    selTerm.classList.add('wrong-flash');
+    el.classList.add('wrong-flash');
+    setTimeout(()=>{selTerm.classList.remove('wrong-flash','sel');el.classList.remove('wrong-flash');},600);
+  }
+  selTerm=null;
+  updateScore();
+}
+
+// ===== RESET =====
+function resetAll(){
+  score=0;totalAnswered=0;
+  buildQuiz();buildScenarios();buildMatch();
+  updateTabLabels();
+  updateScore();
+}
+
+// ===== INIT =====
+buildQuiz();buildScenarios();buildMatch();updateTabLabels();updateScore();
+</script>
+</body>
+</html>

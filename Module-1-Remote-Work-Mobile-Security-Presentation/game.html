@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake & Ladder — Remote Work Security</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f172a;color:#cbd5e1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:12px;}
+
+.screen{display:none;width:100%;}
+.screen.active{display:flex;flex-direction:column;align-items:center;}
+
+/* START */
+#start-screen{max-width:440px;text-align:center;gap:0;padding:0 8px;}
+.big-icon{font-size:5em;margin-bottom:16px;animation:bob 2s ease-in-out infinite alternate;}
+@keyframes bob{from{transform:translateY(0);}to{transform:translateY(-10px);}}
+#start-screen h1{font-size:2.4em;font-weight:900;color:#f1f5f9;margin-bottom:8px;}
+#start-screen p{color:#64748b;margin-bottom:28px;line-height:1.6;}
+input[type=text]{width:100%;padding:14px 18px;border-radius:12px;border:2px solid rgba(56,189,248,.3);background:rgba(255,255,255,.05);color:#f1f5f9;font-size:1.1em;font-family:inherit;outline:none;transition:.2s;margin-bottom:14px;}
+input[type=text]:focus{border-color:#38bdf8;background:rgba(56,189,248,.07);}
+input[type=text]::placeholder{color:#475569;}
+.btn{width:100%;padding:14px;border-radius:12px;border:none;font-size:1.05em;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;}
+.btn-primary{background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#fff;box-shadow:0 4px 20px rgba(56,189,248,.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(56,189,248,.4);}
+.btn-ghost{background:rgba(255,255,255,.05);color:#64748b;border:1px solid rgba(255,255,255,.08);margin-top:10px;}
+.btn-ghost:hover{background:rgba(255,255,255,.09);color:#94a3b8;}
+.back-link{display:block;margin-top:16px;color:#475569;font-size:.85em;text-decoration:none;}
+.back-link:hover{color:#38bdf8;}
+
+/* GAME */
+#game-screen{
+  max-width:1100px;
+  flex-direction:row;
+  gap:16px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+  justify-content:center;
+  width:100%;
+}
+
+.board-container{
+  flex:1 1 480px;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+canvas#board{
+  border-radius:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);
+  display:block;
+  width:100%;
+  height:auto;
+  max-width:640px;
+}
+
+.side{
+  flex:0 0 220px;
+  width:220px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;}
+.panel-title{font-size:.7em;font-weight:700;color:#38bdf8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+
+.player-row{display:flex;align-items:center;gap:10px;}
+.token{width:30px;height:30px;border-radius:50%;background:#38bdf8;display:flex;align-items:center;justify-content:center;font-size:1em;flex-shrink:0;box-shadow:0 0 12px rgba(56,189,248,.4);}
+.pname{font-weight:700;color:#f1f5f9;font-size:.9em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;}
+.ppos{font-size:.72em;color:#64748b;margin-top:2px;}
+.pscore{margin-left:auto;background:rgba(52,211,153,.15);color:#34d399;font-weight:900;font-size:.82em;padding:3px 9px;border-radius:8px;white-space:nowrap;}
+
+.dice-wrap{text-align:center;}
+#dice{font-size:3.4em;line-height:1;margin:4px 0;display:block;}
+#dice.spin{animation:spin .35s ease;}
+@keyframes spin{0%{transform:scale(1) rotate(0);}50%{transform:scale(1.3) rotate(15deg);}100%{transform:scale(1) rotate(0);}}
+#roll-btn{width:100%;padding:11px;border-radius:10px;border:none;background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;font-size:.92em;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;box-shadow:0 4px 14px rgba(249,115,22,.3);}
+#roll-btn:hover:not(:disabled){transform:translateY(-1px);}
+#roll-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+#status{font-size:.82em;color:#94a3b8;line-height:1.65;min-height:44px;}
+#status .hi{color:#38bdf8;font-weight:700;}
+#status .ok{color:#34d399;font-weight:700;}
+#status .bad{color:#ef4444;font-weight:700;}
+#status .warn{color:#f97316;font-weight:700;}
+
+.legend{font-size:.73em;line-height:2;color:#64748b;}
+
+/* PHONE: stack board on top, side panel below as horizontal strip */
+@media(max-width:640px){
+  body{padding:8px;align-items:flex-start;}
+  #game-screen{flex-direction:column;gap:10px;align-items:stretch;}
+  .board-container{flex:none;width:100%;}
+  canvas#board{max-width:100%;border-radius:10px;}
+  .side{
+    flex:none;
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .side .btn-ghost{grid-column:1/-1;}
+  .side .back-link{grid-column:1/-1;text-align:center;}
+  .panel-title{font-size:.65em;}
+  #dice{font-size:2.6em;}
+  #roll-btn{padding:10px;font-size:.88em;}
+}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;}
+.modal{background:#1e293b;border:2px solid rgba(56,189,248,.25);border-radius:20px;padding:26px;max-width:460px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.7);}
+.modal-tag{font-size:.72em;font-weight:700;color:#f97316;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+.modal-q{font-size:1.05em;font-weight:600;color:#f1f5f9;line-height:1.55;margin-bottom:18px;}
+.modal-opts{display:flex;flex-direction:column;gap:9px;}
+.mopt{padding:11px 15px;border-radius:10px;border:2px solid rgba(255,255,255,.09);cursor:pointer;font-size:.92em;color:#e2e8f0;transition:.2s;text-align:left;background:transparent;font-family:inherit;}
+.mopt:hover{border-color:#38bdf8;background:rgba(56,189,248,.07);}
+.mopt.correct{border-color:#34d399!important;background:rgba(52,211,153,.12)!important;color:#34d399!important;cursor:default;}
+.mopt.wrong{border-color:#ef4444!important;background:rgba(239,68,68,.1)!important;color:#fca5a5!important;cursor:default;}
+.mopt.show-correct{border-color:#34d399!important;background:rgba(52,211,153,.07)!important;cursor:default;}
+.mopt.locked{pointer-events:none;}
+.modal-fb{margin-top:12px;padding:11px 14px;border-radius:10px;font-size:.85em;line-height:1.55;display:none;}
+.modal-fb.show-good{display:block;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);color:#6ee7b7;}
+.modal-fb.show-bad{display:block;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+#modal-cont{margin-top:14px;width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#38bdf8,#0ea5e9);color:#fff;font-size:.95em;font-weight:700;cursor:pointer;font-family:inherit;display:none;}
+#modal-cont.show{display:block;}
+
+/* WIN */
+#win-screen{max-width:480px;text-align:center;gap:0;}
+.confetti-row{font-size:3em;margin-bottom:16px;animation:bob 1.2s ease-in-out infinite alternate;}
+#win-screen h1{font-size:2.6em;font-weight:900;color:#f1f5f9;margin-bottom:10px;}
+.win-name{font-size:2em;font-weight:900;color:#38bdf8;margin-bottom:6px;}
+.win-sub{color:#64748b;margin-bottom:8px;font-size:.95em;}
+.win-score{font-size:1.1em;font-weight:700;color:#34d399;margin-bottom:24px;}
+.win-msg{color:#94a3b8;line-height:1.7;margin-bottom:28px;font-size:.95em;}
+</style>
+</head>
+<body>
+
+<!-- ===== START ===== -->
+<div class="screen active" id="start-screen">
+  <div class="big-icon">🐍🪜</div>
+  <h1>Snake & Ladder</h1>
+  <p>Remote Work &amp; Mobile Security<br>Answer correctly to move forward — wrong answers slide you back!</p>
+  <input type="text" id="name-input" placeholder="Enter your name to begin..." maxlength="24"
+    onkeydown="if(event.key==='Enter')startGame()"/>
+  <button class="btn btn-primary" onclick="startGame()">🎮 Start Game</button>
+  <a class="back-link" href="index.html">← Back to Presentation</a>
+</div>
+
+<!-- ===== GAME ===== -->
+<div class="screen" id="game-screen">
+  <div class="board-container">
+    <canvas id="board" width="640" height="640"></canvas>
+  </div>
+  <div class="side">
+
+    <div class="panel">
+      <div class="panel-title">👤 Player</div>
+      <div class="player-row">
+        <div class="token">🧑</div>
+        <div>
+          <div class="pname" id="pname">—</div>
+          <div class="ppos">Block <span id="ppos">1</span> of 50</div>
+        </div>
+        <div class="pscore">✅ <span id="pscore">0</span></div>
+      </div>
+    </div>
+
+    <div class="panel dice-wrap">
+      <div class="panel-title">🎲 Dice</div>
+      <span id="dice">⚀</span>
+      <button id="roll-btn" onclick="rollDice()">Roll the Dice!</button>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📢 Status</div>
+      <div id="status">Roll the dice to begin your adventure!</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">📖 Legend</div>
+      <div class="legend">
+        🎲 Roll dice → answer question<br>
+        ✅ <span style="color:#34d399;">Correct</span> — move forward by roll<br>
+        ❌ <span style="color:#ef4444;">Wrong</span> — move back by roll<br>
+        🪜 <span style="color:#34d399;">Ladder</span> — land on it, skip up!<br>
+        🐍 <span style="color:#ef4444;">Snake</span> — land on it, slide down!<br>
+        🏁 Reach block <strong style="color:#f1f5f9;">50</strong> to win!
+      </div>
+    </div>
+
+    <button class="btn btn-ghost" onclick="if(confirm('Restart?'))location.reload()">🔄 Restart</button>
+    <a class="back-link" href="index.html">← Back to Presentation</a>
+  </div>
+</div>
+
+<!-- ===== WIN ===== -->
+<div class="screen" id="win-screen">
+  <div class="confetti-row">🎉🏆🎊</div>
+  <h1>Congratulations!</h1>
+  <div class="win-name" id="win-name">—</div>
+  <div class="win-sub">You reached Block 50!</div>
+  <div class="win-score" id="win-score">—</div>
+  <p class="win-msg">You've completed the <strong>Remote Work &amp; Mobile Security</strong> challenge!<br>
+  You've proven your knowledge in keeping accounting data safe. Keep it up!</p>
+  <button class="btn btn-primary" onclick="location.reload()">🎮 Play Again</button>
+  <a class="back-link" href="index.html">← Back to Presentation</a>
+</div>
+
+<!-- ===== QUESTION MODAL ===== -->
+<div class="overlay" id="overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-tag" id="modal-tag">⚖️ Safe or Risky?</div>
+    <div class="modal-q" id="modal-q"></div>
+    <div class="modal-opts" id="modal-opts"></div>
+    <div class="modal-fb" id="modal-fb"></div>
+    <button id="modal-cont" onclick="afterAnswer()">Continue →</button>
+  </div>
+</div>
+
+<script>
+// ===== 5 QUESTIONS =====
+const QS = [
+  {
+    q: "You connect to free airport Wi-Fi and immediately open your firm's accounting software — without turning on VPN first. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — airports have secure networks", "⚠️ Risky — always connect VPN before any work app", "✅ Safe — HTTPS protects everything", "⚠️ Risky — only if the Wi-Fi has no password"],
+    a: 1,
+    e: "RISKY! Public Wi-Fi is an open broadcast domain. Evil twin attacks and packet sniffing are common. Always connect VPN FIRST."
+  },
+  {
+    q: "You send payroll files to a colleague via your personal WhatsApp because it's faster than the company portal. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — WhatsApp uses end-to-end encryption", "✅ Safe — the colleague is trusted", "⚠️ Risky — this is Shadow IT and violates firm security controls", "⚠️ Risky — only if the file is large"],
+    a: 2,
+    e: "RISKY! This is Shadow IT. It bypasses your firm's Data Loss Prevention controls and violates the Data Privacy Act of 2012."
+  },
+  {
+    q: "A hotel Wi-Fi captive portal says: 'Install this security certificate to access the internet.' You install it to connect quickly. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — it's just a certificate for the hotel", "✅ Safe — hotels are trustworthy environments", "⚠️ Risky — this lets attackers decrypt ALL your HTTPS traffic", "⚠️ Risky — only if you use banking apps"],
+    a: 2,
+    e: "RISKY! A rogue certificate gives attackers a trusted root on your device — they can decrypt every HTTPS connection you make. NEVER install certificates from captive portals."
+  },
+  {
+    q: "You plug your phone into a free USB charging port at the mall. It asks 'Trust this computer?' — you tap DON'T TRUST and unplug. Is this SAFE or RISKY?",
+    opts: ["⚠️ Risky — you should always trust to charge faster", "✅ Safe — tapping Don't Trust prevents juice jacking", "⚠️ Risky — it won't charge your phone properly", "✅ Safe — but only in malls, not airports"],
+    a: 1,
+    e: "SAFE! Tapping 'Don't Trust' blocks the data pins and prevents juice jacking. Even better: carry your own charger or power bank."
+  },
+  {
+    q: "Three accountants in your team share one QuickBooks Online login to save on license costs. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — it saves the company money", "✅ Safe — they all trust each other", "⚠️ Risky — shared logins destroy the audit trail and accountability", "⚠️ Risky — only if the password is weak"],
+    a: 2,
+    e: "RISKY! Shared credentials make it impossible to track who made which journal entry. Each user must have their own account for audit trail integrity."
+  }
+];
+
+// ===== BOARD =====
+// Snakes: [head, tail] — go DOWN
+const SNAKES = [[38,14],[31,6],[44,26],[47,21],[49,35]];
+// Ladders: [foot, top] — go UP
+const LADDERS = [[4,18],[9,31],[20,42],[28,46],[36,44]];
+
+const COLS=10, ROWS=5, CELL=64, SZ=COLS*CELL;
+const canvas=document.getElementById('board');
+const ctx=canvas.getContext('2d');
+canvas.width=SZ; canvas.height=SZ;
+
+function cellCenter(n){
+  const i=n-1, row=Math.floor(i/COLS), col=i%COLS;
+  const ac=(row%2===0)?col:(COLS-1-col);
+  return {x:ac*CELL+CELL/2, y:(ROWS-1-row)*CELL+CELL/2};
+}
+
+function drawBoard(playerPos){
+  ctx.clearRect(0,0,SZ,SZ);
+  for(let n=1;n<=50;n++){
+    const {x,y}=cellCenter(n);
+    const cx=x-CELL/2+1, cy=y-CELL/2+1, cw=CELL-2, ch=CELL-2;
+    const isSnakeHead=SNAKES.some(s=>s[0]===n);
+    const isLadderFoot=LADDERS.some(l=>l[0]===n);
+    if(n===50) ctx.fillStyle='rgba(251,191,36,.3)';
+    else if(isSnakeHead) ctx.fillStyle='rgba(239,68,68,.2)';
+    else if(isLadderFoot) ctx.fillStyle='rgba(52,211,153,.2)';
+    else ctx.fillStyle=n%2===0?'rgba(255,255,255,.05)':'rgba(255,255,255,.02)';
+    ctx.beginPath(); ctx.roundRect(cx,cy,cw,ch,4); ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.07)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.3)';
+    ctx.font='bold 11px Inter'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(n,x,y);
+  }
+  // snakes
+  SNAKES.forEach(([h,t])=>{
+    const a=cellCenter(h),b=cellCenter(t);
+    drawArrow(a,b,'rgba(239,68,68,.75)',true);
+    ctx.font='18px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('🐍',a.x,a.y-10);
+  });
+  // ladders
+  LADDERS.forEach(([f,top])=>{
+    const a=cellCenter(f),b=cellCenter(top);
+    drawArrow(a,b,'rgba(52,211,153,.75)',false);
+    ctx.font='18px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('🪜',a.x,a.y+10);
+  });
+  // finish
+  const fin=cellCenter(50);
+  ctx.font='20px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('🏁',fin.x,fin.y-8);
+  // player
+  const p=cellCenter(playerPos);
+  ctx.beginPath(); ctx.arc(p.x,p.y,18,0,Math.PI*2);
+  ctx.fillStyle='#38bdf8'; ctx.fill();
+  ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
+  ctx.font='16px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('🧑',p.x,p.y);
+}
+
+function drawArrow(a,b,color,dashed){
+  const mx=(a.x+b.x)/2+(dashed?18:-18), my=(a.y+b.y)/2;
+  ctx.beginPath(); ctx.moveTo(a.x,a.y);
+  ctx.quadraticCurveTo(mx,my,b.x,b.y);
+  ctx.strokeStyle=color; ctx.lineWidth=2.5;
+  ctx.setLineDash(dashed?[5,3]:[]);
+  ctx.stroke(); ctx.setLineDash([]);
+  const ang=Math.atan2(b.y-my,b.x-mx);
+  ctx.beginPath();
+  ctx.moveTo(b.x,b.y);
+  ctx.lineTo(b.x-9*Math.cos(ang-.4),b.y-9*Math.sin(ang-.4));
+  ctx.lineTo(b.x-9*Math.cos(ang+.4),b.y-9*Math.sin(ang+.4));
+  ctx.closePath(); ctx.fillStyle=color; ctx.fill();
+}
+
+// ===== STATE =====
+let playerName='', pos=1, correct=0, total=0, pendingRoll=0, qRound=0, lastCorrect=false;
+const diceF=['⚀','⚁','⚂','⚃','⚄','⚅'];
+
+function setStatus(html){ document.getElementById('status').innerHTML=html; }
+function setPos(n){ pos=n; document.getElementById('ppos').textContent=n; drawBoard(n); }
+function setScore(){ document.getElementById('pscore').textContent=correct; }
+
+// ===== START =====
+function startGame(){
+  const n=document.getElementById('name-input').value.trim();
+  if(!n){ document.getElementById('name-input').focus(); return; }
+  playerName=n;
+  pos=1; correct=0; total=0; qRound=0;
+  document.getElementById('pname').textContent=playerName;
+  setPos(1); setScore();
+  setStatus(`Welcome <span class="hi">${playerName}</span>! Roll the dice to start! 🎲`);
+  showScreen('game-screen');
+  drawBoard(1);
+}
+
+// ===== DICE =====
+function rollDice(){
+  document.getElementById('roll-btn').disabled=true;
+  const d=document.getElementById('dice');
+  d.classList.remove('spin'); void d.offsetWidth; d.classList.add('spin');
+  let c=0;
+  const iv=setInterval(()=>{
+    d.textContent=diceF[Math.floor(Math.random()*6)];
+    if(++c>10){
+      clearInterval(iv);
+      pendingRoll=Math.floor(Math.random()*6)+1;
+      d.textContent=diceF[pendingRoll-1];
+      setStatus(`You rolled <span class="hi">${pendingRoll}</span>! Answer the question to move forward!`);
+      setTimeout(openQuestion, 700);
+    }
+  },70);
+}
+
+// ===== QUESTION =====
+function openQuestion(){
+  const q=QS[qRound%QS.length]; qRound++;
+  document.getElementById('modal-q').textContent=q.q;
+  const oc=document.getElementById('modal-opts');
+  oc.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='mopt'; b.textContent=o;
+    b.onclick=()=>pick(i,q,oc);
+    oc.appendChild(b);
+  });
+  document.getElementById('modal-fb').className='modal-fb';
+  document.getElementById('modal-cont').className='modal-cont';
+  document.getElementById('overlay').style.display='flex';
+}
+
+function pick(i,q,oc){
+  total++;
+  oc.querySelectorAll('.mopt').forEach(b=>b.classList.add('locked'));
+  const btns=oc.querySelectorAll('.mopt');
+  const fb=document.getElementById('modal-fb');
+  lastCorrect=(i===q.a);
+  if(lastCorrect){
+    correct++; setScore();
+    btns[i].classList.add('correct');
+    fb.className='modal-fb show-good';
+    fb.innerHTML='✅ Correct! '+q.e;
+  } else {
+    btns[i].classList.add('wrong');
+    btns[q.a].classList.add('show-correct');
+    fb.className='modal-fb show-bad';
+    fb.innerHTML='❌ Wrong! '+q.e;
+  }
+  document.getElementById('modal-cont').className='modal-cont show';
+}
+
+function afterAnswer(){
+  document.getElementById('overlay').style.display='none';
+  if(lastCorrect){
+    const target=Math.min(pos+pendingRoll,50);
+    setStatus(`✅ Correct! Moving forward <span class="ok">${pendingRoll}</span> step(s) to block <span class="hi">${target}</span>...`);
+    animateMove(pos,target,()=>{
+      setPos(target);
+      if(target===50){ winGame(); return; }
+      checkSpecial(target,'move');
+    });
+  } else {
+    const target=Math.max(1,pos-pendingRoll);
+    setStatus(`❌ Wrong! Moving back <span class="bad">${pendingRoll}</span> step(s) from <span class="bad">${pos}</span> to <span class="bad">${target}</span>...`);
+    setTimeout(()=>{
+      animateBack(pos,target,()=>{
+        setPos(target);
+        checkSpecial(target,'back');
+      });
+    },400);
+  }
+}
+
+function animateBack(from,to,cb){
+  let cur=from;
+  const iv=setInterval(()=>{
+    cur=Math.max(cur-1,to);
+    drawBoard(cur);
+    document.getElementById('ppos').textContent=cur;
+    if(cur<=to){ clearInterval(iv); cb(); }
+  },110);
+}
+
+function animateMove(from,to,cb){
+  let cur=from;
+  const iv=setInterval(()=>{
+    cur=Math.min(cur+1,to);
+    drawBoard(cur);
+    document.getElementById('ppos').textContent=cur;
+    if(cur>=to){ clearInterval(iv); cb(); }
+  },110);
+}
+
+function checkSpecial(n,reason){
+  const snake=SNAKES.find(s=>s[0]===n);
+  const ladder=LADDERS.find(l=>l[0]===n);
+  if(snake){
+    setStatus(`🐍 Snake! Sliding down from <span class="bad">${n}</span> to <span class="bad">${snake[1]}</span>!`);
+    setTimeout(()=>{ setPos(snake[1]); enableRoll(); },900);
+  } else if(ladder){
+    setStatus(`🪜 Ladder! Climbing up from <span class="ok">${n}</span> to <span class="ok">${ladder[1]}</span>!`);
+    setTimeout(()=>{ setPos(ladder[1]); enableRoll(); },900);
+  } else {
+    if(reason==='move') setStatus(`✅ Moved to block <span class="hi">${n}</span>. Roll again!`);
+    else setStatus(`You're now on block <span class="warn">${n}</span>. Roll again!`);
+    enableRoll();
+  }
+}
+
+function enableRoll(){ document.getElementById('roll-btn').disabled=false; }
+
+// ===== WIN =====
+function winGame(){
+  document.getElementById('win-name').textContent=playerName+'! 🎉';
+  document.getElementById('win-score').textContent=`Correct answers: ${correct} / ${total}`;
+  showScreen('win-screen');
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>
