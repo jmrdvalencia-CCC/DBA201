@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Battle — Cloud & SaaS Security</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0a0a1a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+
+/* SCREENS */
+.screen{display:none;width:100%;height:100vh;flex-direction:column;align-items:center;justify-content:center;position:absolute;inset:0;}
+.screen.active{display:flex;}
+
+/* START */
+#start{background:radial-gradient(ellipse at center,#1a1a3e 0%,#0a0a1a 70%);text-align:center;gap:16px;padding:20px;}
+#start .title{font-family:'Press Start 2P',monospace;font-size:clamp(1.2em,4vw,2.2em);color:#f6e05e;text-shadow:0 0 20px rgba(246,224,94,.4);margin-bottom:4px;}
+#start .sub{color:#718096;font-size:.9em;margin-bottom:16px;}
+#start input{width:280px;padding:12px 16px;border-radius:10px;border:2px solid #4F8EF7;background:rgba(255,255,255,.05);color:#fff;font-size:1em;font-family:inherit;outline:none;text-align:center;}
+#start input::placeholder{color:#4A5568;}
+#start input:focus{border-color:#f6e05e;box-shadow:0 0 16px rgba(246,224,94,.2);}
+.btn-go{padding:12px 40px;border-radius:10px;border:none;font-family:'Press Start 2P',monospace;font-size:.75em;cursor:pointer;background:linear-gradient(135deg,#f6e05e,#ed8936);color:#1a1a3e;box-shadow:0 4px 20px rgba(246,224,94,.3);transition:.2s;}
+.btn-go:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(246,224,94,.5);}
+
+/* BATTLE */
+#battle{background:linear-gradient(180deg,#1a1a3e 0%,#0d1b2a 50%,#1b4332 100%);padding:0;flex-direction:column;justify-content:flex-end;}
+
+/* Arena */
+.arena{flex:1;width:100%;max-width:800px;margin:0 auto;position:relative;display:flex;flex-direction:column;justify-content:center;padding:20px;}
+
+/* Ground */
+.ground{position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(180deg,#2d6a4f 0%,#1b4332 100%);border-top:3px solid #52b788;opacity:.6;}
+
+/* HP Bars */
+.hp-bar-wrap{position:absolute;background:rgba(0,0,0,.7);border:2px solid #4a5568;border-radius:10px;padding:8px 12px;min-width:200px;z-index:5;}
+.hp-bar-wrap.enemy{top:20px;left:20px;}
+.hp-bar-wrap.player{bottom:160px;right:20px;}
+.hp-name{font-family:'Press Start 2P',monospace;font-size:.55em;color:#fff;margin-bottom:4px;}
+.hp-lv{float:right;color:#a0aec0;font-size:.5em;}
+.hp-track{width:100%;height:10px;background:#2d3748;border-radius:5px;overflow:hidden;margin-top:4px;}
+.hp-fill{height:100%;border-radius:5px;transition:width .8s ease;background:linear-gradient(90deg,#48bb78,#38a169);}
+.hp-fill.low{background:linear-gradient(90deg,#f6e05e,#ed8936);}
+.hp-fill.critical{background:linear-gradient(90deg,#fc8181,#e53e3e);}
+.hp-text{font-family:'Press Start 2P',monospace;font-size:.45em;color:#a0aec0;margin-top:2px;text-align:right;}
+
+/* Sprites */
+.sprite{position:absolute;z-index:3;transition:transform .3s;}
+.sprite.enemy-sprite{top:60px;right:80px;font-size:5em;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5));}
+.sprite.player-sprite{bottom:170px;left:60px;font-size:4.5em;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5));}
+.sprite.shake{animation:shake .4s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-12px);}40%{transform:translateX(12px);}60%{transform:translateX(-8px);}80%{transform:translateX(8px);}}
+.sprite.hit{animation:hitFlash .5s ease;}
+@keyframes hitFlash{0%,100%{opacity:1;}25%{opacity:.2;}50%{opacity:1;}75%{opacity:.3;}}
+.sprite.attack-anim{animation:attackLunge .4s ease;}
+@keyframes attackLunge{0%{transform:translate(0,0);}40%{transform:translate(60px,-20px) scale(1.1);}100%{transform:translate(0,0);}}
+.sprite.faint{animation:faint .8s ease forwards;}
+@keyframes faint{to{opacity:0;transform:translateY(40px) scale(.5);}}
+
+/* Attack effect */
+.atk-effect{position:absolute;z-index:10;pointer-events:none;font-size:2.5em;animation:atkBurst .6s ease forwards;}
+@keyframes atkBurst{0%{opacity:0;transform:scale(.3);}40%{opacity:1;transform:scale(1.3);}100%{opacity:0;transform:scale(.5) translateY(-30px);}}
+
+/* Damage number */
+.dmg-num{position:absolute;z-index:10;font-family:'Press Start 2P',monospace;font-size:.9em;pointer-events:none;animation:dmgFloat .8s ease forwards;}
+.dmg-num.good{color:#48bb78;}
+.dmg-num.bad{color:#fc8181;}
+@keyframes dmgFloat{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-40px);}}
+
+/* Dialog Box */
+.dialog-box{width:100%;max-width:800px;margin:0 auto;background:rgba(0,0,0,.85);border-top:3px solid #4a5568;padding:16px 20px;min-height:140px;position:relative;z-index:20;}
+.dialog-scenario{font-family:'Press Start 2P',monospace;font-size:.5em;line-height:1.9;color:#fca5a5;min-height:0;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);display:none;}
+.dialog-scenario.show{display:block;}
+.dialog-text{font-family:'Press Start 2P',monospace;font-size:.6em;line-height:2;color:#e2e8f0;min-height:40px;}
+.dialog-text .enemy-name{color:#fc8181;}
+.dialog-text .player-name{color:#48bb78;}
+.dialog-text .highlight{color:#f6e05e;}
+
+/* Move buttons */
+.moves{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.move-btn{padding:12px 10px;border-radius:8px;border:2px solid #4a5568;background:rgba(255,255,255,.04);color:#e2e8f0;font-family:'Press Start 2P',monospace;font-size:.5em;line-height:1.6;cursor:pointer;transition:.2s;text-align:left;}
+.move-btn:hover{border-color:#f6e05e;background:rgba(246,224,94,.08);color:#f6e05e;}
+.move-btn.correct{border-color:#48bb78!important;background:rgba(72,187,120,.15)!important;color:#48bb78!important;}
+.move-btn.wrong{border-color:#fc8181!important;background:rgba(252,129,129,.1)!important;color:#fc8181!important;}
+.move-btn.disabled{pointer-events:none;opacity:.5;}
+.move-btn .move-type{display:block;font-size:.7em;color:#718096;margin-top:4px;}
+
+#continue-btn{display:none;width:100%;padding:10px;border-radius:8px;border:2px solid #f6e05e;background:rgba(246,224,94,.1);color:#f6e05e;font-family:'Press Start 2P',monospace;font-size:.5em;cursor:pointer;margin-top:10px;transition:.2s;}
+#continue-btn:hover{background:rgba(246,224,94,.2);}
+
+/* WIN */
+#win{background:radial-gradient(ellipse at center,#1a3a2a 0%,#0a0a1a 70%);text-align:center;gap:12px;padding:20px;}
+#win .trophy{font-size:4em;animation:bounce 1s ease infinite alternate;}
+@keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-12px);}}
+#win h1{font-family:'Press Start 2P',monospace;font-size:clamp(.9em,3vw,1.5em);color:#f6e05e;text-shadow:0 0 20px rgba(246,224,94,.4);}
+#win .win-name{font-family:'Press Start 2P',monospace;font-size:clamp(.7em,2.5vw,1.1em);color:#48bb78;}
+#win .stats{color:#a0aec0;font-size:.85em;line-height:2;}
+#win .stats span{color:#f6e05e;font-weight:900;}
+
+/* LOSE */
+#lose{background:radial-gradient(ellipse at center,#2d1515 0%,#0a0a1a 70%);text-align:center;gap:12px;padding:20px;}
+#lose h1{font-family:'Press Start 2P',monospace;font-size:clamp(.9em,3vw,1.4em);color:#fc8181;}
+
+/* Responsive */
+@media(max-width:600px){
+  .sprite.enemy-sprite{font-size:3.5em;right:30px;top:50px;}
+  .sprite.player-sprite{font-size:3em;left:20px;bottom:160px;}
+  .hp-bar-wrap{min-width:140px;padding:6px 8px;}
+  .hp-bar-wrap.enemy{top:10px;left:10px;}
+  .hp-bar-wrap.player{bottom:150px;right:10px;}
+  .dialog-box{padding:12px 14px;min-height:120px;}
+  .move-btn{padding:8px;font-size:.42em;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== START ===== -->
+<div class="screen active" id="start">
+  <div style="font-size:4em;margin-bottom:8px;">⚔️🛡️</div>
+  <div class="title">SECURITY BATTLE</div>
+  <div class="sub">Cloud & SaaS Security — Defeat the Threats!</div>
+  <p style="color:#4a5568;font-size:.8em;max-width:360px;line-height:1.6;margin-bottom:8px;">Enemy threats attack with cloud security risks.<br>Choose the correct fix to deal damage!</p>
+  <input type="text" id="name-input" placeholder="Enter your name, hero..." maxlength="16" onkeydown="if(event.key==='Enter')beginBattle()"/>
+  <button class="btn-go" onclick="beginBattle()">⚔️ BATTLE!</button>
+  <a href="index.html" style="color:#4a5568;font-size:.75em;text-decoration:none;margin-top:12px;">← Back to Lessons</a>
+</div>
+
+<!-- ===== BATTLE ===== -->
+<div class="screen" id="battle">
+  <div class="arena" id="arena">
+    <div class="ground"></div>
+
+    <!-- Enemy HP -->
+    <div class="hp-bar-wrap enemy">
+      <div class="hp-name" id="enemy-name">THREAT</div>
+      <div class="hp-track"><div class="hp-fill" id="enemy-hp" style="width:100%"></div></div>
+      <div class="hp-text" id="enemy-hp-text">HP 100/100</div>
+    </div>
+
+    <!-- Player HP -->
+    <div class="hp-bar-wrap player">
+      <div class="hp-name" id="player-hud-name">YOU <span class="hp-lv">Lv5</span></div>
+      <div class="hp-track"><div class="hp-fill" id="player-hp" style="width:100%"></div></div>
+      <div class="hp-text" id="player-hp-text">HP 100/100</div>
+    </div>
+
+    <!-- Sprites -->
+    <div class="sprite enemy-sprite" id="enemy-sprite">👾</div>
+    <div class="sprite player-sprite" id="player-sprite">🛡️</div>
+  </div>
+
+  <!-- Dialog -->
+  <div class="dialog-box" id="dialog-box">
+    <div class="dialog-scenario" id="dialog-scenario"></div>
+    <div class="dialog-text" id="dialog-text">...</div>
+    <div class="moves" id="moves"></div>
+    <button id="continue-btn" onclick="nextTurn()">▶ CONTINUE</button>
+  </div>
+</div>
+
+<!-- ===== WIN ===== -->
+<div class="screen" id="win">
+  <div class="trophy">🏆</div>
+  <h1>VICTORY!</h1>
+  <div class="win-name" id="win-name">—</div>
+  <div class="stats" id="win-stats">—</div>
+  <button class="btn-go" onclick="location.reload()" style="margin-top:12px;">⚔️ PLAY AGAIN</button>
+  <a href="index.html" style="color:#4a5568;font-size:.75em;text-decoration:none;margin-top:10px;">← Back to Lessons</a>
+</div>
+
+<!-- ===== LOSE ===== -->
+<div class="screen" id="lose">
+  <div style="font-size:4em;">💀</div>
+  <h1>DEFEATED...</h1>
+  <p style="color:#a0aec0;max-width:340px;line-height:1.6;margin-bottom:16px;">The threats were too strong this time. Review the lessons and try again!</p>
+  <button class="btn-go" onclick="location.reload()">🔄 TRY AGAIN</button>
+  <a href="index.html" style="color:#4a5568;font-size:.75em;text-decoration:none;margin-top:10px;">← Back to Lessons</a>
+</div>
+
+<script>
+// ===== BATTLE DATA =====
+const ENEMIES = [
+  {
+    name:"OVERSHARE GHOST",
+    emoji:"👻",
+    attack:"uses SHARE WITH EVERYONE! Your payroll spreadsheet is now visible to the entire organization!",
+    moves:[
+      {text:"Share with Specific People only",correct:true},
+      {text:"Set file to View Only",correct:false},
+      {text:"Add a password to the file",correct:false},
+      {text:"Move file to a new folder",correct:false}
+    ],
+    explain:"Always share with specific email addresses. 'Everyone' exposes sensitive data to the entire org."
+  },
+  {
+    name:"MISCONFIG DRAGON",
+    emoji:"🐉",
+    attack:"uses PUBLIC CHANNEL BLAST! Your #invoices Slack channel is set to public — all interns can see billing data!",
+    moves:[
+      {text:"Delete the channel",correct:false},
+      {text:"Set financial channels to Private",correct:true},
+      {text:"Rename the channel",correct:false},
+      {text:"Remove all interns from Slack",correct:false}
+    ],
+    explain:"Financial channels must always be set to Private. Renaming or deleting doesn't fix the root misconfiguration."
+  },
+  {
+    name:"SHADOW IT PHANTOM",
+    emoji:"👤",
+    attack:"uses PERSONAL CLOUD UPLOAD! An accountant uploads client tax returns to personal iCloud!",
+    moves:[
+      {text:"It's fine — iCloud is encrypted",correct:false},
+      {text:"Ask them to use a strong password",correct:false},
+      {text:"Use only firm-approved cloud storage",correct:true},
+      {text:"Download files back to USB drive",correct:false}
+    ],
+    explain:"Shadow IT bypasses all firm security controls. Only approved tools with DLP, encryption, and audit trails should be used."
+  },
+  {
+    name:"CREDENTIAL WRAITH",
+    emoji:"💀",
+    attack:"uses SHARED LOGIN CURSE! Three accountants share one QuickBooks login — audit trail destroyed!",
+    moves:[
+      {text:"Change the shared password monthly",correct:false},
+      {text:"Give each user their own account + MFA",correct:true},
+      {text:"Write down who logs in when",correct:false},
+      {text:"Use a stronger shared password",correct:false}
+    ],
+    explain:"Each user needs individual credentials + MFA. Shared logins make it impossible to track who did what."
+  },
+  {
+    name:"EXPIRED LINK ZOMBIE",
+    emoji:"🧟",
+    attack:"uses ETERNAL LINK! A sharing link from 2 years ago is still active — anyone can access the financial statement!",
+    moves:[
+      {text:"Hope nobody finds it",correct:false},
+      {text:"Set expiration dates on all sharing links (7-30 days)",correct:true},
+      {text:"Change the file name",correct:false},
+      {text:"Move the file to another folder",correct:false}
+    ],
+    explain:"Links without expiry remain active forever. Always set 7-30 day expiration and review shared links regularly."
+  },
+  {
+    name:"DATA LOSS DEMON",
+    emoji:"😈",
+    attack:"uses PERMANENT DELETE! A team member deletes 5 years of tax documents — no version history enabled!",
+    moves:[
+      {text:"Check the recycle bin",correct:false},
+      {text:"Enable version history + 3-2-1 backup rule",correct:true},
+      {text:"Ask the team member to undo",correct:false},
+      {text:"Re-create the documents from memory",correct:false}
+    ],
+    explain:"Enable version history on all cloud storage. The 3-2-1 rule: 3 copies, 2 different media, 1 offsite backup."
+  },
+  {
+    name:"ACCESS REVENANT",
+    emoji:"👹",
+    attack:"uses GHOST ACCESS! A former contractor still has full access to SharePoint 6 months after leaving!",
+    moves:[
+      {text:"Change the Wi-Fi password",correct:false},
+      {text:"Send them an email asking them to stop",correct:false},
+      {text:"Revoke all access immediately on offboarding",correct:true},
+      {text:"Monitor their activity quietly",correct:false}
+    ],
+    explain:"Access must be revoked on the last day of contract. Quarterly access reviews catch any missed accounts."
+  }
+];
+
+// ===== STATE =====
+let playerName='', playerHP=100, enemyHP=0, currentEnemy=0, correctCount=0, totalBattles=0;
+let enemies=[];
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ===== SCREENS =====
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// ===== START =====
+function beginBattle(){
+  const n=document.getElementById('name-input').value.trim();
+  if(!n){document.getElementById('name-input').focus();return;}
+  playerName=n;
+  enemies=shuffle([...ENEMIES]);
+  currentEnemy=0;correctCount=0;totalBattles=0;playerHP=100;
+  document.getElementById('player-hud-name').innerHTML=playerName.toUpperCase()+' <span class="hp-lv">Lv5</span>';
+  showScreen('battle');
+  loadEnemy();
+}
+
+// ===== LOAD ENEMY =====
+function loadEnemy(){
+  if(currentEnemy>=enemies.length){winBattle();return;}
+  const e=enemies[currentEnemy];
+  enemyHP=100;
+  document.getElementById('enemy-name').textContent=e.name;
+  document.getElementById('enemy-sprite').textContent=e.emoji;
+  document.getElementById('enemy-sprite').className='sprite enemy-sprite';
+  updateHP();
+
+  // Entrance animation
+  document.getElementById('enemy-sprite').style.opacity='0';
+  document.getElementById('enemy-sprite').style.transform='translateX(100px)';
+  setTimeout(()=>{
+    document.getElementById('enemy-sprite').style.transition='all .6s ease';
+    document.getElementById('enemy-sprite').style.opacity='1';
+    document.getElementById('enemy-sprite').style.transform='translateX(0)';
+  },100);
+
+  typeText('A wild <span class="enemy-name">'+e.name+'</span> appeared!',()=>{
+    setTimeout(()=>enemyAttack(),1200);
+  });
+}
+
+// ===== ENEMY ATTACK =====
+function enemyAttack(){
+  const e=enemies[currentEnemy];
+  const ps=document.getElementById('player-sprite');
+  ps.classList.add('hit');
+  setTimeout(()=>ps.classList.remove('hit'),500);
+  spawnEffect(ps,'💥');
+  spawnDmg(ps,'-??','bad');
+
+  const scenarioHTML='<span class="enemy-name">'+e.name+'</span> '+e.attack;
+  typeText(scenarioHTML,()=>{
+    // Save scenario text and show moves
+    setTimeout(()=>{
+      document.getElementById('dialog-scenario').innerHTML=scenarioHTML;
+      document.getElementById('dialog-scenario').classList.add('show');
+      showMoves();
+    },800);
+  });
+}
+
+// ===== SHOW MOVES =====
+function showMoves(){
+  const e=enemies[currentEnemy];
+  const mc=document.getElementById('moves');
+  mc.innerHTML='';
+  const shuffled=shuffle(e.moves.map((m,i)=>({...m,idx:i})));
+  shuffled.forEach(m=>{
+    const btn=document.createElement('button');
+    btn.className='move-btn';
+    btn.innerHTML=m.text+'<span class="move-type"></span>';
+    btn.onclick=()=>pickMove(m.correct,btn,e);
+    mc.appendChild(btn);
+  });
+  document.getElementById('dialog-text').innerHTML='What will <span class="player-name">'+playerName+'</span> do?';
+}
+
+// ===== PICK MOVE =====
+function pickMove(correct,btn,e){
+  const mc=document.getElementById('moves');
+  mc.querySelectorAll('.move-btn').forEach(b=>{
+    b.classList.add('disabled');
+    // Show correct one
+    const isCorrect=e.moves.find(m=>m.text===b.textContent.replace(b.querySelector('.move-type').textContent,'').trim());
+    if(isCorrect&&isCorrect.correct) b.classList.add('correct');
+  });
+  if(!correct) btn.classList.add('wrong');
+
+  totalBattles++;
+  const es=document.getElementById('enemy-sprite');
+  const ps=document.getElementById('player-sprite');
+
+  if(correct){
+    correctCount++;
+    // Player attacks enemy
+    ps.classList.add('attack-anim');
+    setTimeout(()=>{ps.classList.remove('attack-anim');},400);
+    setTimeout(()=>{
+      es.classList.add('shake');
+      spawnEffect(es,'⚡');
+      spawnDmg(es,'-100','good');
+      enemyHP=0;
+      updateHP();
+      setTimeout(()=>{es.classList.remove('shake');},400);
+    },300);
+
+    setTimeout(()=>{
+      typeText('<span class="highlight">SUPER EFFECTIVE!</span> '+e.explain,()=>{
+        // Enemy faints
+        setTimeout(()=>{
+          es.classList.add('faint');
+          setTimeout(()=>{
+            document.getElementById('continue-btn').style.display='block';
+          },800);
+        },600);
+      });
+    },900);
+  } else {
+    // Enemy hits player
+    setTimeout(()=>{
+      ps.classList.add('shake');
+      spawnEffect(ps,'💔');
+      spawnDmg(ps,'-20','bad');
+      playerHP=Math.max(0,playerHP-20);
+      updateHP();
+      setTimeout(()=>ps.classList.remove('shake'),400);
+    },300);
+
+    setTimeout(()=>{
+      if(playerHP<=0){
+        ps.classList.add('faint');
+        setTimeout(()=>showScreen('lose'),1000);
+        return;
+      }
+      typeText('<span class="enemy-name">Wrong!</span> '+e.explain,()=>{
+        // Enemy still faints (you learn from mistake)
+        setTimeout(()=>{
+          enemyHP=0;updateHP();
+          es.classList.add('faint');
+          typeText('<span class="highlight">'+e.name+'</span> retreats... but you took damage!',()=>{
+            setTimeout(()=>{
+              document.getElementById('continue-btn').style.display='block';
+            },600);
+          });
+        },800);
+      });
+    },900);
+  }
+}
+
+// ===== NEXT TURN =====
+function nextTurn(){
+  document.getElementById('continue-btn').style.display='none';
+  document.getElementById('moves').innerHTML='';
+  document.getElementById('dialog-scenario').innerHTML='';
+  document.getElementById('dialog-scenario').classList.remove('show');
+  currentEnemy++;
+  if(currentEnemy>=enemies.length){winBattle();return;}
+  // Reset enemy sprite
+  const es=document.getElementById('enemy-sprite');
+  es.className='sprite enemy-sprite';
+  es.style.transition='none';
+  es.style.opacity='1';
+  es.style.transform='';
+  loadEnemy();
+}
+
+// ===== WIN =====
+function winBattle(){
+  document.getElementById('win-name').textContent=playerName+' — Security Champion!';
+  const pct=Math.round(correctCount/totalBattles*100);
+  let rank='🥉 Bronze';
+  if(pct>=90) rank='🏆 Platinum';
+  else if(pct>=70) rank='🥇 Gold';
+  else if(pct>=50) rank='🥈 Silver';
+  document.getElementById('win-stats').innerHTML=
+    'Threats defeated: <span>'+totalBattles+'</span><br>'+
+    'Correct fixes: <span>'+correctCount+' / '+totalBattles+'</span><br>'+
+    'Accuracy: <span>'+pct+'%</span><br>'+
+    'HP remaining: <span>'+playerHP+'/100</span><br>'+
+    'Rank: <span>'+rank+'</span>';
+  showScreen('win');
+}
+
+// ===== HELPERS =====
+function updateHP(){
+  const ef=document.getElementById('enemy-hp');
+  const pf=document.getElementById('player-hp');
+  ef.style.width=enemyHP+'%';
+  pf.style.width=playerHP+'%';
+  ef.className='hp-fill'+(enemyHP<=30?' critical':enemyHP<=60?' low':'');
+  pf.className='hp-fill'+(playerHP<=30?' critical':playerHP<=60?' low':'');
+  document.getElementById('enemy-hp-text').textContent='HP '+enemyHP+'/100';
+  document.getElementById('player-hp-text').textContent='HP '+playerHP+'/100';
+}
+
+function typeText(html,cb,clear=true){
+  const el=document.getElementById('dialog-text');
+  if(clear) el.innerHTML='';
+  const temp=document.createElement('div');
+  temp.innerHTML=html;
+  const fullText=temp.textContent;
+  el.innerHTML='';
+  let i=0;
+  const iv=setInterval(()=>{
+    i++;
+    // Build up using innerHTML to preserve tags
+    el.innerHTML=html.substring(0,findHTMLIndex(html,i));
+    if(i>=fullText.length){
+      clearInterval(iv);
+      el.innerHTML=html;
+      if(cb) cb();
+    }
+  },18);
+}
+
+// Map plaintext index to HTML index (skip tags)
+function findHTMLIndex(html,textIdx){
+  let ti=0,hi=0,inTag=false;
+  while(hi<html.length&&ti<textIdx){
+    if(html[hi]==='<') inTag=true;
+    else if(html[hi]==='>') inTag=false;
+    else if(!inTag) ti++;
+    hi++;
+  }
+  // Include any trailing tags
+  while(hi<html.length&&html[hi]==='<'){
+    const close=html.indexOf('>',hi);
+    if(close===-1) break;
+    hi=close+1;
+  }
+  return hi;
+}
+
+function spawnEffect(target,emoji){
+  const arena=document.getElementById('arena');
+  const rect=target.getBoundingClientRect();
+  const arenaRect=arena.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='atk-effect';
+  el.textContent=emoji;
+  el.style.left=(rect.left-arenaRect.left+rect.width/2-20)+'px';
+  el.style.top=(rect.top-arenaRect.top+rect.height/2-20)+'px';
+  arena.appendChild(el);
+  setTimeout(()=>el.remove(),600);
+}
+
+function spawnDmg(target,text,type){
+  const arena=document.getElementById('arena');
+  const rect=target.getBoundingClientRect();
+  const arenaRect=arena.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='dmg-num '+type;
+  el.textContent=text;
+  el.style.left=(rect.left-arenaRect.left+rect.width/2-15)+'px';
+  el.style.top=(rect.top-arenaRect.top-10)+'px';
+  arena.appendChild(el);
+  setTimeout(()=>el.remove(),800);
+}
+</script>
+</body>
+</html>
