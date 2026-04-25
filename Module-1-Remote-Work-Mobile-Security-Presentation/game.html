@@ -222,8 +222,9 @@ canvas#board{
 </div>
 
 <script>
-// ===== 5 QUESTIONS =====
-const QS = [
+// ===== QUESTIONS (shuffled each game) =====
+const ALL_QS = [
+  // --- Original 5 ---
   {
     q: "You connect to free airport Wi-Fi and immediately open your firm's accounting software — without turning on VPN first. Is this SAFE or RISKY?",
     opts: ["✅ Safe — airports have secure networks", "⚠️ Risky — always connect VPN before any work app", "✅ Safe — HTTPS protects everything", "⚠️ Risky — only if the Wi-Fi has no password"],
@@ -253,8 +254,92 @@ const QS = [
     opts: ["✅ Safe — it saves the company money", "✅ Safe — they all trust each other", "⚠️ Risky — shared logins destroy the audit trail and accountability", "⚠️ Risky — only if the password is weak"],
     a: 2,
     e: "RISKY! Shared credentials make it impossible to track who made which journal entry. Each user must have their own account for audit trail integrity."
+  },
+  // --- New questions ---
+  {
+    q: "Your home router still uses the factory default username 'admin' and password 'admin'. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — it's inside your home", "⚠️ Risky — default credentials are publicly listed and easily exploited", "✅ Safe — only if your Wi-Fi password is strong", "⚠️ Risky — only for businesses, not homes"],
+    a: 1,
+    e: "RISKY! Default credentials are publicly listed on sites like routerpasswords.com. Attackers use automated tools to scan and try them instantly."
+  },
+  {
+    q: "You enable WPA3 encryption on your home router and set a 16-character passphrase. Is this SAFE or RISKY?",
+    opts: ["⚠️ Risky — WPA3 is not widely supported", "✅ Safe — WPA3 + strong passphrase is the most secure Wi-Fi setup", "⚠️ Risky — long passwords are hard to remember", "✅ Safe — but only if you also hide the SSID"],
+    a: 1,
+    e: "SAFE! WPA3 uses SAE handshake + AES-256, making it practically impossible to crack. A strong passphrase adds another layer of protection."
+  },
+  {
+    q: "Your smart TV, kids' tablets, and work laptop are all connected to the same home Wi-Fi network. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — they're all in your home", "✅ Safe — as long as you have a strong Wi-Fi password", "⚠️ Risky — no network segmentation means IoT devices can reach your work laptop", "⚠️ Risky — only if the smart TV is old"],
+    a: 2,
+    e: "RISKY! IoT devices are notoriously insecure. A compromised smart camera or TV on the same network can be used to pivot to your work laptop."
+  },
+  {
+    q: "You receive an SMS from 'BIR' saying your tax return has an error — click the link to fix it immediately. You click the link. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — BIR sends official SMS notifications", "⚠️ Risky — this is smishing, a phishing attack via SMS", "✅ Safe — if the link starts with HTTPS", "⚠️ Risky — only if you enter your password"],
+    a: 1,
+    e: "RISKY! This is smishing — phishing via SMS. Attackers impersonate BIR, banks, and government agencies. Never click links in unsolicited text messages."
+  },
+  {
+    q: "You use an authenticator app (like Google Authenticator) instead of SMS codes for MFA on your work accounts. Is this SAFE or RISKY?",
+    opts: ["⚠️ Risky — apps can be hacked", "✅ Safe — authenticator apps are not vulnerable to SIM swapping attacks", "⚠️ Risky — too complicated for daily use", "✅ Safe — but only if your phone has a PIN"],
+    a: 1,
+    e: "SAFE! Authenticator apps generate time-based codes locally on your device. Unlike SMS, they cannot be intercepted via SIM swapping."
+  },
+  {
+    q: "Your work phone is stolen at a coffee shop. Your first action is to post about it on social media to warn others. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — it warns your contacts", "⚠️ Risky — first action must be to remotely lock the device and notify IT", "✅ Safe — as long as you change your password later", "⚠️ Risky — only if the phone has no PIN"],
+    a: 1,
+    e: "RISKY! The FIRST step is to remotely lock the device via MDM or Find My Device, then notify IT immediately. Posting on social media wastes critical response time."
+  },
+  {
+    q: "Your firm's MDM policy wipes only the work container when you resign, leaving your personal photos and apps untouched. Is this SAFE or RISKY?",
+    opts: ["⚠️ Risky — the firm should wipe everything", "✅ Safe — this is containerization; it protects both firm data and your personal privacy", "⚠️ Risky — personal data could still be accessed", "✅ Safe — but only on corporate-owned devices"],
+    a: 1,
+    e: "SAFE! Containerization on BYOD devices isolates work data in an encrypted container. When you leave, only the work container is wiped — your personal data stays."
+  },
+  {
+    q: "You leave your work laptop unlocked and unattended at your home desk while you take a lunch break. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — you're at home, not in public", "⚠️ Risky — family members or visitors could access confidential client data", "✅ Safe — as long as your Wi-Fi is secure", "⚠️ Risky — only if you have guests over"],
+    a: 1,
+    e: "RISKY! Physical security applies at home too. Family members should never have access to your work device. Always lock your screen (Win + L) when stepping away."
+  },
+  {
+    q: "You store client tax returns on your personal iCloud account so you can access them from any device. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — iCloud is encrypted", "✅ Safe — it's convenient and backed up", "⚠️ Risky — personal cloud storage is Shadow IT and bypasses firm security controls", "⚠️ Risky — only if you share the iCloud account"],
+    a: 2,
+    e: "RISKY! Storing client data on personal iCloud is Shadow IT. It bypasses your firm's DLP controls, violates the Data Privacy Act, and exposes data if your personal account is hacked."
+  },
+  {
+    q: "You update your home router's firmware as soon as a new security update is released. Is this SAFE or RISKY?",
+    opts: ["⚠️ Risky — updates can break router settings", "✅ Safe — firmware updates patch known vulnerabilities that attackers actively exploit", "⚠️ Risky — only IT professionals should update firmware", "✅ Safe — but only if the router is from a major brand"],
+    a: 1,
+    e: "SAFE! 87% of home routers run outdated firmware. VPNFilter malware infected 500,000+ routers by exploiting known firmware bugs. Always update promptly."
+  },
+  {
+    q: "You connect to 'NAIA_Free_WiFi' at the airport without verifying it's the official network. Is this SAFE or RISKY?",
+    opts: ["✅ Safe — it's in an official airport", "⚠️ Risky — this could be an Evil Twin network set up by an attacker", "✅ Safe — as long as you only browse, not log in", "⚠️ Risky — only if you use it for more than 10 minutes"],
+    a: 1,
+    e: "RISKY! Evil Twin attacks create fake hotspots with the same name as legitimate ones. At NAIA, attackers have used this to steal Microsoft 365 credentials and redirect vendor payments."
+  },
+  {
+    q: "You disable WPS (Wi-Fi Protected Setup) on your home router. Is this SAFE or RISKY?",
+    opts: ["⚠️ Risky — WPS makes it easier to connect new devices", "✅ Safe — WPS PIN can be brute-forced in 4–11 hours regardless of your Wi-Fi password strength", "⚠️ Risky — disabling it may slow down your connection", "✅ Safe — but only if you also disable UPnP"],
+    a: 1,
+    e: "SAFE! WPS PIN is validated in two halves (4+4 digits), making it brute-forceable in hours. Once cracked, the attacker gets your full Wi-Fi password regardless of how strong it is."
   }
 ];
+
+// Shuffle and cycle through questions
+let shuffledQS = [], qRound = 0;
+function shuffleQS(){
+  shuffledQS = [...ALL_QS];
+  for(let i=shuffledQS.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [shuffledQS[i],shuffledQS[j]]=[shuffledQS[j],shuffledQS[i]];
+  }
+  qRound=0;
+}
 
 // ===== BOARD =====
 // Snakes: [head, tail] — go DOWN
@@ -333,7 +418,7 @@ function drawArrow(a,b,color,dashed){
 }
 
 // ===== STATE =====
-let playerName='', pos=1, correct=0, total=0, pendingRoll=0, qRound=0, lastCorrect=false;
+let playerName='', pos=1, correct=0, total=0, pendingRoll=0, lastCorrect=false;
 const diceF=['⚀','⚁','⚂','⚃','⚄','⚅'];
 
 function setStatus(html){ document.getElementById('status').innerHTML=html; }
@@ -345,7 +430,8 @@ function startGame(){
   const n=document.getElementById('name-input').value.trim();
   if(!n){ document.getElementById('name-input').focus(); return; }
   playerName=n;
-  pos=1; correct=0; total=0; qRound=0;
+  pos=1; correct=0; total=0;
+  shuffleQS();
   document.getElementById('pname').textContent=playerName;
   setPos(1); setScore();
   setStatus(`Welcome <span class="hi">${playerName}</span>! Roll the dice to start! 🎲`);
@@ -373,7 +459,7 @@ function rollDice(){
 
 // ===== QUESTION =====
 function openQuestion(){
-  const q=QS[qRound%QS.length]; qRound++;
+  const q=shuffledQS[qRound % shuffledQS.length]; qRound++;
   document.getElementById('modal-q').textContent=q.q;
   const oc=document.getElementById('modal-opts');
   oc.innerHTML='';
