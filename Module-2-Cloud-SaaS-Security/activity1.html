@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find the Safe Items — Cloud & SaaS Security</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#F7F9FC;color:#2D3748;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px;}
+
+.top-bar{width:100%;max-width:900px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.top-bar h1{font-size:1.4em;font-weight:900;color:#4F8EF7;}
+.top-bar h1 span{color:#2EC4B6;}
+.back-link{color:#718096;font-size:.85em;text-decoration:none;}
+.back-link:hover{color:#4F8EF7;}
+
+.info-bar{width:100%;max-width:900px;display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.info-box{flex:1;min-width:120px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:10px 16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.info-box .label{font-size:.7em;color:#718096;font-weight:600;}
+.info-box .value{font-size:1.5em;font-weight:900;color:#4F8EF7;}
+.info-box .value.timer{color:#FF9F1C;}
+.info-box .value.done{color:#2EC4B6;}
+
+.hint-bar{width:100%;max-width:900px;background:#FFF8EE;border:1px solid #FFE0A3;border-radius:12px;padding:10px 16px;margin-bottom:12px;font-size:.85em;color:#7B4F00;line-height:1.6;}
+.hint-bar strong{color:#FF9F1C;}
+
+.scene-wrap{width:100%;max-width:900px;position:relative;border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(79,142,247,.12);border:2px solid #E2E8F0;background:#fff;}
+.scene-wrap svg{display:block;width:100%;height:auto;}
+
+.found-popup{position:absolute;padding:6px 14px;border-radius:10px;font-size:.8em;font-weight:700;pointer-events:none;animation:popUp .6s ease forwards;z-index:10;}
+@keyframes popUp{0%{opacity:0;transform:translateY(10px) scale(.8);}40%{opacity:1;transform:translateY(-10px) scale(1.1);}100%{opacity:0;transform:translateY(-30px) scale(.9);}}
+.found-popup.good{background:#F0FDF9;color:#2EC4B6;border:2px solid #2EC4B6;}
+.found-popup.bad{background:#FED7D7;color:#9B2C2C;border:2px solid #FC8181;}
+
+.safe-item{cursor:pointer;transition:filter .2s;}
+.safe-item:hover{filter:drop-shadow(0 0 8px rgba(46,196,182,.6));}
+.safe-item.found{pointer-events:none;filter:none;}
+
+.risky-item{cursor:pointer;transition:filter .2s;}
+.risky-item:hover{filter:drop-shadow(0 0 6px rgba(0,0,0,.15));}
+
+/* win overlay */
+.win-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;}
+.win-card{background:#fff;border-radius:20px;padding:36px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.win-card .emoji{font-size:3em;margin-bottom:12px;}
+.win-card h2{font-size:1.6em;font-weight:900;color:#4F8EF7;margin-bottom:6px;}
+.win-card .time-score{font-size:2em;font-weight:900;color:#2EC4B6;margin-bottom:8px;}
+.win-card p{color:#718096;margin-bottom:20px;line-height:1.6;}
+.win-card .btn{display:inline-block;padding:12px 28px;border-radius:12px;border:none;font-size:1em;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;transition:.2s;}
+.win-card .btn-primary{background:linear-gradient(135deg,#4F8EF7,#2EC4B6);color:#fff;margin-right:8px;}
+.win-card .btn-ghost{background:#EDF2F7;color:#718096;}
+
+
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="back-link" href="index.html">← Back to Lessons</a>
+  <h1>🔍 Find the <span>Safe Items</span></h1>
+</div>
+
+<div class="info-bar">
+  <div class="info-box"><div class="label">⏱ Time</div><div class="value timer" id="timer">0:00</div></div>
+  <div class="info-box"><div class="label">✅ Found</div><div class="value done" id="found-count">0 / 8</div></div>
+  <div class="info-box"><div class="label">❌ Mistakes</div><div class="value" id="mistakes" style="color:#FC8181;">0</div></div>
+</div>
+
+<div class="hint-bar">
+  <strong>🎯 Mission:</strong> This office scene has <strong>8 safe security items</strong> hidden among risky ones. Click only the <strong>SAFE</strong> items! Risky clicks add a mistake. Find all 8 as fast as you can — your time is your score!
+</div>
+
+<div class="scene-wrap" id="scene">
+<svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- BACKGROUND: Office -->
+  <rect width="900" height="500" fill="#F0F4F8"/>
+  <!-- Floor -->
+  <rect y="400" width="900" height="100" fill="#E2E8F0"/>
+  <line x1="0" y1="400" x2="900" y2="400" stroke="#CBD5E0" stroke-width="2"/>
+  <!-- Wall -->
+  <rect y="0" width="900" height="400" fill="#F7F9FC"/>
+  <!-- Window -->
+  <rect x="30" y="40" width="160" height="120" rx="8" fill="#EBF4FF" stroke="#CBD5E0" stroke-width="2"/>
+  <line x1="110" y1="40" x2="110" y2="160" stroke="#CBD5E0" stroke-width="1.5"/>
+  <line x1="30" y1="100" x2="190" y2="100" stroke="#CBD5E0" stroke-width="1.5"/>
+  <!-- Cloud outside window -->
+  <ellipse cx="80" cy="70" rx="30" ry="14" fill="#fff"/>
+  <ellipse cx="100" cy="65" rx="22" ry="16" fill="#fff"/>
+  <ellipse cx="130" cy="72" rx="26" ry="12" fill="#fff"/>
+
+  <!-- DESK -->
+  <rect x="50" y="280" width="380" height="12" rx="4" fill="#A0AEC0"/>
+  <rect x="60" y="292" width="14" height="108" rx="3" fill="#A0AEC0"/>
+  <rect x="406" y="292" width="14" height="108" rx="3" fill="#A0AEC0"/>
+
+  <!-- MONITOR -->
+  <rect x="140" y="190" width="180" height="110" rx="8" fill="#2D3748"/>
+  <rect x="148" y="198" width="164" height="90" rx="4" fill="#EBF4FF"/>
+  <rect x="215" y="288" width="30" height="12" rx="2" fill="#718096"/>
+  <rect x="200" y="296" width="60" height="6" rx="2" fill="#A0AEC0"/>
+  <!-- Screen content: login with MFA -->
+  <rect x="170" y="215" width="120" height="14" rx="3" fill="#4F8EF7" opacity=".2"/>
+  <rect x="185" y="235" width="90" height="10" rx="2" fill="#E2E8F0"/>
+  <rect x="185" y="250" width="90" height="10" rx="2" fill="#E2E8F0"/>
+  <rect x="195" y="266" width="70" height="12" rx="4" fill="#4F8EF7"/>
+  <text x="230" y="275" font-size="7" fill="#fff" text-anchor="middle" font-family="Inter" font-weight="700">Login + MFA</text>
+
+  <!-- KEYBOARD -->
+  <rect x="150" y="310" width="140" height="30" rx="6" fill="#E2E8F0" stroke="#CBD5E0" stroke-width="1"/>
+
+  <!-- ===== SAFE ITEMS (8) ===== -->
+
+  <!-- 1. 🔒 MFA Authenticator App on phone (on desk left) -->
+  <g class="safe-item" data-id="mfa" data-name="MFA Authenticator App">
+    <rect x="70" y="250" width="28" height="44" rx="5" fill="#2D3748"/>
+    <rect x="73" y="254" width="22" height="34" rx="3" fill="#EBF4FF"/>
+    <text x="84" y="268" font-size="7" fill="#2EC4B6" text-anchor="middle" font-family="Inter" font-weight="900">MFA</text>
+    <text x="84" y="278" font-size="12" text-anchor="middle">🔐</text>
+    <circle cx="84" cy="290" r="2" fill="#718096"/>
+  </g>
+
+  <!-- 2. 🔑 Password Manager icon (on screen top-right) -->
+  <g class="safe-item" data-id="pwmgr" data-name="Password Manager">
+    <rect x="295" y="202" width="14" height="14" rx="3" fill="#2EC4B6"/>
+    <text x="302" y="212" font-size="9" text-anchor="middle">🔑</text>
+  </g>
+
+  <!-- 3. 📁 Encrypted folder (on desk right) -->
+  <g class="safe-item" data-id="encrypt" data-name="Encrypted Folder">
+    <rect x="340" y="252" width="36" height="28" rx="4" fill="#4F8EF7" opacity=".9"/>
+    <text x="358" y="264" font-size="7" fill="#fff" text-anchor="middle" font-family="Inter" font-weight="700">AES</text>
+    <text x="358" y="276" font-size="10" text-anchor="middle">🔒</text>
+  </g>
+
+  <!-- 4. 🛡️ Firewall shield (on wall poster) -->
+  <g class="safe-item" data-id="firewall" data-name="Firewall Enabled">
+    <rect x="250" y="50" width="80" height="60" rx="8" fill="#fff" stroke="#E2E8F0" stroke-width="1.5"/>
+    <text x="290" y="78" font-size="22" text-anchor="middle">🛡️</text>
+    <text x="290" y="100" font-size="7" fill="#4F8EF7" text-anchor="middle" font-family="Inter" font-weight="700">FIREWALL ON</text>
+  </g>
+
+  <!-- 5. ✅ "Specific People" sharing badge (floating near monitor) -->
+  <g class="safe-item" data-id="specific" data-name="Share with Specific People">
+    <rect x="330" y="200" width="70" height="22" rx="6" fill="#F0FDF9" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="365" y="214" font-size="7" fill="#2EC4B6" text-anchor="middle" font-family="Inter" font-weight="700">👤 Specific</text>
+  </g>
+
+  <!-- 6. 📋 Version History icon (bottom of monitor) -->
+  <g class="safe-item" data-id="version" data-name="Version History Enabled">
+    <rect x="148" y="272" width="30" height="16" rx="3" fill="#E6FFFA" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="163" y="283" font-size="7" fill="#2EC4B6" text-anchor="middle" font-family="Inter" font-weight="700">v1.2</text>
+  </g>
+
+  <!-- 7. 🔔 Audit Log notebook (on shelf right) -->
+  <g class="safe-item" data-id="audit" data-name="Audit Log / Access Review">
+    <rect x="720" y="160" width="44" height="56" rx="4" fill="#FFF8EE" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="742" y="182" font-size="14" text-anchor="middle">📋</text>
+    <text x="742" y="200" font-size="6" fill="#7B4F00" text-anchor="middle" font-family="Inter" font-weight="700">AUDIT</text>
+    <text x="742" y="210" font-size="6" fill="#7B4F00" text-anchor="middle" font-family="Inter" font-weight="700">LOG</text>
+  </g>
+
+  <!-- 8. ⏰ Link Expiry timer (on whiteboard) -->
+  <g class="safe-item" data-id="expiry" data-name="Link Expiry Date Set">
+    <rect x="550" y="55" width="120" height="70" rx="6" fill="#fff" stroke="#CBD5E0" stroke-width="2"/>
+    <text x="610" y="78" font-size="8" fill="#718096" text-anchor="middle" font-family="Inter" font-weight="700">SHARING LINK</text>
+    <rect x="570" y="88" width="80" height="18" rx="4" fill="#F0FDF9" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="610" y="100" font-size="7" fill="#2EC4B6" text-anchor="middle" font-family="Inter" font-weight="700">⏰ Expires 7d</text>
+  </g>
+
+  <!-- ===== RISKY ITEMS (decoys) ===== -->
+
+  <!-- R1. 🌐 "Everyone" sharing link (on sticky note) -->
+  <g class="risky-item" data-name="'Everyone' Sharing Link">
+    <rect x="440" y="240" width="70" height="30" rx="4" fill="#FED7D7" stroke="#FC8181" stroke-width="1.5" transform="rotate(-3 475 255)"/>
+    <text x="475" y="259" font-size="7" fill="#9B2C2C" text-anchor="middle" font-family="Inter" font-weight="700" transform="rotate(-3 475 259)">🌐 Everyone</text>
+  </g>
+
+  <!-- R2. Sticky note with password written -->
+  <g class="risky-item" data-name="Password on Sticky Note">
+    <rect x="320" y="180" width="50" height="30" rx="2" fill="#FEFCBF" transform="rotate(5 345 195)"/>
+    <text x="345" y="195" font-size="6" fill="#744210" text-anchor="middle" font-family="monospace" transform="rotate(5 345 195)">pass123</text>
+    <text x="345" y="205" font-size="6" fill="#744210" text-anchor="middle" font-family="monospace" transform="rotate(5 345 195)">admin!</text>
+  </g>
+
+  <!-- R3. Personal USB drive on desk -->
+  <g class="risky-item" data-name="Personal USB Drive">
+    <rect x="300" y="310" width="24" height="10" rx="3" fill="#FC8181"/>
+    <rect x="320" y="312" width="8" height="6" rx="1" fill="#E53E3E"/>
+    <text x="312" y="318" font-size="5" fill="#fff" text-anchor="middle" font-family="Inter" font-weight="700">USB</text>
+  </g>
+
+  <!-- R4. Personal Dropbox icon on screen -->
+  <g class="risky-item" data-name="Personal Dropbox for Work Files">
+    <rect x="155" y="202" width="14" height="14" rx="3" fill="#3B82F6" opacity=".8"/>
+    <text x="162" y="212" font-size="8" text-anchor="middle">📦</text>
+  </g>
+
+  <!-- R5. Unlocked padlock on filing cabinet -->
+  <g class="risky-item" data-name="Unlocked File Cabinet">
+    <rect x="500" y="280" width="60" height="120" rx="6" fill="#A0AEC0"/>
+    <rect x="506" y="286" width="48" height="36" rx="3" fill="#CBD5E0"/>
+    <rect x="506" y="328" width="48" height="36" rx="3" fill="#CBD5E0"/>
+    <rect x="506" y="370" width="48" height="24" rx="3" fill="#CBD5E0"/>
+    <circle cx="530" cy="304" r="3" fill="#718096"/>
+    <circle cx="530" cy="346" r="3" fill="#718096"/>
+    <circle cx="530" cy="382" r="3" fill="#718096"/>
+    <text x="530" y="275" font-size="16" text-anchor="middle">🔓</text>
+  </g>
+
+  <!-- R6. Public Slack channel label -->
+  <g class="risky-item" data-name="Public #invoices Slack Channel">
+    <rect x="700" y="240" width="80" height="24" rx="6" fill="#FED7D7" stroke="#FC8181" stroke-width="1"/>
+    <text x="740" y="256" font-size="7" fill="#9B2C2C" text-anchor="middle" font-family="Inter" font-weight="700">#invoices 🌐</text>
+  </g>
+
+  <!-- SHELF on right wall -->
+  <rect x="680" y="140" width="180" height="8" rx="2" fill="#A0AEC0"/>
+  <rect x="690" y="148" width="6" height="60" rx="1" fill="#A0AEC0"/>
+  <rect x="844" y="148" width="6" height="60" rx="1" fill="#A0AEC0"/>
+
+  <!-- Books on shelf -->
+  <rect x="700" y="100" width="16" height="40" rx="2" fill="#4F8EF7"/>
+  <rect x="720" y="108" width="14" height="32" rx="2" fill="#2EC4B6"/>
+  <rect x="738" y="104" width="16" height="36" rx="2" fill="#FF9F1C"/>
+  <rect x="758" y="110" width="12" height="30" rx="2" fill="#FC8181"/>
+
+  <!-- Plant -->
+  <rect x="810" y="370" width="30" height="30" rx="6" fill="#C6F6D5"/>
+  <ellipse cx="825" cy="360" rx="20" ry="18" fill="#48BB78"/>
+  <ellipse cx="815" cy="350" rx="12" ry="14" fill="#68D391"/>
+  <ellipse cx="835" cy="352" rx="10" ry="12" fill="#68D391"/>
+
+  <!-- Chair -->
+  <ellipse cx="230" cy="420" rx="50" ry="14" fill="#4A5568"/>
+  <rect x="210" y="380" width="40" height="40" rx="8" fill="#4A5568"/>
+  <rect x="200" y="340" width="60" height="44" rx="10" fill="#2D3748"/>
+
+  <!-- Coffee mug -->
+  <rect x="110" y="300" width="18" height="20" rx="4" fill="#fff" stroke="#CBD5E0" stroke-width="1.5"/>
+  <path d="M128 306 Q136 310 128 318" stroke="#CBD5E0" stroke-width="1.5" fill="none"/>
+  <rect x="112" y="302" width="14" height="4" rx="1" fill="#805AD5" opacity=".6"/>
+
+  <!-- Clock on wall -->
+  <circle cx="450" cy="60" r="28" fill="#fff" stroke="#CBD5E0" stroke-width="2"/>
+  <circle cx="450" cy="60" r="2" fill="#2D3748"/>
+  <line x1="450" y1="60" x2="450" y2="42" stroke="#2D3748" stroke-width="2" stroke-linecap="round"/>
+  <line x1="450" y1="60" x2="464" y2="56" stroke="#4F8EF7" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- ===== MORE DISTRACTORS (risky / neutral clickable items) ===== -->
+
+  <!-- R7. Shared Google Sheet "Anyone with link" on second monitor -->
+  <g class="risky-item" data-name="'Anyone with Link' Google Sheet">
+    <rect x="600" y="280" width="100" height="70" rx="6" fill="#2D3748"/>
+    <rect x="605" y="285" width="90" height="55" rx="3" fill="#EBF4FF"/>
+    <rect x="612" y="292" width="76" height="8" rx="2" fill="#4F8EF7" opacity=".2"/>
+    <rect x="612" y="304" width="76" height="5" rx="1" fill="#E2E8F0"/>
+    <rect x="612" y="313" width="76" height="5" rx="1" fill="#E2E8F0"/>
+    <rect x="612" y="322" width="50" height="5" rx="1" fill="#E2E8F0"/>
+    <text x="650" y="340" font-size="6" fill="#9B2C2C" text-anchor="middle" font-family="Inter" font-weight="700">🌐 Anyone with link</text>
+    <rect x="635" y="350" width="30" height="8" rx="2" fill="#718096"/>
+    <rect x="625" y="356" width="50" height="4" rx="1" fill="#A0AEC0"/>
+  </g>
+
+  <!-- R8. Open Wi-Fi icon on wall -->
+  <g class="risky-item" data-name="Open Wi-Fi (No Password)">
+    <rect x="30" y="190" width="50" height="40" rx="6" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="55" y="210" font-size="18" text-anchor="middle">📶</text>
+    <text x="55" y="226" font-size="5" fill="#9B2C2C" text-anchor="middle" font-family="Inter" font-weight="700">OPEN</text>
+  </g>
+
+  <!-- R9. Unencrypted email on phone (right side desk) -->
+  <g class="risky-item" data-name="Unencrypted Email with Client Data">
+    <rect x="580" y="370" width="26" height="42" rx="5" fill="#2D3748"/>
+    <rect x="583" y="374" width="20" height="32" rx="3" fill="#EBF4FF"/>
+    <text x="593" y="388" font-size="10" text-anchor="middle">✉️</text>
+    <text x="593" y="400" font-size="5" fill="#9B2C2C" text-anchor="middle" font-family="Inter" font-weight="700">NO 🔒</text>
+  </g>
+
+  <!-- R10. Expired contractor badge on desk -->
+  <g class="risky-item" data-name="Expired Contractor Access Badge">
+    <rect x="390" y="300" width="34" height="22" rx="4" fill="#FEFCBF" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="407" y="310" font-size="6" fill="#744210" text-anchor="middle" font-family="Inter" font-weight="700">BADGE</text>
+    <text x="407" y="319" font-size="5" fill="#9B2C2C" text-anchor="middle" font-family="Inter" font-weight="700">EXPIRED</text>
+  </g>
+
+  <!-- R11. WhatsApp icon for work chat -->
+  <g class="risky-item" data-name="Using WhatsApp for Work Files">
+    <rect x="440" y="310" width="20" height="20" rx="5" fill="#25D366"/>
+    <text x="450" y="324" font-size="12" text-anchor="middle">💬</text>
+  </g>
+
+  <!-- R12. No-backup warning on trash can -->
+  <g class="risky-item" data-name="Deleted Files Without Backup">
+    <rect x="630" y="410" width="30" height="40" rx="4" fill="#A0AEC0"/>
+    <rect x="626" y="406" width="38" height="8" rx="3" fill="#718096"/>
+    <text x="645" y="438" font-size="12" text-anchor="middle">🗑️</text>
+    <text x="645" y="452" font-size="5" fill="#9B2C2C" text-anchor="middle" font-family="Inter" font-weight="700">NO BACKUP</text>
+  </g>
+
+  <!-- R13. Jailbroken phone on floor -->
+  <g class="risky-item" data-name="Jailbroken Personal Phone">
+    <rect x="100" y="420" width="22" height="36" rx="4" fill="#2D3748"/>
+    <rect x="103" y="424" width="16" height="26" rx="2" fill="#FED7D7"/>
+    <text x="111" y="440" font-size="10" text-anchor="middle">⚠️</text>
+  </g>
+
+  <!-- R14. Printer with client docs visible -->
+  <g class="risky-item" data-name="Client Docs Left on Printer">
+    <rect x="770" y="290" width="70" height="50" rx="6" fill="#E2E8F0" stroke="#CBD5E0" stroke-width="1"/>
+    <rect x="780" y="280" width="50" height="14" rx="2" fill="#fff" stroke="#CBD5E0" stroke-width="1"/>
+    <text x="805" y="290" font-size="5" fill="#718096" text-anchor="middle" font-family="Inter" font-weight="600">CLIENT TAX</text>
+    <rect x="790" y="340" width="30" height="6" rx="1" fill="#CBD5E0"/>
+    <text x="805" y="320" font-size="14" text-anchor="middle">🖨️</text>
+  </g>
+
+  <!-- R15. Shared password spreadsheet on wall -->
+  <g class="risky-item" data-name="Shared Password Spreadsheet">
+    <rect x="370" y="50" width="60" height="44" rx="4" fill="#fff" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="400" y="68" font-size="10" text-anchor="middle">📊</text>
+    <text x="400" y="82" font-size="5" fill="#744210" text-anchor="middle" font-family="Inter" font-weight="700">PASSWORDS</text>
+    <text x="400" y="90" font-size="5" fill="#744210" text-anchor="middle" font-family="Inter" font-weight="700">.xlsx</text>
+  </g>
+
+  <!-- R16. Camera/webcam uncovered -->
+  <g class="risky-item" data-name="Webcam Left Uncovered">
+    <circle cx="230" cy="192" r="5" fill="#2D3748"/>
+    <circle cx="230" cy="192" r="3" fill="#EBF4FF"/>
+    <circle cx="230" cy="192" r="1.5" fill="#E53E3E"/>
+  </g>
+
+  <!-- Neutral clickable objects (not risky, just distractors — no penalty but no reward) -->
+
+  <!-- N1. Coffee mug clickable -->
+  <g class="risky-item" data-name="Just a Coffee Mug ☕ — Not a security item">
+    <rect x="108" y="298" width="22" height="24" rx="5" fill="transparent"/>
+  </g>
+
+  <!-- N2. Plant clickable -->
+  <g class="risky-item" data-name="Just a Plant 🌿 — Not a security item">
+    <rect x="805" y="345" width="40" height="58" rx="6" fill="transparent"/>
+  </g>
+
+  <!-- N3. Clock clickable -->
+  <g class="risky-item" data-name="Just a Clock 🕐 — Not a security item">
+    <circle cx="450" cy="60" r="30" fill="transparent"/>
+  </g>
+
+  <!-- N4. Chair clickable -->
+  <g class="risky-item" data-name="Just a Chair 🪑 — Not a security item">
+    <rect x="198" y="338" width="64" height="100" rx="10" fill="transparent"/>
+  </g>
+
+  <!-- N5. Window clickable -->
+  <g class="risky-item" data-name="Just a Window 🪟 — Not a security item">
+    <rect x="28" y="38" width="164" height="124" rx="8" fill="transparent"/>
+  </g>
+
+  <!-- N6. Keyboard clickable -->
+  <g class="risky-item" data-name="Just a Keyboard ⌨️ — Not a security item">
+    <rect x="148" y="308" width="144" height="34" rx="6" fill="transparent"/>
+  </g>
+
+  <!-- N7. Books on shelf -->
+  <g class="risky-item" data-name="Just Books 📚 — Not a security item">
+    <rect x="698" y="98" width="74" height="44" rx="3" fill="transparent"/>
+  </g>
+
+  <!-- N8. Floor rug -->
+  <g class="risky-item" data-name="Just the Floor — Not a security item">
+    <rect x="300" y="420" width="200" height="50" rx="10" fill="transparent"/>
+  </g>
+
+</svg>
+</div>
+
+
+
+<!-- WIN OVERLAY -->
+<div class="win-overlay" id="win-overlay" style="display:none;">
+  <div class="win-card">
+    <div class="emoji">🎉🛡️🎊</div>
+    <h2>All Safe Items Found!</h2>
+    <div class="time-score" id="final-time">0:00</div>
+    <p id="final-msg">Great job! You identified all 8 safe security practices.</p>
+    <button class="btn btn-primary" onclick="location.reload()">🔄 Play Again</button>
+    <a class="btn btn-ghost" href="index.html">← Lessons</a>
+  </div>
+</div>
+
+<script>
+const safeItems = document.querySelectorAll('.safe-item');
+const riskyItems = document.querySelectorAll('.risky-item');
+const scene = document.getElementById('scene');
+let foundCount = 0, mistakes = 0, totalSafe = safeItems.length;
+let timerStart = Date.now(), timerInterval;
+
+
+// Start timer
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - timerStart) / 1000);
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+  document.getElementById('timer').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+timerInterval = setInterval(updateTimer, 200);
+
+// Safe item click
+safeItems.forEach(item => {
+  item.addEventListener('click', function(e) {
+    if (this.classList.contains('found')) return;
+    this.classList.add('found');
+    // Add green box around found item
+    const bbox = this.getBBox();
+    const ns = 'http://www.w3.org/2000/svg';
+    const box = document.createElementNS(ns, 'rect');
+    box.setAttribute('x', bbox.x - 4);
+    box.setAttribute('y', bbox.y - 4);
+    box.setAttribute('width', bbox.width + 8);
+    box.setAttribute('height', bbox.height + 8);
+    box.setAttribute('rx', '6');
+    box.setAttribute('fill', 'none');
+    box.setAttribute('stroke', '#2EC4B6');
+    box.setAttribute('stroke-width', '3');
+    box.setAttribute('stroke-dasharray', '6 3');
+    this.parentElement.insertBefore(box, this);
+    foundCount++;
+    document.getElementById('found-count').textContent = foundCount + ' / ' + totalSafe;
+    showPopup(e, '✅ ' + this.dataset.name, true);
+    if (foundCount === totalSafe) winGame();
+  });
+});
+
+// Risky item click
+riskyItems.forEach(item => {
+  item.addEventListener('click', function(e) {
+    mistakes++;
+    document.getElementById('mistakes').textContent = mistakes;
+    showPopup(e, '❌ ' + this.dataset.name + ' is RISKY!', false);
+  });
+});
+
+function showPopup(e, text, good) {
+  const rect = scene.getBoundingClientRect();
+  const popup = document.createElement('div');
+  popup.className = 'found-popup ' + (good ? 'good' : 'bad');
+  popup.textContent = text;
+  popup.style.left = (e.clientX - rect.left - 40) + 'px';
+  popup.style.top = (e.clientY - rect.top - 30) + 'px';
+  scene.appendChild(popup);
+  setTimeout(() => popup.remove(), 700);
+}
+
+function winGame() {
+  clearInterval(timerInterval);
+  updateTimer();
+  const time = document.getElementById('timer').textContent;
+  document.getElementById('final-time').textContent = '⏱ ' + time;
+  let msg = 'You found all 8 safe items in ' + time;
+  if (mistakes === 0) msg += ' with zero mistakes! Perfect! 🏆';
+  else msg += ' with ' + mistakes + ' mistake(s). Keep practicing!';
+  document.getElementById('final-msg').textContent = msg;
+  setTimeout(() => {
+    document.getElementById('win-overlay').style.display = 'flex';
+  }, 500);
+}
+</script>
+</body>
+</html>
