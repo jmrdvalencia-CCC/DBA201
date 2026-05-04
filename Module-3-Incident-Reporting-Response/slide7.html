@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 6 — Near-Miss Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f1729;color:#c9d1d9;height:100vh;overflow:hidden;}
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:#1c2538;z-index:100;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:0 2px 2px 0;transition:width .4s ease;}
+.slides{position:relative;width:100%;height:100vh;}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:52px 48px 72px;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;}
+.slide.active{opacity:1;pointer-events:all;}
+.slide-inner{width:100%;max-width:920px;display:flex;flex-direction:column;}
+.slide-tag{font-size:1.08em;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:12px;}
+.slide-title{font-size:clamp(1.6em,3.8vw,2.3em);font-weight:700;color:#e2e8f0;line-height:1.25;margin-bottom:6px;}
+.slide-title .accent{color:#2dd4bf;}.slide-title .warn{color:#f97316;}
+.slide-sub{font-size:1.08em;color:#64748b;margin-bottom:20px;line-height:1.6;}
+.divider{width:40px;height:3px;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:2px;margin-bottom:20px;}
+
+#s1{background:radial-gradient(ellipse at 50% 50%,#0f2a20 0%,#0f1729 70%);}
+#s1 .slide-inner{align-items:center;text-align:center;}
+#s1 .big-icon{font-size:3.5em;margin-bottom:16px;opacity:0;animation:fadeIn .6s ease .2s forwards;}
+#s1 .main-title{font-size:clamp(2em,5vw,3em);font-weight:800;color:#f1f5f9;line-height:1.2;margin-bottom:10px;opacity:0;animation:fadeUp .6s ease .4s forwards;transform:translateY(10px);}
+#s1 .main-title span{color:#2dd4bf;}
+#s1 .desc{font-size:1.12em;color:#64748b;max-width:640px;line-height:1.8;opacity:0;animation:fadeUp .6s ease .6s forwards;transform:translateY(10px);}
+@keyframes fadeIn{to{opacity:1;}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+
+/* Pyramid visual */
+.pyramid-section{display:flex;gap:28px;align-items:center;justify-content:center;}
+.pyramid-bars{display:flex;flex-direction:column;align-items:center;gap:4px;width:340px;}
+.pyr-bar{border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .3s ease;cursor:pointer;position:relative;padding:12px 0;}
+.pyr-bar:hover{filter:brightness(1.2);transform:scaleX(1.03);}
+.pyr-bar .pb-num{font-size:1.1em;margin-right:8px;}
+.pyr-bar .pb-label{font-size:1.12em;}
+.pyr-bar.l1{width:100px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4);color:#ef4444;}
+.pyr-bar.l2{width:180px;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);color:#f97316;}
+.pyr-bar.l3{width:260px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:#f59e0b;}
+.pyr-bar.l4{width:340px;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);color:#2dd4bf;}
+
+.pyramid-legend{display:flex;flex-direction:column;gap:12px;max-width:320px;}
+.pl-item{display:flex;align-items:flex-start;gap:10px;}
+.pl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.pl-dot.d1{background:#ef4444;}.pl-dot.d2{background:#f97316;}.pl-dot.d3{background:#f59e0b;}.pl-dot.d4{background:#2dd4bf;}
+.pl-text{font-size:1em;color:#94a3b8;line-height:1.6;}
+.pl-text strong{color:#e2e8f0;}
+
+/* Risk scoring */
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.score-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px;text-align:center;}
+.score-card .sk-icon{font-size:1.6em;}
+.score-card .sk-factor{font-size:1em;font-weight:700;color:#e2e8f0;}
+.score-card .sk-scale{display:flex;gap:4px;justify-content:center;margin-top:4px;}
+.sk-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1em;font-weight:700;}
+.sk-dot.low{background:rgba(45,212,191,.15);color:#2dd4bf;border:1px solid rgba(45,212,191,.3);}
+.sk-dot.med{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);}
+.sk-dot.high{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+.score-card .sk-desc{font-size:1.08em;color:#64748b;line-height:1.5;}
+
+/* Near-miss database */
+.db-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.2);}
+.db-table th{background:#1e293b;color:#94a3b8;padding:10px 14px;text-align:left;font-size:1.1em;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.db-table td{padding:10px 14px;border-bottom:1px solid #1e293b;font-size:1.15em;color:#94a3b8;background:#111827;}
+.db-table tr:last-child td{border-bottom:none;}
+.db-table .db-sev{font-size:1.05em;font-weight:700;padding:3px 8px;border-radius:4px;}
+.db-sev.s-high{background:rgba(239,68,68,.1);color:#ef4444;}
+.db-sev.s-med{background:rgba(245,158,11,.1);color:#f59e0b;}
+.db-sev.s-low{background:rgba(45,212,191,.1);color:#2dd4bf;}
+.db-table .db-status{font-size:1.05em;font-weight:600;}
+.db-status.fixed{color:#22c55e;}.db-status.open{color:#f97316;}.db-status.monitor{color:#60a5fa;}
+
+/* Culture pillars */
+.culture-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.culture-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:14px 12px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;}
+.culture-card .cc-icon{font-size:1.4em;}
+.culture-card .cc-title{font-size:1.1em;font-weight:700;color:#2dd4bf;}
+.culture-card .cc-desc{font-size:1.05em;color:#64748b;line-height:1.5;}
+
+.golden-rule{margin-top:14px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:10px;padding:14px 18px;text-align:center;font-size:1.08em;color:#fbbf24;line-height:1.7;font-weight:500;}
+
+.nav-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(15,23,41,.9);backdrop-filter:blur(8px);border-top:1px solid #1e293b;z-index:100;}
+.nav-btn{padding:8px 22px;border-radius:6px;font-family:'Inter',sans-serif;font-size:1.05em;font-weight:600;cursor:pointer;transition:.2s;border:none;text-decoration:none;display:inline-block;}
+.nav-prev{background:#1e293b;color:#64748b;}.nav-prev:hover{background:#2d3a4f;color:#94a3b8;}
+.nav-next{background:#2dd4bf;color:#0f1729;}.nav-next:hover{background:#5eead4;}
+.nav-info{text-align:center;}
+.nav-count{font-size:1.15em;color:#475569;font-weight:500;display:block;}
+.nav-title{font-size:1.1em;color:#334155;margin-top:2px;}
+
+@media(max-width:700px){.slide{padding:44px 20px 68px;}.pyramid-section{flex-direction:column;}.score-grid{grid-template-columns:1fr;}.culture-grid{grid-template-columns:repeat(2,1fr);}.db-table{font-size:1.05em;}}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="prog"></div></div>
+
+<div class="slides">
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" id="s1">
+  <div class="slide-inner">
+    <div class="big-icon">🧠</div>
+    <div class="main-title">Near-Miss Intelligence<br>& <span>Threat Modeling</span></div>
+    <p class="desc">Near-misses aren't just "things that didn't happen." They're predictive intelligence. Organizations that systematically collect and analyze near-misses reduce major breaches by up to 70%.</p>
+  </div>
+</div>
+
+<!-- SLIDE 2: Heinrich's Triangle Deep Dive -->
+<div class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 6.1 · The Safety Pyramid</div>
+    <div class="slide-title"><span class="accent">Heinrich's Triangle</span> — Predictive Intelligence</div>
+    <div class="slide-sub">Originally from industrial safety (1931), now applied to cybersecurity. The ratio is consistent: for every catastrophic event, hundreds of warnings preceded it.</div>
+    <div class="divider"></div>
+    <div class="pyramid-section">
+      <div class="pyramid-bars">
+        <div class="pyr-bar l1"><span class="pb-num">1</span><span class="pb-label">Major Breach</span></div>
+        <div class="pyr-bar l2"><span class="pb-num">10</span><span class="pb-label">Minor Incidents</span></div>
+        <div class="pyr-bar l3"><span class="pb-num">30</span><span class="pb-label">Near-Misses</span></div>
+        <div class="pyr-bar l4"><span class="pb-num">300</span><span class="pb-label">Unsafe Behaviors</span></div>
+      </div>
+      <div class="pyramid-legend">
+        <div class="pl-item"><div class="pl-dot d1"></div><div class="pl-text"><strong>1 Major Breach</strong> — Data exposed, NPC notification, fines, lawsuits, client trust destroyed</div></div>
+        <div class="pl-item"><div class="pl-dot d2"></div><div class="pl-text"><strong>10 Minor Incidents</strong> — Contained quickly, no confirmed data loss, but resources consumed</div></div>
+        <div class="pl-item"><div class="pl-dot d3"></div><div class="pl-text"><strong>30 Near-Misses</strong> — Could have been breaches. Each one reveals a fixable vulnerability</div></div>
+        <div class="pl-item"><div class="pl-dot d4"></div><div class="pl-text"><strong>300 Unsafe Behaviors</strong> — Weak passwords, sharing shortcuts, skipping MFA. The foundation of all incidents</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: Near-Miss Risk Scoring -->
+<div class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 6.2 · Risk Scoring</div>
+    <div class="slide-title">Scoring Near-Misses: <span class="warn">How Close Was It?</span></div>
+    <div class="slide-sub">Not all near-misses are equal. Score each one on 3 factors to prioritize which vulnerabilities to fix first.</div>
+    <div class="divider"></div>
+    <div class="score-grid">
+      <div class="score-card">
+        <div class="sk-icon">💥</div>
+        <div class="sk-factor">Potential Impact</div>
+        <div class="sk-scale">
+          <div class="sk-dot low">1</div><div class="sk-dot low">2</div><div class="sk-dot med">3</div><div class="sk-dot med">4</div><div class="sk-dot high">5</div>
+        </div>
+        <div class="sk-desc">If this had become a breach, how bad would it be? 1 = minor inconvenience. 5 = hundreds of clients exposed, NPC notification required.</div>
+      </div>
+      <div class="score-card">
+        <div class="sk-icon">🎯</div>
+        <div class="sk-factor">Likelihood of Recurrence</div>
+        <div class="sk-scale">
+          <div class="sk-dot low">1</div><div class="sk-dot low">2</div><div class="sk-dot med">3</div><div class="sk-dot med">4</div><div class="sk-dot high">5</div>
+        </div>
+        <div class="sk-desc">How likely is this to happen again? 1 = freak accident. 5 = systemic issue that will definitely recur (e.g., no offboarding checklist).</div>
+      </div>
+      <div class="score-card">
+        <div class="sk-icon">🛡️</div>
+        <div class="sk-factor">Control Effectiveness</div>
+        <div class="sk-scale">
+          <div class="sk-dot high">1</div><div class="sk-dot med">2</div><div class="sk-dot med">3</div><div class="sk-dot low">4</div><div class="sk-dot low">5</div>
+        </div>
+        <div class="sk-desc">How well did existing controls work? 1 = no controls existed. 5 = controls caught it perfectly. Low scores = urgent fix needed.</div>
+      </div>
+    </div>
+    <div class="golden-rule">📊 <strong>Risk Score = Impact × Likelihood × (6 − Control)</strong> — Higher score = fix first. A near-miss scoring 5 × 5 × 5 = 125 is a ticking time bomb.</div>
+  </div>
+</div>
+
+<!-- SLIDE 4: Building a Near-Miss Database -->
+<div class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 6.3 · Near-Miss Database</div>
+    <div class="slide-title">Building a <span class="accent">Near-Miss Database</span></div>
+    <div class="slide-sub">A living document that tracks every near-miss, its root cause, and the fix applied. This becomes your firm's most valuable security asset.</div>
+    <div class="divider"></div>
+    <table class="db-table">
+      <tr><th>Date</th><th>Near-Miss</th><th>Root Cause</th><th>Risk</th><th>Fix Applied</th><th>Status</th></tr>
+      <tr>
+        <td>Apr 10</td>
+        <td>Phishing email bypassed spam filter — 3 staff received it</td>
+        <td>New BIR spoofing technique not in filter rules</td>
+        <td><span class="db-sev s-high">High</span></td>
+        <td>Updated filter rules + sent alert to all staff</td>
+        <td><span class="db-status fixed">✅ Fixed</span></td>
+      </tr>
+      <tr>
+        <td>Apr 8</td>
+        <td>Former contractor VPN access still active after 4 months</td>
+        <td>Offboarding checklist missing cloud/VPN revocation</td>
+        <td><span class="db-sev s-high">High</span></td>
+        <td>Access revoked. Checklist updated. Audit of all former staff.</td>
+        <td><span class="db-status fixed">✅ Fixed</span></td>
+      </tr>
+      <tr>
+        <td>Apr 5</td>
+        <td>Client tax return emailed to wrong address — recalled in 20 sec</td>
+        <td>No DLP rule preventing external sends of .xlsx with TINs</td>
+        <td><span class="db-sev s-med">Medium</span></td>
+        <td>DLP rule created for files containing TIN patterns</td>
+        <td><span class="db-status open">🔧 In Progress</span></td>
+      </tr>
+      <tr>
+        <td>Apr 2</td>
+        <td>Junior accountant shared payroll folder via WhatsApp</td>
+        <td>No awareness training on approved file sharing channels</td>
+        <td><span class="db-sev s-med">Medium</span></td>
+        <td>Training scheduled. WhatsApp blocked on work devices.</td>
+        <td><span class="db-status monitor">👁️ Monitoring</span></td>
+      </tr>
+      <tr>
+        <td>Mar 28</td>
+        <td>Google Drive folder set to "Anyone with link" — caught in audit</td>
+        <td>Default sharing setting was too permissive</td>
+        <td><span class="db-sev s-high">High</span></td>
+        <td>Default changed to "Restricted." All folders audited.</td>
+        <td><span class="db-status fixed">✅ Fixed</span></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- SLIDE 5: No-Blame Culture -->
+<div class="slide" id="s5">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 6.4 · Culture</div>
+    <div class="slide-title">The 5 Pillars of <span class="accent">No-Blame</span> Reporting Culture</div>
+    <div class="slide-sub">Near-miss intelligence only works if people feel safe reporting. One punishment for honest reporting destroys years of culture-building.</div>
+    <div class="divider"></div>
+    <div class="culture-grid">
+      <div class="culture-card">
+        <div class="cc-icon">🛡️</div>
+        <div class="cc-title">No Punishment</div>
+        <div class="cc-desc">Never punish employees for reporting near-misses — even if they caused it</div>
+      </div>
+      <div class="culture-card">
+        <div class="cc-icon">🏆</div>
+        <div class="cc-title">Celebrate Reports</div>
+        <div class="cc-desc">Recognize reporters publicly. "Maria's report prevented a breach" builds culture</div>
+      </div>
+      <div class="culture-card">
+        <div class="cc-icon">⚡</div>
+        <div class="cc-title">Act on Every Report</div>
+        <div class="cc-desc">If nothing changes after reporting, people stop reporting. Visible action = trust</div>
+      </div>
+      <div class="culture-card">
+        <div class="cc-icon">📢</div>
+        <div class="cc-title">Share Lessons</div>
+        <div class="cc-desc">Anonymized lessons shared org-wide. One person's near-miss protects everyone</div>
+      </div>
+      <div class="culture-card">
+        <div class="cc-icon">📋</div>
+        <div class="cc-title">Make It Easy</div>
+        <div class="cc-desc">Simple form, multiple channels — email, chat, phone, anonymous option</div>
+      </div>
+    </div>
+    <div class="golden-rule">💡 "If you see something, say something — and nothing bad will happen to you for saying it."</div>
+  </div>
+</div>
+
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn nav-prev" onclick="nav(-1)">← Back</button>
+  <div class="nav-info">
+    <span class="nav-count" id="nav-count">1 / 5</span>
+    <span class="nav-title" id="nav-title">Near-Miss Intelligence</span>
+  </div>
+  <button class="nav-btn nav-next" id="btn-next" onclick="nav(1)">Next →</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),titles=['Near-Miss Intelligence','Heinrich\'s Triangle','Risk Scoring','Near-Miss Database','No-Blame Culture'];
+let cur=0;
+function nav(d){
+  if(cur+d<0){window.location.href='slide6.html';return;}
+  if(cur+d>=slides.length){window.location.href='slide8.html';return;}
+  slides[cur].classList.remove('active');cur+=d;slides[cur].classList.add('active');
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('nav-count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('nav-title').textContent=titles[cur];
+}
+document.getElementById('prog').style.width='20%';
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')nav(1);if(e.key==='ArrowLeft')nav(-1);});
+</script>
+</body>
+</html>

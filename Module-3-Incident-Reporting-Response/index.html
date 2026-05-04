@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Reporting & Response</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f1729;color:#c9d1d9;height:100vh;overflow:hidden;}
+
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:#1c2538;z-index:100;}
+.progress-fill{height:100%;width:9%;background:linear-gradient(90deg,#2dd4bf,#3b82f6);transition:width .4s ease;border-radius:0 2px 2px 0;}
+
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:40px 40px 70px;}
+
+.s1-wrap{max-width:640px;text-align:center;display:flex;flex-direction:column;align-items:center;}
+
+.s1-screen{
+  width:100%;max-width:520px;
+  background:#0a0f1a;
+  border:1px solid #1e293b;
+  border-radius:12px;
+  padding:48px 32px 40px;
+  position:relative;
+  overflow:hidden;
+}
+.s1-screen::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.015) 2px,rgba(255,255,255,.015) 4px);
+  pointer-events:none;z-index:1;
+}
+
+.s1-text{
+  font-size:clamp(1em,2.5vw,1.25em);
+  font-weight:300;line-height:2;color:#8b949e;
+  text-align:left;position:relative;z-index:2;
+}
+.s1-text .line{display:block;opacity:0;transform:translateY(8px);transition:opacity .5s ease,transform .5s ease;}
+.s1-text .line.visible{opacity:1;transform:translateY(0);}
+.s1-text .highlight{color:#e2e8f0;font-weight:500;}
+.s1-text .accent{color:#2dd4bf;font-weight:500;}
+.s1-text .warn{color:#f97316;font-weight:500;}
+
+.s1-question{
+  font-size:clamp(1.1em,2.8vw,1.4em);
+  font-weight:600;color:#e2e8f0;margin-top:24px;
+  opacity:0;transition:opacity .6s ease;
+  position:relative;z-index:2;
+}
+.s1-question.visible{opacity:1;}
+
+.s1-glitch{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(1em,2.5vw,1.2em);
+  font-weight:300;color:#f97316;
+  opacity:0;z-index:3;pointer-events:none;
+  transition:opacity .3s ease;
+}
+.s1-glitch.visible{opacity:1;}
+
+.s1-label{
+  font-size:1em;font-weight:600;letter-spacing:2px;
+  text-transform:uppercase;color:#475569;margin-bottom:20px;
+}
+
+/* ===== THE BUTTON ===== */
+.s1-btn{
+  display:none; /* hidden until JS shows it */
+  margin-top:32px;
+  padding:16px 48px;
+  border-radius:8px;
+  border:2px solid #2dd4bf;
+  background:transparent;
+  color:#2dd4bf;
+  font-family:'Inter',sans-serif;
+  font-size:1.1em;
+  font-weight:600;
+  letter-spacing:.5px;
+  cursor:pointer;
+  z-index:10;
+  position:relative;
+}
+.s1-btn:hover{background:#2dd4bf;color:#0f1729;}
+.s1-btn:active{transform:scale(.97);}
+.s1-btn.show{display:inline-block;}
+.s1-btn.clicked{opacity:.4;pointer-events:none;}
+
+/* Flicker */
+.s1-screen.flicker{animation:screenFlicker .8s ease;}
+@keyframes screenFlicker{
+  0%{opacity:1;filter:brightness(1);}
+  10%{opacity:.4;filter:brightness(2);}
+  20%{opacity:1;filter:brightness(1);}
+  30%{opacity:.6;filter:brightness(1.5);}
+  40%{opacity:1;filter:brightness(1);}
+  50%{opacity:.3;filter:brightness(2) hue-rotate(20deg);}
+  60%{opacity:1;filter:brightness(1);}
+  70%{opacity:.7;filter:brightness(1.3);}
+  80%,100%{opacity:1;filter:brightness(1);}
+}
+
+/* Nav */
+.nav-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(15,23,41,.8);backdrop-filter:blur(8px);
+  border-top:1px solid #1e293b;z-index:100;
+}
+.nav-btn{
+  padding:10px 24px;border-radius:6px;
+  font-family:'Inter',sans-serif;font-size:1em;font-weight:600;
+  cursor:pointer;transition:.2s;border:none;text-decoration:none;display:inline-block;
+}
+.nav-prev{background:#1e293b;color:#64748b;}
+.nav-prev:hover{background:#2d3a4f;color:#94a3b8;}
+.nav-next{background:#2dd4bf;color:#0f1729;}
+.nav-next:hover{background:#5eead4;}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+.nav-btn.hidden-link{opacity:.3;pointer-events:none;}
+.nav-count{font-size:1em;color:#475569;font-weight:500;}
+
+@media(max-width:600px){
+  .slide{padding:20px;}
+  .s1-screen{padding:32px 20px 28px;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="progress"></div></div>
+
+<div class="slide" id="slide1">
+  <div class="s1-wrap">
+    <div class="s1-label">Module 3 · Incident Reporting & Response</div>
+    <div class="s1-screen" id="s1-screen">
+      <div class="s1-text" id="s1-text">
+        <span class="line" id="l1">It's a normal workday.</span>
+        <span class="line" id="l2">You click a file that <span class="highlight">looked legitimate</span>.</span>
+        <span class="line" id="l3">A few seconds later… <span class="accent">something feels off</span>.</span>
+        <span class="line" id="l4">No error. No warning. Just <span class="warn">silence</span>.</span>
+      </div>
+      <div class="s1-question" id="s1-question">What do you do next?</div>
+      <div class="s1-glitch" id="s1-glitch">⚠ something is wrong...</div>
+    </div>
+    <button class="s1-btn" id="s1-btn" type="button">Start Scenario →</button>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn nav-prev" disabled>← Back</button>
+  <span class="nav-count">1 / 11</span>
+  <a class="nav-btn nav-next hidden-link" id="nav-next" href="slide2.html">Next →</a>
+</div>
+
+<script>
+(function(){
+  var lines = ['l1','l2','l3','l4'];
+  var idx = 0;
+  var btn = document.getElementById('s1-btn');
+  var screen = document.getElementById('s1-screen');
+  var started = false;
+
+  // Reveal text lines one by one
+  function revealNext(){
+    if(idx >= lines.length){
+      // All lines shown — show question then button
+      setTimeout(function(){
+        document.getElementById('s1-question').classList.add('visible');
+        setTimeout(function(){
+          btn.classList.add('show');
+        }, 400);
+      }, 300);
+      return;
+    }
+    document.getElementById(lines[idx]).classList.add('visible');
+    idx++;
+    setTimeout(revealNext, 700);
+  }
+
+  setTimeout(revealNext, 600);
+
+  // Button click — flicker then navigate
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    if(started) return;
+    started = true;
+
+    btn.classList.add('clicked');
+    screen.classList.add('flicker');
+
+    setTimeout(function(){
+      document.getElementById('s1-glitch').classList.add('visible');
+    }, 400);
+
+    setTimeout(function(){
+      document.getElementById('nav-next').classList.remove('hidden-link');
+    }, 1000);
+
+    setTimeout(function(){
+      window.location.href = 'slide2.html';
+    }, 1800);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Sprint — City College of Calamba</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0a1628;color:#fff;min-height:100vh;overflow:hidden;}
+.screen{display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+.screen.active{display:flex;}
+
+/* START */
+#start{background:linear-gradient(180deg,#0a1628 0%,#1a3a5c 100%);text-align:center;gap:12px;}
+#start .icon{font-size:4em;animation:bob 1s ease infinite alternate;}
+@keyframes bob{from{transform:translateY(0);}to{transform:translateY(-10px);}}
+#start h1{font-family:'Press Start 2P',monospace;font-size:clamp(1em,3.5vw,1.8em);color:#f6e05e;text-shadow:0 0 20px rgba(246,224,94,.3);}
+#start .loc{color:#48bb78;font-size:.85em;font-weight:700;}
+#start .desc{color:#718096;font-size:.82em;max-width:400px;line-height:1.7;}
+#start input{width:260px;padding:12px 16px;border-radius:10px;border:2px solid #4F8EF7;background:rgba(255,255,255,.05);color:#fff;font-size:1em;font-family:inherit;outline:none;text-align:center;}
+#start input::placeholder{color:#4a5568;}
+#start input:focus{border-color:#f6e05e;}
+.btn-go{padding:12px 36px;border-radius:10px;border:none;font-family:'Press Start 2P',monospace;font-size:.7em;cursor:pointer;background:linear-gradient(135deg,#48bb78,#38a169);color:#fff;box-shadow:0 4px 20px rgba(72,187,120,.3);transition:.2s;}
+.btn-go:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(72,187,120,.5);}
+
+/* GAME */
+#game{background:#87CEEB;flex-direction:column;justify-content:flex-start;padding:0;overflow:hidden;}
+.sky{position:absolute;inset:0;background:linear-gradient(180deg,#87CEEB 0%,#b8e4f0 40%,#e8f5e9 70%);z-index:0;}
+.cloud{position:absolute;z-index:1;opacity:.8;}
+.cloud div{background:#fff;border-radius:50%;position:absolute;}
+.mountain{position:absolute;bottom:35%;left:0;right:0;z-index:1;}
+.buildings{position:absolute;bottom:28%;left:0;right:0;z-index:2;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:0 40px;}
+.bldg{border-radius:4px 4px 0 0;position:relative;}
+.bldg-label{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:6px;font-weight:700;color:rgba(255,255,255,.8);white-space:nowrap;font-family:'Inter',sans-serif;}
+.track-area{position:absolute;bottom:8%;left:0;right:0;height:18%;z-index:3;}
+.track-bg{position:absolute;inset:0;background:#d4845a;border-top:3px solid #c0784e;border-bottom:3px solid #c0784e;}
+.lane-line{position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.3);}
+.track-label{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-family:'Press Start 2P',monospace;font-size:.4em;color:#c0784e;white-space:nowrap;}
+.tree{position:absolute;z-index:2;font-size:1.8em;}
+
+/* Runner */
+.runner{position:absolute;bottom:12%;z-index:5;font-size:2.8em;filter:drop-shadow(2px 4px 6px rgba(0,0,0,.3));}
+.runner.running{animation:runCycle .35s steps(2) infinite;}
+@keyframes runCycle{0%{transform:translateY(0) scaleX(1);}50%{transform:translateY(-6px) scaleX(1.05);}100%{transform:translateY(0) scaleX(1);}}
+.runner.boost{animation:runBoost .3s ease forwards;}
+@keyframes runBoost{0%{transform:scale(1);}50%{transform:scale(1.3) translateY(-12px);}100%{transform:scale(1);}}
+.runner.slow{animation:runSlow .4s ease forwards;}
+@keyframes runSlow{0%{transform:scale(1);}50%{transform:scale(.8) translateY(4px);}100%{transform:scale(1);}}
+
+/* HUD */
+.progress-wrap{position:absolute;top:0;left:0;right:0;z-index:10;padding:8px 16px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);}
+.progress-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px;}
+.p-stat{font-family:'Press Start 2P',monospace;font-size:.45em;color:#e2e8f0;}
+.p-stat span{color:#f6e05e;}
+.p-stat.pace span{color:#48bb78;}
+.progress-track{width:100%;height:10px;background:#2d3748;border-radius:5px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#48bb78,#f6e05e);border-radius:5px;transition:width .6s ease;}
+.marker-wrap{position:relative;width:100%;height:14px;margin-top:2px;}
+.marker{position:absolute;top:0;font-size:.7em;transition:left .6s ease;}
+
+/* Question */
+/* Question - semi-transparent so runner visible behind */
+.q-overlay{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:60px 16px 16px;}
+.q-card{background:rgba(30,41,59,.92);border:2px solid #4F8EF7;border-radius:16px;padding:24px;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);backdrop-filter:blur(8px);}
+.q-num{font-family:'Press Start 2P',monospace;font-size:.5em;color:#f6e05e;margin-bottom:8px;}
+.q-text{font-size:1em;font-weight:600;color:#f1f5f9;line-height:1.6;margin-bottom:16px;}
+.q-opts{display:flex;flex-direction:column;gap:8px;}
+.q-opt{padding:12px 14px;border-radius:10px;border:2px solid rgba(255,255,255,.1);cursor:pointer;font-size:.9em;color:#e2e8f0;transition:.2s;background:transparent;font-family:inherit;text-align:left;}
+.q-opt:hover{border-color:#4F8EF7;background:rgba(79,142,247,.08);}
+.q-opt.correct{border-color:#48bb78!important;background:rgba(72,187,120,.15)!important;color:#48bb78!important;}
+.q-opt.wrong{border-color:#fc8181!important;background:rgba(252,129,129,.1)!important;color:#fca5a5!important;}
+.q-opt.locked{pointer-events:none;opacity:.7;}
+.q-feedback{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:.82em;line-height:1.6;display:none;}
+.q-feedback.show-good{display:block;background:rgba(72,187,120,.1);border:1px solid rgba(72,187,120,.3);color:#68d391;}
+.q-feedback.show-bad{display:block;background:rgba(252,129,129,.1);border:1px solid rgba(252,129,129,.3);color:#fca5a5;}
+#q-continue{margin-top:12px;width:100%;padding:10px;border-radius:8px;border:2px solid #f6e05e;background:rgba(246,224,94,.1);color:#f6e05e;font-family:'Press Start 2P',monospace;font-size:.45em;cursor:pointer;display:none;}
+#q-continue:hover{background:rgba(246,224,94,.2);}
+
+.pace-popup{position:absolute;z-index:15;font-family:'Press Start 2P',monospace;font-size:.7em;pointer-events:none;animation:pFloat .8s ease forwards;}
+.pace-popup.up{color:#48bb78;}
+.pace-popup.down{color:#fc8181;}
+@keyframes pFloat{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-40px);}}
+
+/* FINISH */
+#finish{background:radial-gradient(ellipse at center,#1a3a2a 0%,#0a1628 70%);text-align:center;gap:10px;}
+#finish .trophy{font-size:4em;animation:bob 1s ease infinite alternate;}
+#finish h1{font-family:'Press Start 2P',monospace;font-size:clamp(.8em,3vw,1.4em);color:#f6e05e;}
+#finish .fname{font-family:'Press Start 2P',monospace;font-size:clamp(.7em,2.5vw,1.1em);color:#48bb78;}
+#finish .stats{color:#a0aec0;font-size:.85em;line-height:2.2;}
+#finish .stats span{color:#f6e05e;font-weight:900;}
+
+/* Speed levels control runner leg speed */
+.speed-1 .runner.running{animation-duration:.15s!important;}
+.speed-2 .runner.running{animation-duration:.2s!important;}
+.speed-3 .runner.running{animation-duration:.25s!important;}
+.speed-4 .runner.running{animation-duration:.3s!important;}
+.speed-5 .runner.running{animation-duration:.35s!important;}
+.speed-6 .runner.running{animation-duration:.45s!important;}
+.speed-7 .runner.running{animation-duration:.55s!important;}
+.speed-8 .runner.running{animation-duration:.7s!important;}
+.speed-stop .runner{animation-play-state:paused!important;}
+
+@media(max-width:600px){
+  .runner{font-size:2em;}
+  .buildings{gap:4px;padding:0 10px;}
+  .q-card{padding:16px;}
+  .q-text{font-size:.88em;}
+}
+</style>
+</head>
+<body>
+
+<!-- START -->
+<div class="screen active" id="start">
+  <div class="icon">🏃‍♂️💨</div>
+  <h1>SECURITY SPRINT</h1>
+  <div class="loc">📍 City College of Calamba, Laguna</div>
+  <p class="desc">Race around the CCC oval track! Answer Cloud & SaaS Security questions — correct answers boost your pace, wrong answers slow you down. Finish 400m with the fastest pace!</p>
+  <input type="text" id="name-input" placeholder="Enter your name, runner..." maxlength="20" onkeydown="if(event.key==='Enter')startRace()"/>
+  <button class="btn-go" onclick="startRace()">🏁 START RACE</button>
+  <a href="index.html" style="color:#4a5568;font-size:.75em;text-decoration:none;margin-top:10px;">← Back to Lessons</a>
+</div>
+
+<!-- GAME -->
+<div class="screen" id="game">
+  <div class="sky"></div>
+  <div class="cloud" style="top:6%;left:10%;"><div style="width:60px;height:24px;top:0;left:0;"></div><div style="width:40px;height:30px;top:-10px;left:15px;"></div><div style="width:50px;height:20px;top:2px;left:30px;"></div></div>
+  <div class="cloud" style="top:12%;left:55%;"><div style="width:50px;height:20px;top:0;left:0;"></div><div style="width:35px;height:26px;top:-8px;left:12px;"></div></div>
+  <div class="cloud" style="top:4%;left:80%;"><div style="width:40px;height:16px;top:0;left:0;"></div><div style="width:30px;height:22px;top:-6px;left:10px;"></div></div>
+
+  <div class="mountain"><svg viewBox="0 0 900 120" width="100%" preserveAspectRatio="none"><path d="M0 120 L0 80 Q100 30 200 60 Q280 10 360 50 Q420 5 500 40 Q560 15 620 45 Q700 20 780 55 Q840 35 900 70 L900 120Z" fill="#2d6a4f" opacity=".6"/><path d="M0 120 L0 90 Q150 50 300 75 Q400 30 500 65 Q600 40 700 70 Q800 50 900 80 L900 120Z" fill="#40916c" opacity=".5"/></svg></div>
+
+  <div class="buildings">
+    <div class="bldg" style="width:50px;height:70px;background:#5a6e82;"><div class="bldg-label">Library</div></div>
+    <div class="bldg" style="width:80px;height:90px;background:#4a6274;border-top:4px solid #f6e05e;"><div class="bldg-label" style="color:#f6e05e;">CCC Main</div></div>
+    <div class="bldg" style="width:40px;height:55px;background:#5a7a8a;"><div class="bldg-label">IT Lab</div></div>
+    <div class="bldg" style="width:60px;height:65px;background:#4a6e7a;"><div class="bldg-label">Gym</div></div>
+    <div class="bldg" style="width:45px;height:50px;background:#5a7a6a;"><div class="bldg-label">Canteen</div></div>
+    <div class="bldg" style="width:35px;height:40px;background:#6a8a7a;"></div>
+    <div class="bldg" style="width:55px;height:60px;background:#4a6a6a;"><div class="bldg-label">Acad Bldg</div></div>
+  </div>
+
+  <div class="tree" style="bottom:26%;left:5%;">🌳</div>
+  <div class="tree" style="bottom:27%;left:15%;">🌴</div>
+  <div class="tree" style="bottom:26%;left:88%;">🌳</div>
+  <div class="tree" style="bottom:27%;left:75%;">🌴</div>
+  <div class="tree" style="bottom:26%;left:45%;">🌳</div>
+  <div class="tree" style="bottom:27%;left:60%;">🌴</div>
+  <div class="tree" style="bottom:26%;left:30%;">🌳</div>
+  <div class="tree" style="bottom:27%;left:95%;">🌴</div>
+
+  <div class="track-area">
+    <div class="track-bg"></div>
+    <div class="lane-line" style="top:25%;"></div>
+    <div class="lane-line" style="top:50%;"></div>
+    <div class="lane-line" style="top:75%;"></div>
+    <div class="track-label">🏟️ CCC OVAL TRACK — CALAMBA, LAGUNA</div>
+    <div style="position:absolute;left:2%;top:0;bottom:0;width:3px;background:repeating-linear-gradient(180deg,#fff 0,#fff 4px,#000 4px,#000 8px);z-index:4;"></div>
+    <div style="position:absolute;right:2%;top:0;bottom:0;width:3px;background:repeating-linear-gradient(180deg,#fff 0,#fff 4px,#000 4px,#000 8px);z-index:4;"></div>
+    <div style="position:absolute;left:1%;top:-14px;font-family:'Press Start 2P',monospace;font-size:.35em;color:#fff;z-index:4;">START</div>
+    <div style="position:absolute;right:1%;top:-14px;font-family:'Press Start 2P',monospace;font-size:.35em;color:#fff;z-index:4;">FINISH</div>
+  </div>
+
+  <div class="runner" id="runner" style="left:3%;">🏃</div>
+
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <div class="p-stat">👤 <span id="hud-name">—</span></div>
+      <div class="p-stat pace">⚡ Pace: <span id="hud-pace">5.0</span> min/km</div>
+      <div class="p-stat">📏 <span id="hud-dist">0</span>/400m</div>
+      <div class="p-stat">❓ <span id="hud-q">0/10</span></div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
+    <div class="marker-wrap"><div class="marker" id="marker" style="left:0%;">🏃</div></div>
+  </div>
+
+  <div class="q-overlay" id="q-overlay" style="display:none;">
+    <div class="q-card">
+      <div class="q-num" id="q-num">Question 1/10</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="q-opts" id="q-opts"></div>
+      <div class="q-feedback" id="q-feedback"></div>
+      <button id="q-continue" onclick="continueRun()">▶ KEEP RUNNING</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINISH -->
+<div class="screen" id="finish">
+  <div class="trophy">🏆🏃‍♂️</div>
+  <h1>RACE COMPLETE!</h1>
+  <div class="fname" id="finish-name">—</div>
+  <div class="stats" id="finish-stats">—</div>
+  <button class="btn-go" onclick="location.reload()" style="margin-top:12px;">🏁 RACE AGAIN</button>
+  <a href="index.html" style="color:#4a5568;font-size:.75em;text-decoration:none;margin-top:10px;">← Back to Lessons</a>
+</div>
+
+<script>
+const ALL_Q=[
+  {q:"Your firm shares a payroll spreadsheet with 'Everyone in the organization'. What's the fix?",opts:["Share with specific people only","Add a password to the file","Move it to a new folder","Set it to View Only"],a:0,e:"Always share with specific email addresses. 'Everyone' exposes sensitive data to the entire org."},
+  {q:"The #invoices Slack channel is accidentally set to public. What should you do?",opts:["Rename the channel","Delete all messages","Set financial channels to Private","Remove interns from Slack"],a:2,e:"Financial channels must always be Private. Renaming doesn't fix the misconfiguration."},
+  {q:"An accountant uploads client tax returns to personal iCloud. What's the correct action?",opts:["It's fine — iCloud is encrypted","Use only firm-approved cloud storage","Ask them to use a strong password","Download to USB instead"],a:1,e:"Shadow IT bypasses firm security controls. Only approved tools with DLP and audit trails should be used."},
+  {q:"Three accountants share one QuickBooks login. What's the security fix?",opts:["Change the shared password monthly","Use a stronger shared password","Give each user their own account + MFA","Write down who logs in when"],a:2,e:"Each user needs individual credentials + MFA for audit trail integrity."},
+  {q:"A sharing link from 2 years ago is still active. What should be done?",opts:["Hope nobody finds it","Change the file name","Set expiration dates on all sharing links","Move the file to another folder"],a:2,e:"Links without expiry remain active forever. Always set 7-30 day expiration."},
+  {q:"A team member permanently deletes 5 years of tax documents with no version history. What prevents this?",opts:["Check the recycle bin","Enable version history + 3-2-1 backup rule","Ask them to undo","Re-create from memory"],a:1,e:"Enable version history on all cloud storage. 3-2-1 rule: 3 copies, 2 media, 1 offsite."},
+  {q:"A former contractor still has SharePoint access 6 months after leaving. What's the fix?",opts:["Monitor their activity quietly","Send them an email asking to stop","Revoke all access immediately on offboarding","Change the Wi-Fi password"],a:2,e:"Access must be revoked on the last day. Quarterly access reviews catch missed accounts."},
+  {q:"Who is responsible for configuring sharing permissions in cloud platforms?",opts:["The cloud provider","The IT department only","You — the accountant using the platform","The government"],a:2,e:"Shared responsibility: providers secure infrastructure, YOU secure access, sharing, and permissions."},
+  {q:"What is the Principle of Least Privilege?",opts:["Give everyone admin access","Give users only the minimum access they need","Share everything publicly","Use the same password everywhere"],a:1,e:"Least Privilege means granting only the minimum access required to perform a specific task."},
+  {q:"A Google Drive folder with client financials is set to 'Anyone with the link'. What's the risk?",opts:["No risk — it's convenient","Anyone who gets the link can access confidential data","It only works within the company","Google protects it automatically"],a:1,e:"'Anyone with the link' means zero access control. The link can be forwarded, leaked, or found by anyone."}
+];
+
+let playerName='',questions=[],qIndex=0,distance=0,pace=5.0,correctCount=0,totalQ=10,trackLen=400;
+let runnerPos=3; // percentage across track
+let targetPos=3;
+let moveSpeed=0.04; // % per frame — changes with pace
+let animFrame=null;
+let raceActive=false;
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function startRace(){
+  const n=document.getElementById('name-input').value.trim();
+  if(!n){document.getElementById('name-input').focus();return;}
+  playerName=n;
+  questions=shuffle([...ALL_Q]).slice(0,totalQ);
+  qIndex=0;distance=0;pace=5.0;correctCount=0;runnerPos=3;targetPos=3;
+  document.getElementById('hud-name').textContent=playerName;
+  document.getElementById('runner').style.left='3%';
+  updateHUD();
+  updateMoveSpeed();
+  showScreen('game');
+  raceActive=true;
+  document.getElementById('runner').classList.add('running');
+  updateScrollSpeed();
+  startRunLoop();
+  setTimeout(()=>showQuestion(),800);
+}
+
+function updateMoveSpeed(){
+  // Faster pace = higher move speed per frame
+  // pace 2.5 → 0.12, pace 5.0 → 0.04, pace 8.0 → 0.012
+  moveSpeed = 0.16 - (pace * 0.018);
+  if(moveSpeed<0.008) moveSpeed=0.008;
+}
+
+function startRunLoop(){
+  function loop(){
+    if(!raceActive) return;
+    if(runnerPos<targetPos){
+      runnerPos=Math.min(runnerPos+moveSpeed,targetPos);
+      document.getElementById('runner').style.left=runnerPos+'%';
+    }
+    animFrame=requestAnimationFrame(loop);
+  }
+  if(animFrame) cancelAnimationFrame(animFrame);
+  loop();
+}
+
+function updateScrollSpeed(){
+  const g=document.getElementById('game');
+  // Remove all speed classes
+  for(let i=1;i<=8;i++) g.classList.remove('speed-'+i);
+  g.classList.remove('speed-stop');
+  // Map pace (2.5 fastest - 8.0 slowest) to speed level (1 fastest - 8 slowest)
+  let level;
+  if(pace<=2.8) level=1;
+  else if(pace<=3.3) level=2;
+  else if(pace<=3.8) level=3;
+  else if(pace<=4.5) level=4;
+  else if(pace<=5.2) level=5;
+  else if(pace<=6.0) level=6;
+  else if(pace<=7.0) level=7;
+  else level=8;
+  g.classList.add('speed-'+level);
+}
+
+function updateHUD(){
+  const pct=Math.min(distance/trackLen*100,100);
+  document.getElementById('hud-pace').textContent=pace.toFixed(1);
+  document.getElementById('hud-dist').textContent=Math.round(distance);
+  document.getElementById('hud-q').textContent=qIndex+'/'+totalQ;
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('marker').style.left=Math.min(pct,97)+'%';
+  // Set target position — runner will smoothly move there
+  targetPos=3+pct*0.87;
+}
+
+function showQuestion(){
+  if(qIndex>=totalQ){finishRace();return;}
+  // Runner keeps moving while question is shown
+  const q=questions[qIndex];
+  document.getElementById('q-num').textContent='Question '+(qIndex+1)+' / '+totalQ;
+  document.getElementById('q-text').textContent=q.q;
+  const oc=document.getElementById('q-opts');
+  oc.innerHTML='';
+  const so=q.opts.map((o,i)=>({text:o,idx:i}));
+  shuffle(so);
+  so.forEach(o=>{
+    const btn=document.createElement('button');
+    btn.className='q-opt';
+    btn.textContent=o.text;
+    btn.onclick=()=>answer(o.idx===q.a,btn,q);
+    oc.appendChild(btn);
+  });
+  document.getElementById('q-feedback').className='q-feedback';
+  document.getElementById('q-continue').style.display='none';
+  document.getElementById('q-overlay').style.display='flex';
+}
+
+function answer(correct,btn,q){
+  document.querySelectorAll('.q-opt').forEach(b=>{
+    b.classList.add('locked');
+    if(b.textContent===q.opts[q.a]) b.classList.add('correct');
+  });
+  const fb=document.getElementById('q-feedback');
+  if(correct){
+    correctCount++;
+    btn.classList.add('correct');
+    pace=Math.max(2.5,pace-0.3);
+    fb.className='q-feedback show-good';
+    fb.innerHTML='⚡ PACE BOOST! -0.3 min/km → Now '+pace.toFixed(1)+' min/km<br>'+q.e;
+  } else {
+    btn.classList.add('wrong');
+    pace=Math.min(8.0,pace+0.3);
+    fb.className='q-feedback show-bad';
+    fb.innerHTML='🐌 PACE DROP! +0.3 min/km → Now '+pace.toFixed(1)+' min/km<br>'+q.e;
+  }
+  qIndex++;
+  distance=Math.min(trackLen,(qIndex/totalQ)*trackLen);
+  updateMoveSpeed();
+  updateScrollSpeed();
+  updateHUD();
+  document.getElementById('q-continue').style.display='block';
+}
+
+function continueRun(){
+  document.getElementById('q-overlay').style.display='none';
+  const runner=document.getElementById('runner');
+  runner.classList.remove('boost','slow');
+  if(pace<=4.5){runner.classList.add('boost');setTimeout(()=>{runner.classList.remove('boost');runner.classList.add('running');},300);}
+  else if(pace>=5.5){runner.classList.add('slow');setTimeout(()=>{runner.classList.remove('slow');runner.classList.add('running');},400);}
+  spawnPace();
+  setTimeout(()=>{if(qIndex>=totalQ)finishRace();else showQuestion();},1200);
+}
+
+function spawnPace(){
+  const r=document.getElementById('runner'),g=document.getElementById('game');
+  const rr=r.getBoundingClientRect(),gr=g.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='pace-popup '+(pace<=5.0?'up':'down');
+  el.textContent=pace<=5.0?'⚡'+pace.toFixed(1):'🐌'+pace.toFixed(1);
+  el.style.cssText='position:absolute;left:'+(rr.left-gr.left+rr.width/2-20)+'px;top:'+(rr.top-gr.top-20)+'px;z-index:15;';
+  g.appendChild(el);
+  setTimeout(()=>el.remove(),800);
+}
+
+function finishRace(){
+  distance=trackLen;updateHUD();
+  raceActive=false;
+  if(animFrame) cancelAnimationFrame(animFrame);
+  // Move runner to finish
+  document.getElementById('runner').style.left='90%';
+  document.getElementById('runner').classList.remove('running');
+  document.getElementById('game').classList.add('speed-stop');
+  setTimeout(()=>{
+    const pct=Math.round(correctCount/totalQ*100);
+    let rank='🥉 Jogger';
+    if(pct>=90)rank='🏆 Sprint Champion';
+    else if(pct>=70)rank='🥇 Fast Runner';
+    else if(pct>=50)rank='🥈 Steady Pacer';
+    document.getElementById('finish-name').textContent='🎉 '+playerName+' — '+rank;
+    document.getElementById('finish-stats').innerHTML=
+      'Track: <span>CCC Oval — Calamba, Laguna — 400m</span><br>'+
+      'Correct: <span>'+correctCount+'/'+totalQ+'</span><br>'+
+      'Accuracy: <span>'+pct+'%</span><br>'+
+      'Final Pace: <span>'+pace.toFixed(1)+' min/km</span><br>'+
+      'Rank: <span>'+rank+'</span>';
+    showScreen('finish');
+  },800);
+}
+</script>
+</body>
+</html>

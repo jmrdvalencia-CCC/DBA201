@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 2 — Digital Forensics Awareness</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f1729;color:#c9d1d9;height:100vh;overflow:hidden;}
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:#1c2538;z-index:100;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:0 2px 2px 0;transition:width .4s ease;}
+.slides{position:relative;width:100%;height:100vh;}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:52px 48px 72px;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;}
+.slide.active{opacity:1;pointer-events:all;}
+.slide-inner{width:100%;max-width:920px;display:flex;flex-direction:column;}
+.slide-tag{font-size:.88em;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:12px;}
+.slide-title{font-size:clamp(1.6em,3.8vw,2.3em);font-weight:700;color:#e2e8f0;line-height:1.25;margin-bottom:8px;}
+.slide-title .accent{color:#2dd4bf;}.slide-title .warn{color:#f97316;}.slide-title .red{color:#ef4444;}
+.slide-sub{font-size:1.05em;color:#64748b;margin-bottom:20px;line-height:1.6;}
+.divider{width:40px;height:3px;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:2px;margin-bottom:20px;}
+
+/* Title slide */
+#s1{background:radial-gradient(ellipse at 60% 40%,#1a0f2e 0%,#0f1729 70%);}
+#s1 .slide-inner{align-items:center;text-align:center;}
+#s1 .big-icon{font-size:3.5em;margin-bottom:16px;opacity:0;animation:fadeIn .6s ease .2s forwards;}
+#s1 .main-title{font-size:clamp(2em,5vw,3em);font-weight:800;color:#f1f5f9;line-height:1.2;margin-bottom:10px;opacity:0;animation:fadeUp .6s ease .4s forwards;transform:translateY(10px);}
+#s1 .main-title span{color:#60a5fa;}
+#s1 .desc{font-size:1.1em;color:#64748b;max-width:620px;line-height:1.8;margin-bottom:20px;opacity:0;animation:fadeUp .6s ease .6s forwards;transform:translateY(10px);}
+#s1 .iso-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);border-radius:20px;padding:8px 20px;font-size:.92em;font-weight:600;color:#60a5fa;opacity:0;animation:fadeUp .6s ease .8s forwards;transform:translateY(10px);}
+@keyframes fadeIn{to{opacity:1;}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+
+/* Two-column grid */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.col-box{border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;}
+.col-box .cb-header{font-size:.95em;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.col-box .cb-item{display:flex;align-items:flex-start;gap:10px;font-size:1em;line-height:1.6;color:#94a3b8;}
+.col-box .cb-item .ci-icon{flex-shrink:0;margin-top:2px;}
+.col-box .cb-item strong{color:#e2e8f0;}
+
+/* Evidence cards */
+.ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.ev-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;}
+.ev-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:2px 2px 0 0;}
+.ev-card.vol::before{background:#ef4444;}
+.ev-card.nonvol::before{background:#2dd4bf;}
+.ev-card.doc::before{background:#f59e0b;}
+.ev-card .ec-icon{font-size:1.4em;}
+.ev-card .ec-title{font-size:1em;font-weight:700;color:#e2e8f0;}
+.ev-card .ec-desc{font-size:.92em;color:#64748b;line-height:1.5;}
+.ev-card .ec-tag{font-size:.8em;font-weight:700;padding:4px 10px;border-radius:6px;align-self:flex-start;margin-top:4px;}
+.ec-tag.vol{background:rgba(239,68,68,.1);color:#ef4444;}
+.ec-tag.nonvol{background:rgba(45,212,191,.1);color:#2dd4bf;}
+.ec-tag.doc{background:rgba(245,158,11,.1);color:#f59e0b;}
+
+/* Chain of custody */
+.chain-flow{display:flex;flex-direction:column;gap:0;align-items:center;}
+.chain-step{width:100%;max-width:600px;background:#111827;border:1px solid #1e293b;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px;}
+.chain-step .cs-num{width:36px;height:36px;border-radius:50%;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:700;color:#60a5fa;flex-shrink:0;}
+.chain-step .cs-content{flex:1;}
+.chain-step .cs-title{font-size:1.05em;font-weight:600;color:#e2e8f0;}
+.chain-step .cs-desc{font-size:.95em;color:#64748b;margin-top:3px;line-height:1.5;}
+.chain-arrow{width:2px;height:20px;background:linear-gradient(180deg,#1e293b,#60a5fa);position:relative;}
+.chain-arrow::after{content:'▼';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);font-size:.55em;color:#60a5fa;}
+
+/* Destroy vs Preserve */
+.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.dp-col{border-radius:12px;padding:18px 20px;}
+.dp-col.destroy{background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15);}
+.dp-col.preserve{background:rgba(45,212,191,.04);border:1px solid rgba(45,212,191,.15);}
+.dp-header{font-size:.95em;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.dp-col.destroy .dp-header{color:#ef4444;}
+.dp-col.preserve .dp-header{color:#2dd4bf;}
+.dp-list{display:flex;flex-direction:column;gap:6px;}
+.dp-item{display:flex;align-items:flex-start;gap:8px;font-size:1em;color:#94a3b8;line-height:1.6;}
+.dp-item .di-icon{flex-shrink:0;margin-top:1px;}
+
+/* Insight box */
+.insight-box{margin-top:14px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:10px;padding:16px 20px;font-size:1em;color:#93c5fd;line-height:1.7;text-align:center;}
+
+/* Nav */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(15,23,41,.9);backdrop-filter:blur(8px);border-top:1px solid #1e293b;z-index:100;}
+.nav-btn{padding:10px 26px;border-radius:6px;font-family:'Inter',sans-serif;font-size:1em;font-weight:600;cursor:pointer;transition:.2s;border:none;text-decoration:none;display:inline-block;}
+.nav-prev{background:#1e293b;color:#64748b;}.nav-prev:hover{background:#2d3a4f;color:#94a3b8;}
+.nav-next{background:#2dd4bf;color:#0f1729;}.nav-next:hover{background:#5eead4;}
+.nav-info{text-align:center;}
+.nav-count{font-size:.92em;color:#475569;font-weight:500;display:block;}
+.nav-title{font-size:.85em;color:#334155;margin-top:2px;}
+
+@media(max-width:640px){
+  .slide{padding:44px 20px 68px;}
+  .two-col,.dp-grid{grid-template-columns:1fr;}
+  .ev-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="prog"></div></div>
+
+<div class="slides">
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" id="s1">
+  <div class="slide-inner">
+    <div class="big-icon">🔬</div>
+    <div class="main-title">Digital Forensics<br><span>Awareness</span></div>
+    <p class="desc">When a breach happens, evidence is everything. As an accountant, you won't conduct the investigation — but you can make or break it by how you handle evidence in the first critical minutes.</p>
+    <div class="iso-badge">📄 Based on ISO/IEC 27037 — Digital Evidence Identification, Collection & Preservation</div>
+  </div>
+</div>
+
+<!-- SLIDE 2: Volatile vs Non-Volatile Evidence -->
+<div class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 2.1 · Evidence Types</div>
+    <div class="slide-title"><span class="red">Volatile</span> vs <span class="accent">Non-Volatile</span> Evidence</div>
+    <div class="slide-sub">Volatile evidence disappears when a device is powered off or restarted. This is why you should NEVER shut down your computer during an incident unless IT instructs you to.</div>
+    <div class="divider"></div>
+    <div class="two-col">
+      <div class="col-box" style="background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.15);">
+        <div class="cb-header" style="color:#ef4444;">⚡ Volatile Evidence (Disappears on Power-Off)</div>
+        <div class="cb-item"><span class="ci-icon">🧠</span><div><strong>RAM contents</strong> — active malware, decryption keys, open documents currently in memory</div></div>
+        <div class="cb-item"><span class="ci-icon">🌐</span><div><strong>Active network connections</strong> — which servers the attacker is communicating with right now</div></div>
+        <div class="cb-item"><span class="ci-icon">⚙️</span><div><strong>Running processes</strong> — malicious programs currently executing on your machine</div></div>
+        <div class="cb-item"><span class="ci-icon">📋</span><div><strong>Clipboard contents</strong> — data the attacker may have copied (passwords, account numbers)</div></div>
+        <div class="cb-item"><span class="ci-icon">🔑</span><div><strong>Logged-in sessions</strong> — active authentication tokens that prove who accessed what</div></div>
+      </div>
+      <div class="col-box" style="background:rgba(45,212,191,.04);border:1px solid rgba(45,212,191,.15);">
+        <div class="cb-header" style="color:#2dd4bf;">💾 Non-Volatile Evidence (Survives Power-Off)</div>
+        <div class="cb-item"><span class="ci-icon">📁</span><div><strong>Files on disk</strong> — documents, spreadsheets, databases stored on hard drive or SSD</div></div>
+        <div class="cb-item"><span class="ci-icon">📧</span><div><strong>Email archives</strong> — sent/received messages, attachments, headers with routing info</div></div>
+        <div class="cb-item"><span class="ci-icon">📊</span><div><strong>System logs</strong> — Windows Event Logs, application logs, security audit trails</div></div>
+        <div class="cb-item"><span class="ci-icon">🌐</span><div><strong>Browser history</strong> — URLs visited, cached pages, saved passwords, cookies</div></div>
+        <div class="cb-item"><span class="ci-icon">📱</span><div><strong>Cloud audit logs</strong> — Microsoft 365, Google Workspace, QuickBooks sign-in records</div></div>
+      </div>
+    </div>
+    <div class="insight-box">⚡ Volatile evidence is often the <strong>most valuable</strong> for investigators — it shows what the attacker was doing <em>at that exact moment</em>. Shutting down your computer destroys it permanently.</div>
+  </div>
+</div>
+
+<!-- SLIDE 3: 6 Types of Digital Evidence Accountants Encounter -->
+<div class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 2.2 · Evidence You'll Encounter</div>
+    <div class="slide-title">6 Types of Evidence <span class="accent">Accountants</span> Handle</div>
+    <div class="slide-sub">You interact with these daily. During an incident, each becomes a forensic artifact.</div>
+    <div class="divider"></div>
+    <div class="ev-grid">
+      <div class="ev-card vol">
+        <div class="ec-icon">📧</div>
+        <div class="ec-title">Phishing Emails</div>
+        <div class="ec-desc">Full email headers contain sender IP, routing path, and spoofing indicators. Save as .eml — don't just screenshot.</div>
+        <div class="ec-tag vol">Save as .eml attachment</div>
+      </div>
+      <div class="ev-card nonvol">
+        <div class="ec-icon">📊</div>
+        <div class="ec-title">Sign-In Logs</div>
+        <div class="ec-desc">Microsoft 365 / Google Workspace logs show IP addresses, locations, device types, and timestamps of every login.</div>
+        <div class="ec-tag nonvol">Screenshot + export CSV</div>
+      </div>
+      <div class="ev-card doc">
+        <div class="ec-icon">📁</div>
+        <div class="ec-title">File Version History</div>
+        <div class="ec-desc">OneDrive, SharePoint, and Google Drive track every edit. Version history shows who changed what and when.</div>
+        <div class="ec-tag doc">Do NOT edit the file</div>
+      </div>
+      <div class="ev-card vol">
+        <div class="ec-icon">💬</div>
+        <div class="ec-title">Chat Messages</div>
+        <div class="ec-desc">Teams/Slack messages can be deleted by attackers. Screenshot suspicious conversations immediately — include timestamps.</div>
+        <div class="ec-tag vol">Screenshot with timestamps</div>
+      </div>
+      <div class="ev-card nonvol">
+        <div class="ec-icon">🔔</div>
+        <div class="ec-title">Error Messages & Alerts</div>
+        <div class="ec-desc">Exact wording of error messages, security alerts, or unusual pop-ups. These help IT identify the specific attack vector.</div>
+        <div class="ec-tag nonvol">Copy exact text + screenshot</div>
+      </div>
+      <div class="ev-card doc">
+        <div class="ec-icon">📋</div>
+        <div class="ec-title">Your Own Timeline Notes</div>
+        <div class="ec-desc">A written record of what you observed, when, and what actions you took. This becomes a legal document in investigations.</div>
+        <div class="ec-tag doc">Write immediately — memory fades</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: Chain of Custody -->
+<div class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 2.3 · Chain of Custody</div>
+    <div class="slide-title">The <span class="accent">Chain of Custody</span> — Why It Matters</div>
+    <div class="slide-sub">For evidence to be admissible in legal proceedings or NPC investigations, there must be an unbroken record of who handled it and when. Breaking the chain = evidence thrown out.</div>
+    <div class="divider"></div>
+    <div class="chain-flow">
+      <div class="chain-step">
+        <div class="cs-num">1</div>
+        <div class="cs-content">
+          <div class="cs-title">You discover the evidence</div>
+          <div class="cs-desc">Note the exact date, time, and what you observed. Do NOT touch, modify, or move the evidence.</div>
+        </div>
+      </div>
+      <div class="chain-arrow"></div>
+      <div class="chain-step">
+        <div class="cs-num">2</div>
+        <div class="cs-content">
+          <div class="cs-title">You document and report</div>
+          <div class="cs-desc">Screenshot/save evidence. Record your name, the time, and exactly what you did. Report to IT Security.</div>
+        </div>
+      </div>
+      <div class="chain-arrow"></div>
+      <div class="chain-step">
+        <div class="cs-num">3</div>
+        <div class="cs-content">
+          <div class="cs-title">IT Security takes custody</div>
+          <div class="cs-desc">IT creates forensic copies (disk images) using write-blockers. Original evidence is sealed and logged.</div>
+        </div>
+      </div>
+      <div class="chain-arrow"></div>
+      <div class="chain-step">
+        <div class="cs-num">4</div>
+        <div class="cs-content">
+          <div class="cs-title">Analysis on forensic copies only</div>
+          <div class="cs-desc">Investigators work on copies — never the original. Every action is logged with timestamps and analyst names.</div>
+        </div>
+      </div>
+      <div class="chain-arrow"></div>
+      <div class="chain-step">
+        <div class="cs-num">5</div>
+        <div class="cs-content">
+          <div class="cs-title">Evidence stored securely</div>
+          <div class="cs-desc">Originals stored in tamper-evident bags or encrypted vaults. Access log maintained for legal admissibility.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: What Destroys vs Preserves Evidence -->
+<div class="slide" id="s5">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 2.4 · Critical Actions</div>
+    <div class="slide-title">What <span class="red">Destroys</span> vs <span class="accent">Preserves</span> Evidence</div>
+    <div class="slide-sub">Your actions in the first 5 minutes determine whether investigators can trace the attacker — or not.</div>
+    <div class="divider"></div>
+    <div class="dp-grid">
+      <div class="dp-col destroy">
+        <div class="dp-header">🚫 Actions That DESTROY Evidence</div>
+        <div class="dp-list">
+          <div class="dp-item"><span class="di-icon">❌</span> Shutting down or restarting the computer — kills volatile memory</div>
+          <div class="dp-item"><span class="di-icon">❌</span> Deleting suspicious emails — removes headers, routing data, attachments</div>
+          <div class="dp-item"><span class="di-icon">❌</span> Clearing browser history — erases URLs, cookies, cached credentials</div>
+          <div class="dp-item"><span class="di-icon">❌</span> Running antivirus scans yourself — may quarantine evidence before IT can image it</div>
+          <div class="dp-item"><span class="di-icon">❌</span> Editing or opening suspicious files — changes metadata (last accessed timestamp)</div>
+          <div class="dp-item"><span class="di-icon">❌</span> Forwarding phishing emails normally — strips original headers</div>
+          <div class="dp-item"><span class="di-icon">❌</span> Disconnecting from network without instruction — may alert the attacker</div>
+        </div>
+      </div>
+      <div class="dp-col preserve">
+        <div class="dp-header">✅ Actions That PRESERVE Evidence</div>
+        <div class="dp-list">
+          <div class="dp-item"><span class="di-icon">✅</span> Leave the computer ON and untouched — volatile evidence stays intact</div>
+          <div class="dp-item"><span class="di-icon">✅</span> Save suspicious emails as .eml files — preserves full headers</div>
+          <div class="dp-item"><span class="di-icon">✅</span> Screenshot everything with timestamps — visual proof of what you saw</div>
+          <div class="dp-item"><span class="di-icon">✅</span> Write down exact error messages — word-for-word, including codes</div>
+          <div class="dp-item"><span class="di-icon">✅</span> Note the exact time you noticed the anomaly — incident timeline starts here</div>
+          <div class="dp-item"><span class="di-icon">✅</span> Lock your screen (Win+L) — prevents further tampering without powering off</div>
+          <div class="dp-item"><span class="di-icon">✅</span> Call IT Security verbally — don't use the potentially compromised device to report</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight-box">🔬 In the 2023 Verizon DBIR, <strong>37% of breach investigations were hampered</strong> by evidence destruction — most of it accidental, by well-meaning employees trying to "fix" the problem themselves.</div>
+  </div>
+</div>
+
+</div>
+
+<!-- Nav -->
+<div class="nav-bar">
+  <button class="nav-btn nav-prev" onclick="nav(-1)">← Back</button>
+  <div class="nav-info">
+    <span class="nav-count" id="nav-count">1 / 5</span>
+    <span class="nav-title" id="nav-title">Digital Forensics Awareness</span>
+  </div>
+  <button class="nav-btn nav-next" id="btn-next" onclick="nav(1)">Next →</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),titles=['Digital Forensics Awareness','Volatile vs Non-Volatile Evidence','6 Evidence Types','Chain of Custody','Destroy vs Preserve'];
+let cur=0;
+function nav(d){
+  if(cur+d<0){window.location.href='slide2.html';return;}
+  if(cur+d>=slides.length){window.location.href='slide4.html';return;}
+  slides[cur].classList.remove('active');cur+=d;slides[cur].classList.add('active');
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('nav-count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('nav-title').textContent=titles[cur];
+}
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' ')nav(1);if(e.key==='ArrowLeft')nav(-1);});
+document.getElementById('prog').style.width='20%';
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')nav(1);if(e.key==='ArrowLeft')nav(-1);});
+</script>
+</body>
+</html>

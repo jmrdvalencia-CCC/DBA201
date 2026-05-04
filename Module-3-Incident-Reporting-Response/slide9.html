@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 8 — Real-World Scenarios</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f1729;color:#c9d1d9;height:100vh;overflow:hidden;}
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:#1c2538;z-index:100;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:0 2px 2px 0;transition:width .4s ease;}
+.slides{position:relative;width:100%;height:100vh;}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:52px 48px 72px;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;}
+.slide.active{opacity:1;pointer-events:all;}
+.slide-inner{width:100%;max-width:900px;display:flex;flex-direction:column;}
+.slide-tag{font-size:1.08em;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:12px;}
+.slide-title{font-size:clamp(1.6em,3.8vw,2.3em);font-weight:700;color:#e2e8f0;line-height:1.25;margin-bottom:6px;}
+.slide-title .accent{color:#2dd4bf;}.slide-title .warn{color:#f97316;}.slide-title .danger{color:#ef4444;}
+.slide-sub{font-size:1.08em;color:#64748b;margin-bottom:20px;line-height:1.6;}
+.divider{width:40px;height:3px;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:2px;margin-bottom:20px;}
+
+/* Title slide */
+#s1{background:radial-gradient(ellipse at 70% 30%,#201020 0%,#0f1729 70%);}
+#s1 .slide-inner{align-items:center;text-align:center;}
+#s1 .big-icon{font-size:3.5em;margin-bottom:16px;opacity:0;animation:fadeIn .6s ease .2s forwards;}
+#s1 .main-title{font-size:clamp(2em,5vw,3em);font-weight:800;color:#f1f5f9;line-height:1.2;margin-bottom:10px;opacity:0;animation:fadeUp .6s ease .4s forwards;transform:translateY(10px);}
+#s1 .main-title span{color:#f97316;}
+#s1 .desc{font-size:1.12em;color:#64748b;max-width:640px;line-height:1.8;opacity:0;animation:fadeUp .6s ease .6s forwards;transform:translateY(10px);}
+#s1 .scenario-pills{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:20px;opacity:0;animation:fadeUp .6s ease .8s forwards;transform:translateY(10px);}
+#s1 .sc-pill{padding:8px 16px;border-radius:8px;font-size:1.15em;font-weight:600;border:1px solid;}
+#s1 .sc-pill.a{background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2);color:#ef4444;}
+#s1 .sc-pill.b{background:rgba(45,212,191,.06);border-color:rgba(45,212,191,.2);color:#2dd4bf;}
+#s1 .sc-pill.c{background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.2);color:#f97316;}
+@keyframes fadeIn{to{opacity:1;}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+
+/* Scenario box */
+.scenario-box{background:#0a0f1a;border:1px solid #1e293b;border-radius:12px;padding:20px 24px;margin-bottom:16px;position:relative;overflow:hidden;}
+.scenario-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:2px 2px 0 0;}
+.scenario-box.red::before{background:#ef4444;}
+.scenario-box.green::before{background:#2dd4bf;}
+.scenario-box.orange::before{background:#f97316;}
+.scenario-label{font-size:1.08em;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.scenario-box.red .scenario-label{color:#ef4444;}
+.scenario-box.green .scenario-label{color:#2dd4bf;}
+.scenario-box.orange .scenario-label{color:#f97316;}
+.scenario-text{font-size:1.08em;color:#94a3b8;line-height:1.8;font-style:italic;}
+
+/* Response sections */
+.response-section{margin-bottom:12px;}
+.resp-header{font-size:1em;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#2dd4bf;margin-bottom:8px;}
+.resp-header.firm{color:#60a5fa;}
+.resp-header.signs{color:#f59e0b;}
+.resp-steps{display:flex;flex-direction:column;gap:6px;}
+.resp-step{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px;}
+.resp-num{width:22px;height:22px;border-radius:50%;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);display:flex;align-items:center;justify-content:center;font-size:1em;font-weight:700;color:#2dd4bf;flex-shrink:0;margin-top:1px;}
+.resp-num.blue{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);color:#60a5fa;}
+.resp-num.yellow{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.2);color:#f59e0b;}
+.resp-text{font-size:1.02em;color:#94a3b8;line-height:1.5;}
+.resp-text strong{color:#e2e8f0;}
+
+/* Near-miss why box */
+.why-box{background:rgba(45,212,191,.04);border:1px solid rgba(45,212,191,.15);border-radius:10px;padding:14px 18px;margin-bottom:12px;}
+.why-title{font-size:1em;font-weight:700;color:#2dd4bf;margin-bottom:8px;}
+.why-list{font-size:1.02em;color:#94a3b8;line-height:1.8;}
+
+/* Nav */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(15,23,41,.9);backdrop-filter:blur(8px);border-top:1px solid #1e293b;z-index:100;}
+.nav-btn{padding:8px 22px;border-radius:6px;font-family:'Inter',sans-serif;font-size:1.05em;font-weight:600;cursor:pointer;transition:.2s;border:none;text-decoration:none;display:inline-block;}
+.nav-prev{background:#1e293b;color:#64748b;}.nav-prev:hover{background:#2d3a4f;color:#94a3b8;}
+.nav-next{background:#2dd4bf;color:#0f1729;}.nav-next:hover{background:#5eead4;}
+.nav-info{text-align:center;}
+.nav-count{font-size:1.15em;color:#475569;font-weight:500;display:block;}
+.nav-title{font-size:1.1em;color:#334155;margin-top:2px;}
+
+@media(max-width:640px){.slide{padding:44px 20px 68px;}}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="prog"></div></div>
+
+<div class="slides">
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" id="s1">
+  <div class="slide-inner">
+    <div class="big-icon">🎯</div>
+    <div class="main-title">Real-World<br><span>Scenarios</span></div>
+    <p class="desc">Three scenarios that could happen to any accounting firm. Each one tests a different aspect of what you've learned — phishing, near-misses, and business email compromise.</p>
+    <div class="scenario-pills">
+      <div class="sc-pill a">🎣 Phishing Attack</div>
+      <div class="sc-pill b">🛡️ Near-Miss</div>
+      <div class="sc-pill c">💸 BEC Fraud</div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: Scenario A — The Phishing Tax Season -->
+<div class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="slide-tag">Scenario A · Phishing Attack</div>
+    <div class="slide-title">The <span class="danger">Phishing</span> Tax Season</div>
+    <div class="divider"></div>
+    <div class="scenario-box red">
+      <div class="scenario-label">📖 The Situation</div>
+      <div class="scenario-text">It's April 14. Maria, a junior accountant, receives an email that appears to be from the BIR: "Your firm's eFPS filing has an error. Click here to correct it immediately." The email looks legitimate — BIR logo, correct formatting, urgent tone. Maria clicks the link and enters her eFPS credentials on what turns out to be a fake site.</div>
+    </div>
+    <div class="response-section">
+      <div class="resp-header">What should Maria do NOW?</div>
+      <div class="resp-steps">
+        <div class="resp-step"><div class="resp-num">1</div><div class="resp-text"><strong>STOP</strong> — close the browser immediately</div></div>
+        <div class="resp-step"><div class="resp-num">2</div><div class="resp-text"><strong>DOCUMENT</strong> — screenshot the email, note the URL, record the time</div></div>
+        <div class="resp-step"><div class="resp-num">3</div><div class="resp-text"><strong>REPORT</strong> — call IT Security immediately, notify her supervisor</div></div>
+        <div class="resp-step"><div class="resp-num">4</div><div class="resp-text"><strong>CHANGE</strong> — change her eFPS password from a different, secure device</div></div>
+        <div class="resp-step"><div class="resp-num">5</div><div class="resp-text"><strong>PRESERVE</strong> — do NOT delete the phishing email</div></div>
+      </div>
+    </div>
+    <div class="response-section">
+      <div class="resp-header firm">What should the firm do?</div>
+      <div class="resp-steps">
+        <div class="resp-step"><div class="resp-num blue">1</div><div class="resp-text">Reset all eFPS credentials across the firm</div></div>
+        <div class="resp-step"><div class="resp-num blue">2</div><div class="resp-text">Check for unauthorized filings made with stolen credentials</div></div>
+        <div class="resp-step"><div class="resp-num blue">3</div><div class="resp-text">Notify BIR if fraudulent returns were filed</div></div>
+        <div class="resp-step"><div class="resp-num blue">4</div><div class="resp-text">Notify NPC if client data was accessed (within 72 hours)</div></div>
+        <div class="resp-step"><div class="resp-num blue">5</div><div class="resp-text">Conduct post-incident review and reinforce phishing training</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: Scenario B — The Near-Miss That Saved the Firm -->
+<div class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="slide-tag">Scenario B · Near-Miss</div>
+    <div class="slide-title">The Near-Miss That <span class="accent">Saved the Firm</span></div>
+    <div class="divider"></div>
+    <div class="scenario-box green">
+      <div class="scenario-label">📖 The Situation</div>
+      <div class="scenario-text">During a routine quarterly access review, the IT team discovers that a freelance bookkeeper who left 4 months ago still has full access to the firm's SharePoint and QuickBooks Online. No unauthorized access was detected in the logs.</div>
+    </div>
+    <div class="why-box">
+      <div class="why-title">🛡️ Why report this near-miss?</div>
+      <div class="why-list">
+        <strong>1.</strong> The offboarding checklist has a gap — it didn't include cloud platform access revocation<br>
+        <strong>2.</strong> The firm was lucky — the freelancer didn't access anything, but they could have<br>
+        <strong>3.</strong> Fixing this now prevents a future breach when the next contractor leaves<br>
+        <strong>4.</strong> It demonstrates the value of quarterly access reviews
+      </div>
+    </div>
+    <div class="response-section">
+      <div class="resp-header">Action Items</div>
+      <div class="resp-steps">
+        <div class="resp-step"><div class="resp-num">1</div><div class="resp-text">Revoke the freelancer's access <strong>immediately</strong></div></div>
+        <div class="resp-step"><div class="resp-num">2</div><div class="resp-text">Audit ALL former contractor/employee accounts across all platforms</div></div>
+        <div class="resp-step"><div class="resp-num">3</div><div class="resp-text">Update the offboarding checklist to include all cloud platforms</div></div>
+        <div class="resp-step"><div class="resp-num">4</div><div class="resp-text">Implement automated access expiration for contractor accounts</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: Scenario C — The Redirected Payment -->
+<div class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="slide-tag">Scenario C · Business Email Compromise</div>
+    <div class="slide-title">The <span class="warn">Redirected Payment</span></div>
+    <div class="divider"></div>
+    <div class="scenario-box orange">
+      <div class="scenario-label">📖 The Situation</div>
+      <div class="scenario-text">The firm's accounts payable clerk receives an email from what appears to be a long-time vendor: "We've changed our bank account. Please update our payment details and send this month's payment to the new account." The email comes from an address that's one letter different from the real vendor's email.</div>
+    </div>
+    <div class="response-section">
+      <div class="resp-header signs">⚠️ Warning Signs</div>
+      <div class="resp-steps">
+        <div class="resp-step"><div class="resp-num yellow">!</div><div class="resp-text">Bank account change request via email — classic social engineering</div></div>
+        <div class="resp-step"><div class="resp-num yellow">!</div><div class="resp-text">Email address is slightly different — typosquatting (e.g., vendor<strong>s</strong>.com vs vendor.com)</div></div>
+        <div class="resp-step"><div class="resp-num yellow">!</div><div class="resp-text">Urgency — "send this month's payment" creates pressure to act fast</div></div>
+        <div class="resp-step"><div class="resp-num yellow">!</div><div class="resp-text">No phone verification requested — legitimate vendors expect you to verify</div></div>
+      </div>
+    </div>
+    <div class="response-section">
+      <div class="resp-header">✅ Correct Response</div>
+      <div class="resp-steps">
+        <div class="resp-step"><div class="resp-num">1</div><div class="resp-text"><strong>DO NOT</strong> update the bank details</div></div>
+        <div class="resp-step"><div class="resp-num">2</div><div class="resp-text"><strong>REPORT</strong> to supervisor and IT Security immediately</div></div>
+        <div class="resp-step"><div class="resp-num">3</div><div class="resp-text"><strong>VERIFY</strong> by calling the vendor at their known phone number (not the one in the email)</div></div>
+        <div class="resp-step"><div class="resp-num">4</div><div class="resp-text"><strong>DOCUMENT</strong> the email as evidence of a BEC attempt</div></div>
+        <div class="resp-step"><div class="resp-num">5</div><div class="resp-text"><strong>REPORT</strong> as a near-miss even if no payment was sent</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Nav -->
+<div class="nav-bar">
+  <button class="nav-btn nav-prev" onclick="nav(-1)">← Back</button>
+  <div class="nav-info">
+    <span class="nav-count" id="nav-count">1 / 4</span>
+    <span class="nav-title" id="nav-title">Real-World Scenarios</span>
+  </div>
+  <button class="nav-btn nav-next" id="btn-next" onclick="nav(1)">Next →</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),titles=['Real-World Scenarios','Scenario A: Phishing','Scenario B: Near-Miss','Scenario C: BEC Fraud'];
+let cur=0;
+function nav(d){
+  if(cur+d<0){window.location.href='slide8.html';return;}
+  if(cur+d>=slides.length){window.location.href='slide10.html';return;}
+  slides[cur].classList.remove('active');cur+=d;slides[cur].classList.add('active');
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('nav-count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('nav-title').textContent=titles[cur];
+}
+document.getElementById('prog').style.width='25%';
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' ')nav(1);if(e.key==='ArrowLeft')nav(-1);});
+</script>
+</body>
+</html>

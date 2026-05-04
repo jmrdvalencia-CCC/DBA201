@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3 — Summary & Glossary</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f1729;color:#c9d1d9;height:100vh;overflow:hidden;}
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:#1c2538;z-index:100;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:0 2px 2px 0;transition:width .4s ease;}
+.slides{position:relative;width:100%;height:100vh;}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:52px 48px 72px;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;}
+.slide.active{opacity:1;pointer-events:all;}
+.slide-inner{width:100%;max-width:920px;display:flex;flex-direction:column;}
+.slide-tag{font-size:1.08em;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:12px;}
+.slide-title{font-size:clamp(1.6em,3.8vw,2.3em);font-weight:700;color:#e2e8f0;line-height:1.25;margin-bottom:6px;}
+.slide-title .accent{color:#2dd4bf;}.slide-title .warn{color:#f97316;}
+.slide-sub{font-size:1.08em;color:#64748b;margin-bottom:20px;line-height:1.6;}
+.divider{width:40px;height:3px;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:2px;margin-bottom:20px;}
+
+/* Title slide */
+#s1{background:radial-gradient(ellipse at 50% 50%,#0f2040 0%,#0f1729 70%);}
+#s1 .slide-inner{align-items:center;text-align:center;}
+#s1 .big-icon{font-size:3.5em;margin-bottom:16px;opacity:0;animation:fadeIn .6s ease .2s forwards;}
+#s1 .main-title{font-size:clamp(2em,5vw,3em);font-weight:800;color:#f1f5f9;line-height:1.2;margin-bottom:10px;opacity:0;animation:fadeUp .6s ease .4s forwards;transform:translateY(10px);}
+#s1 .main-title span{color:#2dd4bf;}
+#s1 .desc{font-size:1.12em;color:#64748b;max-width:640px;line-height:1.8;opacity:0;animation:fadeUp .6s ease .6s forwards;transform:translateY(10px);}
+@keyframes fadeIn{to{opacity:1;}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+
+/* Summary grid */
+.sum-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.sum-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;}
+.sum-icon{font-size:1.3em;flex-shrink:0;margin-top:1px;}
+.sum-content{flex:1;}
+.sum-topic{font-size:1em;font-weight:700;color:#2dd4bf;margin-bottom:2px;}
+.sum-takeaway{font-size:1em;color:#94a3b8;line-height:1.6;}
+
+/* Glossary */
+.gloss-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.gloss-item{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px 14px;}
+.gloss-term{font-size:1em;font-weight:700;color:#2dd4bf;margin-bottom:2px;}
+.gloss-def{font-size:1.12em;color:#64748b;line-height:1.5;}
+
+/* References */
+.ref-list{display:flex;flex-direction:column;gap:6px;}
+.ref-item{background:#111827;border:1px solid #1e293b;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;}
+.ref-num{width:22px;height:22px;border-radius:50%;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:1em;font-weight:700;color:#60a5fa;flex-shrink:0;}
+.ref-text{font-size:1.15em;color:#94a3b8;line-height:1.4;}
+.ref-text em{color:#64748b;font-style:normal;}
+
+/* End card */
+#s5 .slide-inner{align-items:center;text-align:center;}
+#s5{background:radial-gradient(ellipse at 50% 50%,#0f2a20 0%,#0f1729 70%);}
+.end-icon{font-size:4em;margin-bottom:20px;}
+.end-title{font-size:clamp(1.8em,4.5vw,2.6em);font-weight:800;color:#f1f5f9;line-height:1.3;margin-bottom:12px;}
+.end-title span{color:#2dd4bf;}
+.end-sub{font-size:1.15em;color:#64748b;max-width:480px;line-height:1.8;margin-bottom:24px;}
+.end-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.2);border-radius:20px;padding:8px 20px;font-size:1em;font-weight:600;color:#2dd4bf;}
+.end-meta{margin-top:20px;font-size:1.12em;color:#334155;line-height:1.8;}
+
+/* Nav */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(15,23,41,.9);backdrop-filter:blur(8px);border-top:1px solid #1e293b;z-index:100;}
+.nav-btn{padding:8px 22px;border-radius:6px;font-family:'Inter',sans-serif;font-size:1.05em;font-weight:600;cursor:pointer;transition:.2s;border:none;text-decoration:none;display:inline-block;}
+.nav-prev{background:#1e293b;color:#64748b;}.nav-prev:hover{background:#2d3a4f;color:#94a3b8;}
+.nav-next{background:#2dd4bf;color:#0f1729;}.nav-next:hover{background:#5eead4;}
+.nav-btn:disabled{opacity:.3;cursor:not-allowed;}
+.nav-info{text-align:center;}
+.nav-count{font-size:1.15em;color:#475569;font-weight:500;display:block;}
+.nav-title{font-size:1.1em;color:#334155;margin-top:2px;}
+
+@media(max-width:640px){
+  .slide{padding:44px 20px 68px;}
+  .sum-grid{grid-template-columns:1fr;}
+  .gloss-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="prog"></div></div>
+
+<div class="slides">
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" id="s1">
+  <div class="slide-inner">
+    <div class="big-icon">📚</div>
+    <div class="main-title">Module <span>Summary</span><br>& Key Terms</div>
+    <p class="desc">Everything you've learned in Module 3 — condensed into key takeaways, essential terms, and references for further study.</p>
+  </div>
+</div>
+
+<!-- SLIDE 2: Module Summary -->
+<div class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 9 · Module Summary</div>
+    <div class="slide-title">Key <span class="accent">Takeaways</span></div>
+    <div class="divider"></div>
+    <div class="sum-grid">
+      <div class="sum-card">
+        <div class="sum-icon">🔴</div>
+        <div class="sum-content">
+          <div class="sum-topic">Data Breach</div>
+          <div class="sum-takeaway">Unauthorized access to sensitive data — accountants are prime targets due to the high-value financial data they handle daily.</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🚨</div>
+        <div class="sum-content">
+          <div class="sum-topic">12 Warning Signs</div>
+          <div class="sum-takeaway">Account anomalies, file changes, client reports, unexpected transactions — spotting just one and reporting it can prevent a full-scale breach.</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🛡️</div>
+        <div class="sum-content">
+          <div class="sum-topic">6-Phase Response</div>
+          <div class="sum-takeaway">Prepare → Identify → Contain → Eradicate → Recover → Lessons Learned. You are most critical in Phase 2 (Identify).</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">📢</div>
+        <div class="sum-content">
+          <div class="sum-topic">Your #1 Job</div>
+          <div class="sum-takeaway">REPORT immediately — don't wait, don't investigate, don't try to fix it yourself. Let the experts handle it.</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🟢</div>
+        <div class="sum-content">
+          <div class="sum-topic">Near-Misses</div>
+          <div class="sum-takeaway">Early warning signals — reporting them PREVENTS major breaches. They are your most valuable security intelligence.</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🤝</div>
+        <div class="sum-content">
+          <div class="sum-topic">No-Blame Culture</div>
+          <div class="sum-takeaway">Reporting is celebrated, not punished. If you see something, say something — and nothing bad will happen to you for saying it.</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">⚖️</div>
+        <div class="sum-content">
+          <div class="sum-topic">Philippine Law</div>
+          <div class="sum-takeaway">NPC notification within 72 hours. Fines up to ₱5M. Personal CPA liability under PICPA standards.</div>
+        </div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon">🔄</div>
+        <div class="sum-content">
+          <div class="sum-topic">Recovery</div>
+          <div class="sum-takeaway">Verify passwords, MFA, file integrity, sharing permissions, and email forwarding rules after every incident.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: Key Terms Glossary -->
+<div class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 10 · Glossary</div>
+    <div class="slide-title">Key Terms <span class="accent">Glossary</span></div>
+    <div class="divider"></div>
+    <div class="gloss-grid">
+      <div class="gloss-item">
+        <div class="gloss-term">Data Breach</div>
+        <div class="gloss-def">Unauthorized access to or disclosure of sensitive data</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Security Incident</div>
+        <div class="gloss-def">Any event threatening confidentiality, integrity, or availability of data</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Near-Miss</div>
+        <div class="gloss-def">Event that could have been a breach but was prevented or didn't materialize</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Incident Response Plan (IRP)</div>
+        <div class="gloss-def">Documented procedures for handling security incidents</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Containment</div>
+        <div class="gloss-def">Actions to stop a breach from spreading further</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Eradication</div>
+        <div class="gloss-def">Removing the root cause of the breach (malware, unauthorized access)</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">DPO</div>
+        <div class="gloss-def">Data Protection Officer — responsible for privacy compliance</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">NPC</div>
+        <div class="gloss-def">National Privacy Commission — Philippine data privacy regulator</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">BEC</div>
+        <div class="gloss-def">Business Email Compromise — fraud via impersonated email</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Forensic Evidence</div>
+        <div class="gloss-def">Digital artifacts preserved for investigation (logs, emails, files)</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Heinrich's Triangle</div>
+        <div class="gloss-def">Safety model showing the ratio of near-misses to major incidents</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">RA 10173</div>
+        <div class="gloss-def">Data Privacy Act of 2012 — Philippine data protection law</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: References -->
+<div class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="slide-tag">References</div>
+    <div class="slide-title"><span class="accent">References</span> & Further Reading</div>
+    <div class="divider"></div>
+    <div class="ref-list">
+      <div class="ref-item"><div class="ref-num">1</div><div class="ref-text">NIST SP 800-61 Rev. 2 — <em>Computer Security Incident Handling Guide</em></div></div>
+      <div class="ref-item"><div class="ref-num">2</div><div class="ref-text">NIST Cybersecurity Framework 2.0 — <em>Respond & Recover Functions</em></div></div>
+      <div class="ref-item"><div class="ref-num">3</div><div class="ref-text">Republic Act No. 10173 — <em>Data Privacy Act of 2012</em></div></div>
+      <div class="ref-item"><div class="ref-num">4</div><div class="ref-text">NPC Circular 16-03 — <em>Personal Data Breach Management</em></div></div>
+      <div class="ref-item"><div class="ref-num">5</div><div class="ref-text">Republic Act No. 10175 — <em>Cybercrime Prevention Act of 2012</em></div></div>
+      <div class="ref-item"><div class="ref-num">6</div><div class="ref-text">Verizon. (2023). <em>Data Breach Investigations Report (DBIR)</em></div></div>
+      <div class="ref-item"><div class="ref-num">7</div><div class="ref-text">SANS Institute. (2023). <em>Incident Handler's Handbook</em></div></div>
+      <div class="ref-item"><div class="ref-num">8</div><div class="ref-text">ISO/IEC 27035 — <em>Information Security Incident Management</em></div></div>
+      <div class="ref-item"><div class="ref-num">9</div><div class="ref-text">PICPA Code of Ethics for Professional Accountants</div></div>
+      <div class="ref-item"><div class="ref-num">10</div><div class="ref-text">BSP Circular No. 982 — <em>Enhanced Guidelines on IT Risk Management</em></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: End Card -->
+<div class="slide" id="s5">
+  <div class="slide-inner">
+    <div class="end-icon">🎓</div>
+    <div class="end-title">Module 3 <span>Complete</span></div>
+    <div class="end-sub">You now know how to identify, report, and support response to data breaches and near-misses. Remember: your #1 job is to report. Everything else follows from that.</div>
+    <div class="end-badge">✅ Incident Reporting & Response — Module Complete</div>
+    <div class="end-meta">
+      Module 3 of 3 · Data Security for Accounting Students<br>
+      DBA201 — SY 2025–2026, 2nd Semester<br>
+      Online Modality · 90–120 minutes
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Nav -->
+<div class="nav-bar">
+  <button class="nav-btn nav-prev" onclick="nav(-1)">← Back</button>
+  <div class="nav-info">
+    <span class="nav-count" id="nav-count">1 / 5</span>
+    <span class="nav-title" id="nav-title">Summary & Glossary</span>
+  </div>
+  <button class="nav-btn nav-next" id="btn-next" onclick="nav(1)">Next →</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),titles=['Summary & Glossary','Key Takeaways','Key Terms Glossary','References','Module Complete'];
+let cur=0;
+function nav(d){
+  if(cur+d<0){window.location.href='slide9.html';return;}
+  if(cur+d>=slides.length)return;
+  slides[cur].classList.remove('active');cur+=d;slides[cur].classList.add('active');
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('nav-count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('nav-title').textContent=titles[cur];
+  document.getElementById('btn-next').disabled=cur===slides.length-1;
+}
+document.getElementById('prog').style.width='20%';
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' ')nav(1);if(e.key==='ArrowLeft')nav(-1);});
+</script>
+</body>
+</html>

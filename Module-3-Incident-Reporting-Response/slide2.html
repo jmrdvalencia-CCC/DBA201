@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Slide 2 — Immediate Reaction</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f1729;color:#c9d1d9;height:100vh;overflow:hidden;}
+
+/* Progress */
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:#1c2538;z-index:100;}
+.progress-fill{height:100%;width:18%;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:0 2px 2px 0;}
+
+/* Slide */
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:40px 40px 70px;}
+
+/* Content */
+.wrap{max-width:560px;width:100%;display:flex;flex-direction:column;align-items:center;}
+
+.tag{font-size:.9em;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:16px;}
+
+.prompt{
+  font-size:clamp(1.2em,3vw,1.6em);
+  font-weight:600;color:#e2e8f0;
+  text-align:center;margin-bottom:8px;
+  opacity:0;transform:translateY(10px);
+  animation:fadeUp .6s ease .2s forwards;
+}
+.sub{
+  font-size:.9em;color:#64748b;
+  text-align:center;margin-bottom:28px;
+  opacity:0;transform:translateY(10px);
+  animation:fadeUp .6s ease .4s forwards;
+}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+
+/* Choices */
+.choices{display:flex;flex-direction:column;gap:10px;width:100%;opacity:0;transform:translateY(10px);animation:fadeUp .6s ease .6s forwards;}
+
+.choice{
+  width:100%;padding:16px 20px;
+  border-radius:10px;
+  border:1.5px solid #1e293b;
+  background:#111827;
+  color:#c9d1d9;
+  font-family:'Inter',sans-serif;
+  font-size:.95em;font-weight:500;
+  text-align:left;cursor:pointer;
+  transition:all .25s ease;
+  display:flex;align-items:center;gap:12px;
+}
+.choice:hover{border-color:#2dd4bf;background:#0f1d2e;}
+.choice .icon{font-size:1.2em;flex-shrink:0;width:28px;text-align:center;}
+
+/* States after pick */
+.choice.picked{pointer-events:none;}
+.choice.best{border-color:#2dd4bf!important;background:rgba(45,212,191,.08)!important;color:#2dd4bf!important;}
+.choice.okay{border-color:#f59e0b!important;background:rgba(245,158,11,.06)!important;color:#f59e0b!important;}
+.choice.bad{border-color:#ef4444!important;background:rgba(239,68,68,.06)!important;color:#ef4444!important;}
+.choice.dimmed{opacity:.35;pointer-events:none;}
+
+/* Result */
+.result{
+  width:100%;margin-top:16px;
+  padding:16px 20px;border-radius:10px;
+  font-size:.88em;line-height:1.7;
+  opacity:0;transform:translateY(8px);
+  transition:opacity .4s ease,transform .4s ease;
+}
+.result.visible{opacity:1;transform:translateY(0);}
+.result.res-best{background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.2);color:#5eead4;}
+.result.res-okay{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);color:#fbbf24;}
+.result.res-bad{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+.result .label{font-weight:700;display:block;margin-bottom:4px;}
+
+/* Nav */
+.nav-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(15,23,41,.8);
+  backdrop-filter:blur(8px);
+  border-top:1px solid #1e293b;z-index:100;
+}
+.nav-btn{
+  padding:8px 20px;border-radius:6px;
+  font-family:'Inter',sans-serif;font-size:1.05em;font-weight:600;
+  cursor:pointer;transition:.2s;border:none;text-decoration:none;display:inline-block;
+}
+.nav-prev{background:#1e293b;color:#64748b;}
+.nav-prev:hover{background:#2d3a4f;color:#94a3b8;}
+.nav-next{background:#2dd4bf;color:#0f1729;}
+.nav-next:hover{background:#5eead4;}
+.nav-btn.disabled{opacity:.3;pointer-events:none;}
+.nav-count{font-size:.95em;color:#475569;font-weight:500;}
+
+@media(max-width:600px){
+  .slide{padding:20px 16px 70px;}
+  .choice{padding:14px 16px;font-size:.88em;}
+}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill"></div></div>
+
+<div class="slide">
+  <div class="wrap">
+    <div class="tag">Slide 2 · Immediate Reaction</div>
+    <div class="prompt">Be honest—what's your first move?</div>
+    <div class="sub">Something feels wrong after clicking that file. Pick one.</div>
+
+    <div class="choices" id="choices">
+      <button class="choice" data-type="bad" data-msg="Ignoring it gives the threat more time to spread. Malware can silently exfiltrate data, install backdoors, or encrypt files while you keep working. By the time you notice real damage, it may be too late to contain.&lt;br&gt;&lt;br&gt;This happens more often than you think." onclick="pick(this)">
+        <span class="icon">🤷</span> Ignore it and continue working
+      </button>
+      <button class="choice" data-type="okay" data-msg="Restarting might destroy forensic evidence stored in memory—active connections, malware traces, session logs. IT needs that data to understand what happened.&lt;br&gt;&lt;br&gt;Unless they specifically tell you to restart, leave it running." onclick="pick(this)">
+        <span class="icon">🔄</span> Restart the computer
+      </button>
+      <button class="choice" data-type="best" data-msg="This is the right call. Reporting immediately gives your IT/security team the best chance to contain the threat before it spreads. You don't need to be sure it's a breach.&lt;br&gt;&lt;br&gt;Report first. Verify later." onclick="pick(this)">
+        <span class="icon">📢</span> Report it immediately
+      </button>
+      <button class="choice" data-type="okay" data-msg="Asking a coworker costs time. They'll likely say 'report it'—which is what you should do first. Every minute of delay increases the risk.&lt;br&gt;&lt;br&gt;Go straight to IT/security. Loop in your coworker after." onclick="pick(this)">
+        <span class="icon">💬</span> Ask a coworker first
+      </button>
+    </div>
+
+    <div class="result" id="result"></div>
+  </div>
+</div>
+
+<div class="nav-bar">
+  <a class="nav-btn nav-prev" href="index.html">← Back</a>
+  <span class="nav-count">2 / 11</span>
+  <a class="nav-btn nav-next disabled" id="nav-next" href="slide3.html">Next →</a>
+</div>
+
+<script>
+const labels = {
+  bad:  '❌ Risky move.',
+  okay: '⚠️ Not the worst—but not ideal.',
+  best: '✅ This is the right call.'
+};
+const resCls = { bad:'res-bad', okay:'res-okay', best:'res-best' };
+
+function pick(btn){
+  const type = btn.dataset.type;
+  const msg = btn.dataset.msg.replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+
+  // Mark all buttons
+  document.querySelectorAll('.choice').forEach(b => {
+    b.classList.add('picked');
+    if(b !== btn) b.classList.add('dimmed');
+    b.classList.add(b.dataset.type);
+  });
+
+  // Show result
+  const res = document.getElementById('result');
+  res.className = 'result ' + resCls[type];
+  res.innerHTML = '<span class="label">' + labels[type] + '</span>' + msg;
+  setTimeout(() => res.classList.add('visible'), 50);
+
+  // Enable next
+  setTimeout(() => {
+    document.getElementById('nav-next').classList.remove('disabled');
+  }, 800);
+}
+</script>
+</body>
+</html>

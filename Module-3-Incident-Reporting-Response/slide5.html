@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Part 4 — Anatomy of a Breach Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#0f1729;color:#c9d1d9;height:100vh;overflow:hidden;}
+.progress{position:fixed;top:0;left:0;right:0;height:3px;background:#1c2538;z-index:100;}
+.progress-fill{height:100%;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:0 2px 2px 0;transition:width .4s ease;}
+.slides{position:relative;width:100%;height:100vh;}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:52px 48px 72px;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;}
+.slide.active{opacity:1;pointer-events:all;}
+.slide-inner{width:100%;max-width:920px;display:flex;flex-direction:column;}
+.slide-tag{font-size:1.08em;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#475569;margin-bottom:12px;}
+.slide-title{font-size:clamp(1.6em,3.8vw,2.3em);font-weight:700;color:#e2e8f0;line-height:1.25;margin-bottom:6px;}
+.slide-title .accent{color:#2dd4bf;}.slide-title .warn{color:#f97316;}.slide-title .red{color:#ef4444;}
+.slide-sub{font-size:1.08em;color:#64748b;margin-bottom:20px;line-height:1.6;}
+.divider{width:40px;height:3px;background:linear-gradient(90deg,#2dd4bf,#3b82f6);border-radius:2px;margin-bottom:20px;}
+
+#s1{background:radial-gradient(ellipse at 50% 30%,#1a1030 0%,#0f1729 70%);}
+#s1 .slide-inner{align-items:center;text-align:center;}
+#s1 .big-icon{font-size:3.5em;margin-bottom:16px;opacity:0;animation:fadeIn .6s ease .2s forwards;}
+#s1 .main-title{font-size:clamp(2em,5vw,3em);font-weight:800;color:#f1f5f9;line-height:1.2;margin-bottom:10px;opacity:0;animation:fadeUp .6s ease .4s forwards;transform:translateY(10px);}
+#s1 .main-title span{color:#ef4444;}
+#s1 .desc{font-size:1.12em;color:#64748b;max-width:640px;line-height:1.8;opacity:0;animation:fadeUp .6s ease .6s forwards;transform:translateY(10px);}
+@keyframes fadeIn{to{opacity:1;}}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0);}}
+
+/* Dwell time stats */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.stat-card{background:#111827;border:1px solid #1e293b;border-radius:12px;padding:18px 14px;text-align:center;display:flex;flex-direction:column;gap:4px;}
+.stat-num{font-size:clamp(1.4em,3vw,2em);font-weight:800;line-height:1;}
+.stat-num.red{color:#ef4444;}.stat-num.orange{color:#f97316;}.stat-num.yellow{color:#f59e0b;}.stat-num.teal{color:#2dd4bf;}
+.stat-label{font-size:1.08em;color:#64748b;line-height:1.4;}
+.stat-source{font-size:1em;color:#334155;margin-top:2px;}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:0;position:relative;padding-left:28px;}
+.timeline::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#ef4444,#f97316,#f59e0b,#2dd4bf);border-radius:1px;}
+.tl-item{display:flex;align-items:flex-start;gap:16px;padding:10px 0;position:relative;}
+.tl-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1em;font-weight:700;flex-shrink:0;position:absolute;left:-28px;z-index:1;}
+.tl-dot.d1{background:#1a0a0a;border:2px solid #ef4444;color:#ef4444;}
+.tl-dot.d2{background:#1a1008;border:2px solid #f97316;color:#f97316;}
+.tl-dot.d3{background:#1a1708;border:2px solid #f59e0b;color:#f59e0b;}
+.tl-dot.d4{background:#0a1a14;border:2px solid #2dd4bf;color:#2dd4bf;}
+.tl-content{flex:1;background:#111827;border:1px solid #1e293b;border-radius:10px;padding:12px 16px;}
+.tl-time{font-size:1.08em;font-weight:700;margin-bottom:2px;}
+.tl-time.t1{color:#ef4444;}.tl-time.t2{color:#f97316;}.tl-time.t3{color:#f59e0b;}.tl-time.t4{color:#2dd4bf;}
+.tl-title{font-size:1.02em;font-weight:600;color:#e2e8f0;margin-bottom:4px;}
+.tl-desc{font-size:1.15em;color:#64748b;line-height:1.6;}
+.tl-desc strong{color:#94a3b8;}
+.tl-you{font-size:1.08em;font-weight:600;color:#2dd4bf;margin-top:6px;padding:4px 10px;background:rgba(45,212,191,.08);border-radius:6px;display:inline-block;}
+
+/* Attacker lifecycle */
+.atk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.atk-card{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;}
+.atk-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.atk-card.a1::before{background:#ef4444;}.atk-card.a2::before{background:#f97316;}.atk-card.a3::before{background:#f59e0b;}
+.atk-card.a4::before{background:#a855f7;}.atk-card.a5::before{background:#3b82f6;}.atk-card.a6::before{background:#2dd4bf;}
+.atk-card .ak-icon{font-size:1.3em;}
+.atk-card .ak-phase{font-size:1.05em;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#475569;}
+.atk-card .ak-name{font-size:1em;font-weight:700;color:#e2e8f0;}
+.atk-card .ak-desc{font-size:1.1em;color:#64748b;line-height:1.5;}
+.atk-card .ak-detect{font-size:1.05em;color:#2dd4bf;font-weight:600;margin-top:4px;}
+
+.insight-box{margin-top:14px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:14px 18px;font-size:1.02em;color:#fca5a5;line-height:1.7;text-align:center;}
+
+.nav-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(15,23,41,.9);backdrop-filter:blur(8px);border-top:1px solid #1e293b;z-index:100;}
+.nav-btn{padding:8px 22px;border-radius:6px;font-family:'Inter',sans-serif;font-size:1.05em;font-weight:600;cursor:pointer;transition:.2s;border:none;text-decoration:none;display:inline-block;}
+.nav-prev{background:#1e293b;color:#64748b;}.nav-prev:hover{background:#2d3a4f;color:#94a3b8;}
+.nav-next{background:#2dd4bf;color:#0f1729;}.nav-next:hover{background:#5eead4;}
+.nav-info{text-align:center;}
+.nav-count{font-size:1.15em;color:#475569;font-weight:500;display:block;}
+.nav-title{font-size:1.1em;color:#334155;margin-top:2px;}
+
+@media(max-width:640px){.slide{padding:44px 20px 68px;}.stat-row{grid-template-columns:1fr 1fr;}.atk-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="prog"></div></div>
+
+<div class="slides">
+
+<!-- SLIDE 1: Title -->
+<div class="slide active" id="s1">
+  <div class="slide-inner">
+    <div class="big-icon">⏱️</div>
+    <div class="main-title">Anatomy of a<br><span>Breach Timeline</span></div>
+    <p class="desc">Breaches don't happen in an instant. They unfold over hours, days, or weeks. Understanding the attacker's timeline reveals why every minute of delayed reporting costs exponentially more.</p>
+  </div>
+</div>
+
+<!-- SLIDE 2: Dwell Time Statistics -->
+<div class="slide" id="s2">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 4.1 · The Numbers</div>
+    <div class="slide-title">Dwell Time — The <span class="red">Silent Window</span></div>
+    <div class="slide-sub">"Dwell time" is how long an attacker remains inside your systems before being detected. Every day they're inside, they steal more data.</div>
+    <div class="divider"></div>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num red">204</div>
+        <div class="stat-label">Average days to <strong style="color:#e2e8f0;">identify</strong> a breach</div>
+        <div class="stat-source">IBM Cost of a Data Breach 2023</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num orange">73</div>
+        <div class="stat-label">Average days to <strong style="color:#e2e8f0;">contain</strong> a breach after detection</div>
+        <div class="stat-source">IBM Cost of a Data Breach 2023</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num yellow">₱7.35M</div>
+        <div class="stat-label">Average cost of a breach in <strong style="color:#e2e8f0;">ASEAN region</strong></div>
+        <div class="stat-source">IBM Cost of a Data Breach 2023</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num teal">54%</div>
+        <div class="stat-label">Cost reduction when breach is contained in <strong style="color:#e2e8f0;">&lt;200 days</strong></div>
+        <div class="stat-source">IBM Cost of a Data Breach 2023</div>
+      </div>
+    </div>
+    <div class="insight-box">🚨 The math is simple: <strong>faster detection = less data stolen = lower cost</strong>. When you report a suspicious sign immediately instead of waiting, you could be cutting the dwell time from 204 days to 1 day — saving your firm millions.</div>
+  </div>
+</div>
+
+<!-- SLIDE 3: Hour-by-Hour Breach Timeline -->
+<div class="slide" id="s3">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 4.2 · Hour-by-Hour</div>
+    <div class="slide-title">A Breach Unfolds: <span class="warn">Hour by Hour</span></div>
+    <div class="slide-sub">A realistic timeline of a phishing-based breach at an accounting firm. Notice where YOU could have stopped it.</div>
+    <div class="divider"></div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot d1">1</div>
+        <div class="tl-content">
+          <div class="tl-time t1">Hour 0 — Initial Compromise</div>
+          <div class="tl-title">Accountant clicks phishing link disguised as BIR eFPS notice</div>
+          <div class="tl-desc">Enters credentials on fake login page. Attacker now has valid username + password. <strong>No alarm triggered</strong> — the login looks legitimate from the attacker's browser.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d1">2</div>
+        <div class="tl-content">
+          <div class="tl-time t1">Hour 1–2 — Persistence & Reconnaissance</div>
+          <div class="tl-title">Attacker sets up email forwarding rule + explores file access</div>
+          <div class="tl-desc">Creates a hidden inbox rule forwarding all emails to external address. Browses OneDrive, SharePoint, and shared mailboxes to map what data is available.</div>
+          <div class="tl-you">🔍 YOU could spot: unfamiliar inbox rules, sign-in from unusual location</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d2">3</div>
+        <div class="tl-content">
+          <div class="tl-time t2">Hour 3–12 — Privilege Escalation</div>
+          <div class="tl-title">Attacker finds shared admin credentials in a Teams chat</div>
+          <div class="tl-desc">Searches chat history for "password," "login," "admin." Finds QuickBooks admin credentials shared in a message 6 months ago. Now has access to the entire financial database.</div>
+          <div class="tl-you">🔍 YOU could spot: unexpected admin account activity, new sign-in on QuickBooks</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d3">4</div>
+        <div class="tl-content">
+          <div class="tl-time t3">Day 2–5 — Data Exfiltration</div>
+          <div class="tl-title">Attacker downloads client tax returns, payroll files, bank details</div>
+          <div class="tl-desc">Uses OneDrive sync to download 2,400 files over 3 days. Small batches to avoid triggering data loss prevention alerts. Also reads email correspondence to prepare BEC attacks.</div>
+          <div class="tl-you">🔍 YOU could spot: unusual file download activity, sharing permission changes</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot d4">5</div>
+        <div class="tl-content">
+          <div class="tl-time t4">Day 6+ — Monetization</div>
+          <div class="tl-title">Attacker sends BEC emails to clients requesting payment redirects</div>
+          <div class="tl-desc">Using knowledge from stolen emails, sends convincing payment redirect requests to 12 clients. 3 clients transfer a combined ₱4.8M to attacker's accounts before anyone notices.</div>
+          <div class="tl-you">🔍 Clients report: "Your firm asked us to change bank details"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: Attacker Lifecycle (Simplified MITRE ATT&CK) -->
+<div class="slide" id="s4">
+  <div class="slide-inner">
+    <div class="slide-tag">Part 4.3 · Attacker Lifecycle</div>
+    <div class="slide-title">The 6 Stages of an <span class="red">Attack</span></div>
+    <div class="slide-sub">Based on the MITRE ATT&CK framework — simplified for accountants. Each stage has detectable signs if you know what to look for.</div>
+    <div class="divider"></div>
+    <div class="atk-grid">
+      <div class="atk-card a1">
+        <div class="ak-icon">🎣</div>
+        <div class="ak-phase">Stage 1</div>
+        <div class="ak-name">Initial Access</div>
+        <div class="ak-desc">Phishing email, stolen credentials, exploited vulnerability. The attacker gets their first foothold.</div>
+        <div class="ak-detect">🔍 Detect: Suspicious emails, unexpected MFA prompts</div>
+      </div>
+      <div class="atk-card a2">
+        <div class="ak-icon">🔧</div>
+        <div class="ak-phase">Stage 2</div>
+        <div class="ak-name">Persistence</div>
+        <div class="ak-desc">Email forwarding rules, backdoor accounts, scheduled tasks. Ensures access survives password changes.</div>
+        <div class="ak-detect">🔍 Detect: New inbox rules, unknown admin accounts</div>
+      </div>
+      <div class="atk-card a3">
+        <div class="ak-icon">🔑</div>
+        <div class="ak-phase">Stage 3</div>
+        <div class="ak-name">Privilege Escalation</div>
+        <div class="ak-desc">Finds admin credentials, exploits misconfigurations, moves from user to admin access.</div>
+        <div class="ak-detect">🔍 Detect: Unusual admin activity, access to restricted systems</div>
+      </div>
+      <div class="atk-card a4">
+        <div class="ak-icon">🗺️</div>
+        <div class="ak-phase">Stage 4</div>
+        <div class="ak-name">Discovery & Lateral Movement</div>
+        <div class="ak-desc">Maps the network, finds valuable data, moves between systems (email → file server → accounting software).</div>
+        <div class="ak-detect">🔍 Detect: Unusual file access patterns, cross-system logins</div>
+      </div>
+      <div class="atk-card a5">
+        <div class="ak-icon">📦</div>
+        <div class="ak-phase">Stage 5</div>
+        <div class="ak-name">Data Exfiltration</div>
+        <div class="ak-desc">Downloads, copies, or transfers sensitive data out of the organization. Often done in small batches to avoid detection.</div>
+        <div class="ak-detect">🔍 Detect: Large downloads, sharing changes, sync activity</div>
+      </div>
+      <div class="atk-card a6">
+        <div class="ak-icon">💰</div>
+        <div class="ak-phase">Stage 6</div>
+        <div class="ak-name">Impact / Monetization</div>
+        <div class="ak-desc">Ransomware deployment, BEC fraud, selling stolen data on dark web, identity theft using stolen TINs.</div>
+        <div class="ak-detect">🔍 Detect: Client reports, unauthorized transactions, ransom notes</div>
+      </div>
+    </div>
+    <div class="insight-box">🛡️ The earlier in this lifecycle you detect and report, the less damage occurs. Stages 1–2 = <strong>minor incident</strong>. Stages 5–6 = <strong>catastrophic breach</strong>. Your vigilance at Stage 1 prevents Stage 6.</div>
+  </div>
+</div>
+
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn nav-prev" onclick="nav(-1)">← Back</button>
+  <div class="nav-info">
+    <span class="nav-count" id="nav-count">1 / 4</span>
+    <span class="nav-title" id="nav-title">Breach Timeline</span>
+  </div>
+  <button class="nav-btn nav-next" id="btn-next" onclick="nav(1)">Next →</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),titles=['Breach Timeline','Dwell Time Statistics','Hour-by-Hour Breakdown','Attacker Lifecycle'];
+let cur=0;
+function nav(d){
+  if(cur+d<0){window.location.href='slide4.html';return;}
+  if(cur+d>=slides.length){window.location.href='slide6.html';return;}
+  slides[cur].classList.remove('active');cur+=d;slides[cur].classList.add('active');
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('nav-count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('nav-title').textContent=titles[cur];
+}
+document.getElementById('prog').style.width='25%';
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' ')nav(1);if(e.key==='ArrowLeft')nav(-1);});
+</script>
+</body>
+</html>
